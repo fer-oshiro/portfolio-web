@@ -15,6 +15,8 @@ module.exports = (_, argv) => ({
   devServer: {
     port: 3002,
     historyApiFallback: true,
+    hot: true,
+    watchFiles: ['src/**/*'],
   },
 
   module: {
