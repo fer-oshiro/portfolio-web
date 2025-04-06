@@ -20,10 +20,10 @@ export const button = defineRecipe({
         bg: 'gray.100',
         color: 'gray.800',
         _hover: { bg: 'gray.200' },
-      }
-    }
+      },
+    },
   },
   defaultVariants: {
-    variant: 'primary'
-  }
+    variant: 'primary',
+  },
 })
