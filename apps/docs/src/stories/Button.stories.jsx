@@ -3,7 +3,6 @@ import { fn } from '@storybook/test';
 
 import { Button } from '@charmbyte/ui';
 import '@charmbyte/ui/styles.css'
-// apps/docs/.storybook/preview.ts
 
 export default {
   title: 'Example/Button',

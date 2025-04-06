@@ -3,10 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "private": true,
-
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "storybook dev -p 6006",
+    "clean": "rm -rf node_modules/.cache",
+    "dev": "npm run clean && storybook dev -p 6006",
     "build": "storybook build"
   },
   "keywords": [],
@@ -14,8 +13,8 @@
   "license": "ISC",
   "description": "",
   "devDependencies": {
-    "@charmbyte/ui": "*",
     "@charmbyte/typescript-config": "*",
+    "@charmbyte/ui": "*",
     "@chromatic-com/storybook": "^3.2.6",
     "@storybook/addon-essentials": "^8.6.12",
     "@storybook/addon-onboarding": "^8.6.12",
@@ -30,5 +29,8 @@
     "prop-types": "^15.8.1",
     "storybook": "^8.6.12",
     "vitest": "^3.1.1"
+  },
+  "dependencies": {
+    "polished": "^4.3.1"
   }
 }

@@ -1,4 +1,5 @@
 import { defineConfig } from "@pandacss/dev";
+import { colors } from "./src/tokens/colors";
 
 export default defineConfig({
   preflight: true,
@@ -10,7 +11,11 @@ export default defineConfig({
   exclude: [],
 
   theme: {
-    extend: {},
+    extend: {
+      tokens: {
+        colors
+      }
+    },
   },
 
   outdir: "styled-system",
