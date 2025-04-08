@@ -681,6 +681,110 @@
     background: var(--colors-blue-500);
 }
 
+  .bg_rose\.100 {
+    background: var(--colors-rose-100);
+}
+
+  .c_rose\.100 {
+    color: var(--colors-rose-100);
+}
+
+  .bg_rose\.200 {
+    background: var(--colors-rose-200);
+}
+
+  .c_rose\.200 {
+    color: var(--colors-rose-200);
+}
+
+  .bg_rose\.300 {
+    background: var(--colors-rose-300);
+}
+
+  .c_rose\.300 {
+    color: var(--colors-rose-300);
+}
+
+  .bg_rose\.400 {
+    background: var(--colors-rose-400);
+}
+
+  .c_rose\.400 {
+    color: var(--colors-rose-400);
+}
+
+  .bg_rose\.500 {
+    background: var(--colors-rose-500);
+}
+
+  .c_rose\.500 {
+    color: var(--colors-rose-500);
+}
+
+  .bg_bg {
+    background: bg;
+}
+
+  .c_bg {
+    color: bg;
+}
+
+  .bg_magic\.glow {
+    background: var(--colors-magic-glow);
+}
+
+  .c_magic\.glow {
+    color: var(--colors-magic-glow);
+}
+
+  .bg_magic\.light {
+    background: var(--colors-magic-light);
+}
+
+  .c_magic\.light {
+    color: var(--colors-magic-light);
+}
+
+  .bg_staff\.bronze {
+    background: var(--colors-staff-bronze);
+}
+
+  .c_staff\.bronze {
+    color: var(--colors-staff-bronze);
+}
+
+  .bg_staff\.gem {
+    background: var(--colors-staff-gem);
+}
+
+  .c_staff\.gem {
+    color: var(--colors-staff-gem);
+}
+
+  .bg_staff\.gold {
+    background: var(--colors-staff-gold);
+}
+
+  .c_staff\.gold {
+    color: var(--colors-staff-gold);
+}
+
+  .bg_staff\.ruby {
+    background: var(--colors-staff-ruby);
+}
+
+  .c_staff\.ruby {
+    color: var(--colors-staff-ruby);
+}
+
+  .bg_staff\.wood {
+    background: var(--colors-staff-wood);
+}
+
+  .c_staff\.wood {
+    color: var(--colors-staff-wood);
+}
+
   .hover\:cursor_pointer:is(:hover, [data-hover]) {
     cursor: pointer;
 }
