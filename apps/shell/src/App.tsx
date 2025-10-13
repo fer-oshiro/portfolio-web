@@ -1,15 +1,12 @@
-import { createRoot } from 'react-dom/client'
 import '@charmbyte/ui/styles.css'
-
-import Home from 'home/Home'
-import Resume from 'resume/Resume'
+import { createRoot } from 'react-dom/client'
 
 import './index.css'
+import { AppRoutes } from './router/index.router'
 
 const App = () => (
   <div className="container">
-    <Home />
-    <Resume />
+    <AppRoutes />
   </div>
 )
 
