@@ -1,15 +1,15 @@
-const HtmlWebPackPlugin = require("html-webpack-plugin");
-const ModuleFederationPlugin = require("webpack/lib/container/ModuleFederationPlugin");
-const Dotenv = require('dotenv-webpack');
-const deps = require("./package.json").dependencies;
+const HtmlWebPackPlugin = require('html-webpack-plugin')
+const ModuleFederationPlugin = require('webpack/lib/container/ModuleFederationPlugin')
+const Dotenv = require('dotenv-webpack')
+const deps = require('./package.json').dependencies
 
 module.exports = (_, argv) => ({
   output: {
-    publicPath: "http://localhost:3000/",
+    publicPath: 'http://localhost:3000/',
   },
 
   resolve: {
-    extensions: [".tsx", ".ts", ".jsx", ".js", ".json"],
+    extensions: ['.tsx', '.ts', '.jsx', '.js', '.json'],
   },
 
   devServer: {
@@ -21,14 +21,15 @@ module.exports = (_, argv) => ({
     rules: [
       {
         test: /\.m?js/,
-        type: "javascript/auto",
+        type: 'javascript/auto',
         resolve: {
           fullySpecified: false,
         },
       },
+      { test: /\.(glb|gltf|bin)$/i, type: 'asset/resource' },
       {
         test: /\.(css|s[ac]ss)$/i,
-        use: ["style-loader", "css-loader"],
+        use: ['style-loader', 'css-loader'],
       },
       {
         test: /\.[jt]sx?$/,
@@ -39,27 +40,28 @@ module.exports = (_, argv) => ({
             jsc: {
               parser: {
                 syntax: 'typescript',
-                tsx: true
+                tsx: true,
               },
               transform: {
                 react: {
-                  runtime: 'automatic' // React 17+ JSX transform
-                }
-              }
-            }
-          }
-        }
-      }
+                  runtime: 'automatic', // React 17+ JSX transform
+                },
+              },
+            },
+          },
+        },
+      },
     ],
   },
 
   plugins: [
     new ModuleFederationPlugin({
-      name: "shell",
-      filename: "remoteEntry.js",
+      name: 'shell',
+      filename: 'remoteEntry.js',
       remotes: {
-        resume: "resume@http://localhost:3002/remoteEntry.js",
-        home: "home@http://localhost:3001/remoteEntry.js",
+        blog: 'blog@http://localhost:3003/remoteEntry.js',
+        resume: 'resume@http://localhost:3002/remoteEntry.js',
+        home: 'home@http://localhost:3001/remoteEntry.js',
       },
       exposes: {},
       shared: {
@@ -68,15 +70,19 @@ module.exports = (_, argv) => ({
           singleton: true,
           requiredVersion: deps.react,
         },
-        "react-dom": {
+        'react-dom': {
           singleton: true,
-          requiredVersion: deps["react-dom"],
+          requiredVersion: deps['react-dom'],
+        },
+        'react-router': {
+          singleton: true,
+          requiredVersion: deps['react-router'],
         },
       },
     }),
     new HtmlWebPackPlugin({
-      template: "./src/index.html",
+      template: './src/index.html',
     }),
-    new Dotenv()
+    new Dotenv(),
   ],
-});
+})
