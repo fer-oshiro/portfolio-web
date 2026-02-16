@@ -7,9 +7,11 @@ import { MeshBasicMaterial, SRGBColorSpace } from 'three'
 export function LoadObject({
   model,
   texture,
+  scale = 1,
 }: {
   model: string
   texture?: string
+  scale?: number
 }) {
   const { scene } = useGLTF(model)
   const [springs, api] = useSpring(() => ({
@@ -18,7 +20,7 @@ export function LoadObject({
   }))
 
   useEffect(() => {
-    api.start({ scale: 1 })
+    api.start({ scale })
   }, [api])
   if (texture) {
     const tex = useTexture(texture)

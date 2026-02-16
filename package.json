@@ -25,5 +25,8 @@
   "workspaces": [
     "apps/*",
     "packages/*"
-  ]
+  ],
+  "dependencies": {
+    "@swc/core-darwin-arm64": "^1.15.11"
+  }
 }
