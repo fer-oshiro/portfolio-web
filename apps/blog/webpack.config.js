@@ -2,10 +2,22 @@ const HtmlWebPackPlugin = require('html-webpack-plugin')
 const ModuleFederationPlugin = require('webpack/lib/container/ModuleFederationPlugin')
 const Dotenv = require('dotenv-webpack')
 const deps = require('./package.json').dependencies
+const os = require('os')
+const getLocalIP = () => {
+  const interfaces = os.networkInterfaces()
+  for (const name of Object.keys(interfaces)) {
+    for (const iface of interfaces[name]) {
+      if (iface.family === 'IPv4' && !iface.internal) return iface.address
+    }
+  }
+  return 'localhost'
+}
+
+const LAN_IP = getLocalIP()
 
 module.exports = (_, argv) => ({
   output: {
-    publicPath: 'http://localhost:3003/',
+    publicPath: `http://${LAN_IP}:3003/`,
   },
 
   resolve: {
@@ -15,8 +27,10 @@ module.exports = (_, argv) => ({
   devServer: {
     port: 3003,
     historyApiFallback: true,
+    host: '0.0.0.0',
     hot: true,
     watchFiles: ['src/**/*'],
+    allowedHosts: 'all',
     headers: {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'GET, HEAD, OPTIONS',

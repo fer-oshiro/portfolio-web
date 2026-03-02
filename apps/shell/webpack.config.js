@@ -3,9 +3,13 @@ const ModuleFederationPlugin = require('webpack/lib/container/ModuleFederationPl
 const Dotenv = require('dotenv-webpack')
 const deps = require('./package.json').dependencies
 
+const address = require('address')
+const LAN_IP = address.ip()
+console.log({ LAN_IP })
+
 module.exports = (_, argv) => ({
   output: {
-    publicPath: 'http://localhost:3000/',
+    publicPath: `http://${LAN_IP}:3000/`,
   },
 
   resolve: {
@@ -15,6 +19,7 @@ module.exports = (_, argv) => ({
   devServer: {
     port: 3000,
     historyApiFallback: true,
+    allowedHosts: 'all',
   },
 
   module: {
@@ -59,9 +64,9 @@ module.exports = (_, argv) => ({
       name: 'shell',
       filename: 'remoteEntry.js',
       remotes: {
-        blog: 'blog@http://localhost:3003/remoteEntry.js',
-        resume: 'resume@http://localhost:3002/remoteEntry.js',
-        home: 'home@http://localhost:3001/remoteEntry.js',
+        blog: `blog@http://${LAN_IP}:3003/remoteEntry.js`,
+        resume: `resume@http://${LAN_IP}:3002/remoteEntry.js`,
+        home: `home@http://${LAN_IP}:3001/remoteEntry.js`,
       },
       exposes: {},
       shared: {

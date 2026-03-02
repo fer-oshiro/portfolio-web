@@ -8,10 +8,9 @@ export function AppRoutes() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Home />} />
         <Route path="/resume" element={<Resume />} />
         <Route path="/blog/*" element={<Blog />} />
-        <Route path="*" element={<div>404 Not Found</div>} />
+        <Route path="/*" element={<Home />} />
       </Routes>
     </BrowserRouter>
   )

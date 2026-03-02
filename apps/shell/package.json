@@ -13,6 +13,7 @@
     "@charmbyte/typescript-config": "*",
     "@charmbyte/ui": "*",
     "@swc/core": "^1.4.0",
+    "address": "^2.0.3",
     "autoprefixer": "^10.4.21",
     "css-loader": "^7.1.2",
     "dotenv-webpack": "^8.1.0",
