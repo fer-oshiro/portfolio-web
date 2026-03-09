@@ -23,9 +23,27 @@ resource "aws_apigatewayv2_route" "disconnect" {
   target    = "integrations/${aws_apigatewayv2_integration.lambda.id}"
 }
 
-resource "aws_apigatewayv2_route" "gyro" {
+resource "aws_apigatewayv2_route" "join" {
   api_id    = aws_apigatewayv2_api.ws.id
-  route_key = "gyro"
+  route_key = "join"
+  target    = "integrations/${aws_apigatewayv2_integration.lambda.id}"
+}
+
+resource "aws_apigatewayv2_route" "offer" {
+  api_id    = aws_apigatewayv2_api.ws.id
+  route_key = "offer"
+  target    = "integrations/${aws_apigatewayv2_integration.lambda.id}"
+}
+
+resource "aws_apigatewayv2_route" "answer" {
+  api_id    = aws_apigatewayv2_api.ws.id
+  route_key = "answer"
+  target    = "integrations/${aws_apigatewayv2_integration.lambda.id}"
+}
+
+resource "aws_apigatewayv2_route" "iceCandidate" {
+  api_id    = aws_apigatewayv2_api.ws.id
+  route_key = "iceCandidate"
   target    = "integrations/${aws_apigatewayv2_integration.lambda.id}"
 }
 

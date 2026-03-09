@@ -16,89 +16,96 @@ const getLocalIP = () => {
 
 const LAN_IP = getLocalIP()
 
-module.exports = (_, argv) => ({
-  output: {
-    publicPath: `http://${LAN_IP}:3002/`,
-  },
+module.exports = (_, argv) => {
+  const isProd = argv.mode === 'production'
 
-  resolve: {
-    extensions: ['.tsx', '.ts', '.jsx', '.js', '.json'],
-  },
-
-  devServer: {
-    port: 3002,
-    historyApiFallback: true,
-    hot: true,
-    host: '0.0.0.0',
-    allowedHosts: 'all',
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, HEAD, OPTIONS',
-      'Access-Control-Allow-Headers':
-        'Origin, X-Requested-With, Content-Type, Accept, Range',
+  return {
+    output: {
+      publicPath: isProd
+        ? 'https://dk341v3ghfif7.cloudfront.net/resume/'
+        : `http://${LAN_IP}:3002/`,
+      clean: true,
     },
-    watchFiles: ['src/**/*'],
-  },
 
-  module: {
-    rules: [
-      {
-        test: /\.m?js/,
-        type: 'javascript/auto',
-        resolve: {
-          fullySpecified: false,
+    resolve: {
+      extensions: ['.tsx', '.ts', '.jsx', '.js', '.json'],
+    },
+
+    devServer: {
+      port: 3002,
+      historyApiFallback: true,
+      hot: true,
+      host: '0.0.0.0',
+      allowedHosts: 'all',
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, HEAD, OPTIONS',
+        'Access-Control-Allow-Headers':
+          'Origin, X-Requested-With, Content-Type, Accept, Range',
+      },
+      watchFiles: ['src/**/*'],
+    },
+
+    module: {
+      rules: [
+        {
+          test: /\.m?js/,
+          type: 'javascript/auto',
+          resolve: {
+            fullySpecified: false,
+          },
         },
-      },
-      {
-        test: /\.(css|s[ac]ss)$/i,
-        use: ['style-loader', 'css-loader'],
-      },
-      {
-        test: /\.[jt]sx?$/,
-        exclude: /node_modules/,
-        use: {
-          loader: 'swc-loader',
-          options: {
-            jsc: {
-              parser: {
-                syntax: 'typescript',
-                tsx: true,
-              },
-              transform: {
-                react: {
-                  runtime: 'automatic', // React 17+ JSX transform
+        {
+          test: /\.(css|s[ac]ss)$/i,
+          use: ['style-loader', 'css-loader'],
+        },
+        {
+          test: /\.[jt]sx?$/,
+          exclude: /node_modules/,
+          use: {
+            loader: 'swc-loader',
+            options: {
+              jsc: {
+                parser: {
+                  syntax: 'typescript',
+                  tsx: true,
+                },
+                transform: {
+                  react: {
+                    runtime: 'automatic', // React 17+ JSX transform
+                  },
                 },
               },
             },
           },
         },
-      },
-    ],
-  },
+      ],
+    },
 
-  plugins: [
-    new ModuleFederationPlugin({
-      name: 'resume',
-      filename: 'remoteEntry.js',
-      remotes: {},
-      exposes: {
-        './Resume': './src/Resume',
-      },
-      shared: {
-        ...deps,
-        react: {
-          singleton: true,
-          requiredVersion: deps.react,
+    plugins: [
+      new ModuleFederationPlugin({
+        name: 'resume',
+        filename: 'remoteEntry.js',
+        remotes: {},
+        exposes: {
+          './Resume': './src/Resume',
         },
-        'react-dom': {
-          singleton: true,
-          requiredVersion: deps['react-dom'],
+        shared: {
+          ...deps,
+          react: {
+            singleton: true,
+            requiredVersion: deps.react,
+          },
+          'react-dom': {
+            singleton: true,
+            requiredVersion: deps['react-dom'],
+          },
         },
-      },
-    }),
-    new HtmlWebPackPlugin({
-      template: './src/index.html',
-    }),
-    new Dotenv(),
-  ],
-})
+      }),
+      new HtmlWebPackPlugin({
+        template: './src/index.html',
+      }),
+      new Dotenv(),
+    ],
+  }
+}
