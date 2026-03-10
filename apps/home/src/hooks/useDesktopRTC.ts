@@ -1,41 +1,73 @@
 import { useEffect, useRef, useState } from 'react'
-import { WebRTCEngine } from '../service/WebRTCEngine'
-import { useSignaling } from './useSignaling'
+import { WebController } from '../service/WebController'
+import useWebSocket from 'react-use-websocket'
+import { WS_URL } from '../service/constants'
 
-export const useDesktopRTC = (url: string, onData: (data: any) => void) => {
-  const [connected, setConnected] = useState(false)
-  const engine = useRef<WebRTCEngine | null>(null)
-  const { signal, send } = useSignaling(url)
+const ROOM_ID = '123'
+export const useDesktopRTC = () => {
+  const [connected, setConnected] =
+    useState<RTCPeerConnectionState>('disconnected')
+  const [gyro, setGyro] = useState({ alpha: 0, beta: 0, gamma: 0 })
+  const webController = useRef<WebController | null>(null)
+  const { sendJsonMessage, lastJsonMessage } = useWebSocket(
+    `${WS_URL}?role=desktop&roomId=${ROOM_ID}`,
+    {
+      onOpen: () => {
+        console.log('✅ WebSocket conectado')
+        sendJsonMessage({ action: 'join', roomId: ROOM_ID })
+      },
+      onClose: () => console.log('❌ WebSocket desconectado'),
+    },
+  )
 
-  useEffect(() => {
-    if (!signal) return
-    const handle = async () => {
-      switch (signal.type) {
-        case 'peer-joined': {
-          const e = new WebRTCEngine(onData, setConnected)
-          engine.current = e
-          e.pc.onicecandidate = (ev) => {
-            if (ev.candidate)
-              send('iceCandidate', {
-                candidate: ev.candidate,
-                targetConnectionId: signal.connectionId,
-              })
-          }
-          e.dc = e.pc.createDataChannel('gyro-data', { ordered: false })
-          const offer = await e.createOffer()
-          send('offer', { sdp: offer, targetConnectionId: signal.connectionId })
-          break
-        }
-        case 'answer':
-          await engine.current?.handleAnswer(signal.sdp)
-          break
-        case 'ice-candidate':
-          await engine.current?.addIce(signal.candidate)
-          break
+  const setupPeerConnection = (mobileConnectionId: string) => {
+    const controller = new WebController(
+      setGyro,
+      (state) => setConnected(state),
+      console.log,
+    )
+
+    controller.pc.onicecandidate = ({ candidate }) => {
+      if (candidate) {
+        sendJsonMessage({
+          action: 'iceCandidate',
+          candidate,
+          targetConnectionId: mobileConnectionId,
+        })
       }
     }
-    handle()
-  }, [signal])
 
-  return { connected }
+    webController.current = controller
+    return controller
+  }
+
+  useEffect(() => {
+    async function handleLastMessage() {
+      if (!lastJsonMessage) return
+      const msg = lastJsonMessage as any
+
+      if (msg.type === 'peer-joined') {
+        console.log('📱 Mobile detectado:', msg.connectionId)
+        const controller = setupPeerConnection(msg.connectionId)
+        const offer = await controller.createOffer()
+        sendJsonMessage({
+          action: 'offer',
+          sdp: offer,
+          targetConnectionId: msg.connectionId,
+          roomId: ROOM_ID,
+        })
+      }
+
+      if (msg.type === 'answer') {
+        webController.current?.handleRemoteDescription(msg.sdp)
+      }
+
+      if (msg.type === 'ice-candidate') {
+        webController.current?.addIceCandidate(msg.candidate)
+      }
+    }
+    handleLastMessage()
+  }, [lastJsonMessage])
+
+  return { connected, gyro }
 }

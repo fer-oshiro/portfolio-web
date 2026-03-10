@@ -1,48 +1,95 @@
 import { useEffect, useRef, useState } from 'react'
-import { WebRTCEngine } from '../service/WebRTCEngine'
-import { useSignaling } from './useSignaling'
+import { MobileReceiver } from '../service/MobileReceiver'
+import useWebSocket from 'react-use-websocket'
+import { WS_URL } from '../service/constants'
+import { alpha } from 'motion'
+import { pre } from 'motion/react-m'
 
-export const useMobileRTC = (url: string) => {
-  const [connected, setConnected] = useState(false)
-  const engine = useRef<WebRTCEngine | null>(null)
-  const { signal, send } = useSignaling(url) // O mesmo hook de sinalização
+const DEFAULT = { alpha: 0, beta: 0, gamma: 0 }
 
-  useEffect(() => {
-    if (!signal) return
+export const useMobileRTC = (onLog: (log: string) => void, roomId: string) => {
+  const [connected, setConnected] =
+    useState<RTCPeerConnectionState>('disconnected')
+  const [gyro, setGyro] = useState({ alpha: 0, beta: 0, gamma: 0 })
+  const mobileReceiver = useRef<MobileReceiver | null>(null)
+  const desktopId = useRef<string | null>(null)
 
-    const handle = async () => {
-      switch (signal.type) {
-        case 'offer':
-          // 1. Cria o motor quando recebe o offer
-          engine.current = new WebRTCEngine(() => {}, setConnected)
+  const { sendJsonMessage, lastJsonMessage } = useWebSocket(
+    `${WS_URL}?role=mobile&roomId=${roomId}`,
+    {
+      onOpen: () => {
+        onLog('✅ WebSocket conectado')
+        sendJsonMessage({ action: 'join', roomId })
+      },
+    },
+  )
 
-          // 2. Configura o ICE para enviar de volta pro Desktop
-          engine.current.pc.onicecandidate = (e) => {
-            if (e.candidate)
-              send('iceCandidate', {
-                candidate: e.candidate,
-                targetConnectionId: signal.from,
-              })
-          }
+  const handleOffer = async (msg: any) => {
+    try {
+      desktopId.current = msg.from
+      const receiver = new MobileReceiver(
+        () => {},
+        (state) => setConnected(state),
+        onLog,
+      )
 
-          // 3. Gera o Answer e envia
-          const answer = await engine.current.createAnswer(signal.sdp)
-          send('answer', { sdp: answer, targetConnectionId: signal.from })
-          break
-
-        case 'ice-candidate':
-          await engine.current?.addIce(signal.candidate)
-          break
+      receiver.pc.onicecandidate = ({ candidate }) => {
+        if (candidate) {
+          sendJsonMessage({
+            action: 'iceCandidate',
+            candidate,
+            targetConnectionId: msg.from,
+          })
+        }
       }
-    }
-    handle()
-  }, [signal])
 
-  const sendGyro = (data: any) => {
-    if (engine.current?.dc?.readyState === 'open') {
-      engine.current.dc.send(JSON.stringify(data))
+      mobileReceiver.current = receiver
+      const answer = await receiver.createAnswer(msg.sdp)
+      sendJsonMessage({
+        action: 'answer',
+        sdp: answer,
+        targetConnectionId: msg.from,
+      })
+    } catch (e: any) {
+      onLog(`Error: ${e?.message || e?.name || String(e)}`)
+      setConnected('failed')
     }
   }
 
-  return { connected, sendGyro }
+  useEffect(() => {
+    if (!lastJsonMessage) return
+    const msg = lastJsonMessage as any
+
+    if (msg.type === 'peer-joined') {
+      onLog(`🖥️ Desktop detectado: ${msg.connectionId}`)
+      desktopId.current = msg.connectionId
+    }
+
+    if (msg.type === 'offer') handleOffer(msg)
+
+    if (msg.type === 'ice-candidate') {
+      mobileReceiver.current?.addIceCandidate(msg.candidate)
+    }
+  }, [lastJsonMessage])
+
+  const handleSendGyro = (input: {
+    alpha: number | null
+    beta: number | null
+    gamma: number | null
+  }) => {
+    const formattedInput = {
+      alpha: input.alpha !== null ? Number(input.alpha.toFixed(2)) : gyro.alpha,
+      beta: input.beta !== null ? Number(input.beta.toFixed(2)) : gyro.beta,
+      gamma: input.gamma !== null ? Number(input.gamma.toFixed(2)) : gyro.gamma,
+    }
+
+    setGyro(formattedInput)
+    mobileReceiver.current?.send({ ...gyro, ...input })
+  }
+
+  return {
+    connected,
+    gyro,
+    handleSendGyro,
+  }
 }

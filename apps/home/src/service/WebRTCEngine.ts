@@ -39,6 +39,7 @@ export abstract class WebRTCBase {
   async createOffer() {
     const offer = await this.pc.createOffer()
     await this.pc.setLocalDescription(offer)
+    this.onLog('📤 Offer enviado')
     return offer
   }
 
@@ -51,6 +52,7 @@ export abstract class WebRTCBase {
 
   async handleRemoteDescription(remoteSdp: RTCSessionDescriptionInit) {
     await this.setRemoteDescription(remoteSdp)
+    this.onLog('✅ P2P Handshake finalizado')
   }
 
   async addIceCandidate(candidate: RTCIceCandidateInit) {
