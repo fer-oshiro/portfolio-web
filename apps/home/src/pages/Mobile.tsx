@@ -18,7 +18,11 @@ export const Mobile = () => {
       const now = Date.now()
       if (now - lastSend < 32) return
       lastSend = now
-      handleSendGyro(event)
+      handleSendGyro({
+        alpha: event.alpha,
+        beta: event.beta,
+        gamma: event.gamma,
+      })
     }
     window.addEventListener('deviceorientation', handleMotion)
   }
