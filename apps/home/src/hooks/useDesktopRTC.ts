@@ -1,20 +1,21 @@
 import { useEffect, useRef, useState } from 'react'
-import { WebController } from '../service/WebController'
 import useWebSocket from 'react-use-websocket'
-import { WS_URL } from '../service/constants'
 
-const ROOM_ID = '123'
+import { WS_URL } from '../service/constants'
+import { WebController } from '../service/WebController'
+
+const roomId = crypto.randomUUID && crypto.randomUUID()
 export const useDesktopRTC = () => {
   const [connected, setConnected] =
     useState<RTCPeerConnectionState>('disconnected')
   const [gyro, setGyro] = useState({ alpha: 0, beta: 0, gamma: 0 })
   const webController = useRef<WebController | null>(null)
   const { sendJsonMessage, lastJsonMessage } = useWebSocket(
-    `${WS_URL}?role=desktop&roomId=${ROOM_ID}`,
+    `${WS_URL}?role=desktop&roomId=${roomId}`,
     {
       onOpen: () => {
         console.log('✅ WebSocket conectado')
-        sendJsonMessage({ action: 'join', roomId: ROOM_ID })
+        sendJsonMessage({ action: 'join', roomId: roomId })
       },
       onClose: () => console.log('❌ WebSocket desconectado'),
     },
@@ -54,7 +55,7 @@ export const useDesktopRTC = () => {
           action: 'offer',
           sdp: offer,
           targetConnectionId: msg.connectionId,
-          roomId: ROOM_ID,
+          roomId,
         })
       }
 
@@ -69,5 +70,5 @@ export const useDesktopRTC = () => {
     handleLastMessage()
   }, [lastJsonMessage])
 
-  return { connected, gyro }
+  return { connected, gyro, roomId }
 }

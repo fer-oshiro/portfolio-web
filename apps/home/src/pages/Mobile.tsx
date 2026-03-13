@@ -1,16 +1,34 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { useSearchParams } from 'react-router'
+
 import { useMobileRTC } from '../hooks/useMobileRTC'
 
-const ROOM_ID = '123'
 let lastSend = 0
 
 export const Mobile = () => {
+  const [searchParams] = useSearchParams()
   const [msg1, setMsg] = useState<string[]>([])
   const [gyroStatus, setGyroStatus] = useState('idle')
   const { connected, gyro, handleSendGyro } = useMobileRTC(
     (log) => setMsg((prev) => [...prev, log]),
-    ROOM_ID,
+    searchParams.get('roomId') ?? 'error',
   )
+  const wakeLock = useRef<WakeLockSentinel | null>(null)
+
+  const requestWakeLock = async () => {
+    try {
+      if ('wakeLock' in navigator) {
+        wakeLock.current = await navigator.wakeLock.request('screen')
+        console.log('✅ Tela bloqueada (não vai hibernar)')
+
+        wakeLock.current.addEventListener('release', () => {
+          console.log('Wake Lock liberado')
+        })
+      }
+    } catch (err: any) {
+      console.error(`${err.name}, ${err.message}`)
+    }
+  }
 
   const startGyroscope = () => {
     setGyroStatus('startGyroscope')
@@ -45,10 +63,22 @@ export const Mobile = () => {
           `Error: ${e?.message || e?.name || String(e)}`,
         ])
       }
+      await requestWakeLock()
     } else {
       startGyroscope()
     }
   }
+
+  useEffect(() => {
+    const handleVisibilityChange = async () => {
+      if (wakeLock.current !== null && document.visibilityState === 'visible') {
+        await requestWakeLock()
+      }
+    }
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    return () =>
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+  }, [])
 
   const handleFakeInput = (input: {
     alpha?: number
@@ -84,7 +114,7 @@ export const Mobile = () => {
           id="alpha"
           name="alpha"
           min="0"
-          max="180"
+          max="360"
           value={gyro.alpha}
           onChange={(e) => handleFakeInput({ alpha: Number(e.target.value) })}
         />
@@ -96,7 +126,7 @@ export const Mobile = () => {
           type="range"
           id="beta"
           name="beta"
-          min="0"
+          min="-180"
           max="180"
           value={gyro.beta}
           onChange={(e) => handleFakeInput({ beta: Number(e.target.value) })}
@@ -109,8 +139,8 @@ export const Mobile = () => {
           type="range"
           id="gamma"
           name="gamma"
-          min="0"
-          max="180"
+          min="-90"
+          max="90"
           value={gyro.gamma}
           onChange={(e) => handleFakeInput({ gamma: Number(e.target.value) })}
         />

@@ -1,10 +1,14 @@
-import './QRCode.css'
 import { QRCodeSVG } from 'qrcode.react'
+import './QRCode.css'
 
-export const QRCode = () => {
+export const QRCode = ({ roomId }: { roomId: string }) => {
+  console.log(`${process.env.WEBPACK_URL}/mobile?roomId=${roomId}`)
   return (
     <div className="QRCode">
-      <QRCodeSVG value="http://192.168.0.29:3000/mobile" size={128} />
+      <QRCodeSVG
+        value={`${process.env.WEBPACK_URL}/mobile?roomId=${roomId}`}
+        size={128}
+      />
     </div>
   )
 }

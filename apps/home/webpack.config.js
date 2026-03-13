@@ -3,8 +3,9 @@ const ModuleFederationPlugin = require('webpack/lib/container/ModuleFederationPl
 const Dotenv = require('dotenv-webpack')
 const deps = require('./package.json').dependencies
 const { 'qrcode.react': _, 'react-use-websocket': __, ...sharedDeps } = deps
-
 const address = require('address')
+const { DefinePlugin } = require('webpack')
+
 const LAN_IP = address.ip()
 
 module.exports = (_, argv) => {
@@ -95,7 +96,14 @@ module.exports = (_, argv) => {
       new HtmlWebPackPlugin({
         template: './src/index.html',
       }),
-      new Dotenv(),
+      new Dotenv({
+        silent: true,
+      }),
+      new DefinePlugin({
+        'process.env.WEBPACK_URL': JSON.stringify(
+          isProd ? 'fer-oshiro.com' : `http://${LAN_IP}:3000`,
+        ),
+      }),
     ],
   }
 }

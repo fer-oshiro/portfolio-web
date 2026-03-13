@@ -105,7 +105,9 @@ module.exports = (_, argv) => {
       new HtmlWebPackPlugin({
         template: './src/index.html',
       }),
-      new Dotenv(),
+      new Dotenv({
+        silent: true,
+      }),
     ],
   }
 }

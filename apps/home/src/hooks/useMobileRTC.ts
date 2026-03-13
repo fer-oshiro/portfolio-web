@@ -1,11 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
-import { MobileReceiver } from '../service/MobileReceiver'
 import useWebSocket from 'react-use-websocket'
-import { WS_URL } from '../service/constants'
-import { alpha } from 'motion'
-import { pre } from 'motion/react-m'
 
-const DEFAULT = { alpha: 0, beta: 0, gamma: 0 }
+import { WS_URL } from '../service/constants'
+import { MobileReceiver } from '../service/MobileReceiver'
 
 export const useMobileRTC = (onLog: (log: string) => void, roomId: string) => {
   const [connected, setConnected] =
@@ -18,7 +15,7 @@ export const useMobileRTC = (onLog: (log: string) => void, roomId: string) => {
     `${WS_URL}?role=mobile&roomId=${roomId}`,
     {
       onOpen: () => {
-        onLog('✅ WebSocket conectado')
+        onLog(`✅ WebSocket conectado ${roomId}`)
         sendJsonMessage({ action: 'join', roomId })
       },
     },

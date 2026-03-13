@@ -5,4 +5,4 @@ aws s3 sync apps/shell/dist  s3://fer-oshiro-portfolio/shell   --delete --profil
 aws s3 sync apps/home/dist   s3://fer-oshiro-portfolio/home    --delete --profile personal
 aws s3 sync apps/blog/dist   s3://fer-oshiro-portfolio/blog    --delete --profile personal
 aws s3 sync apps/resume/dist s3://fer-oshiro-portfolio/resume  --delete --profile personal
-aws cloudfront create-invalidation  --distribution-id E1B4ILT6W9LUF4 --paths "/*" --profile personal
+aws cloudfront create-invalidation  --distribution-id E1B4ILT6W9LUF4 --paths "/*" --no-cli-pager --profile personal
