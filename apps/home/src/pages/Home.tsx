@@ -1,10 +1,11 @@
-import { OrbitControls, useGLTF, useTexture } from '@react-three/drei'
+import { useGLTF, useTexture } from '@react-three/drei'
 import { Canvas } from '@react-three/fiber'
 import * as THREE from 'three'
 
 import roomUrl from '../assets/models/room.glb'
 import roomBaked from '../assets/models/room.png'
-import { CameraControl } from '../components/Camera'
+import { CameraManager } from '../components/CameraManager'
+import { useStore } from '../store'
 
 function Room() {
   const { nodes } = useGLTF(roomUrl)
@@ -34,17 +35,21 @@ function Room() {
 }
 
 export default function Home() {
+  const { position } = useStore()
   return (
     <div style={{ width: '100vw', height: '100vh' }}>
-      <Canvas camera={{ position: [0, 5, 10], fov: 75 }}>
-        <CameraControl />
+      <Canvas
+        camera={{
+          fov: 75,
+        }}
+      >
+        <CameraManager />
 
         <color attach="background" args={['#996754']} />
         <ambientLight intensity={0.8} />
         <directionalLight position={[10, 10, 5]} intensity={1.5} />
 
         <Room />
-        <OrbitControls />
       </Canvas>
     </div>
   )
