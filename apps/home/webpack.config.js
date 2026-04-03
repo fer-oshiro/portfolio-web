@@ -2,7 +2,12 @@ const HtmlWebPackPlugin = require('html-webpack-plugin')
 const ModuleFederationPlugin = require('webpack/lib/container/ModuleFederationPlugin')
 const Dotenv = require('dotenv-webpack')
 const deps = require('./package.json').dependencies
-const { 'qrcode.react': _, 'react-use-websocket': __, ...sharedDeps } = deps
+const {
+  'qrcode.react': _,
+  'react-use-websocket': __,
+  zustand: ___,
+  ...sharedDeps
+} = deps
 const address = require('address')
 const { DefinePlugin } = require('webpack')
 

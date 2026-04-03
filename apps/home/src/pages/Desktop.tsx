@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useControls } from 'leva'
 
 import { Cursor } from '../components/Cursor'
 import { QRCode } from '../components/QRCode'

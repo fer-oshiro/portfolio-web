@@ -30,7 +30,7 @@
   "devDependencies": {
     "@charmbyte/eslint-config": "*",
     "@charmbyte/typescript-config": "*",
-    "@pandacss/dev": "^0.53.3",
+    "@pandacss/dev": "^0.53.0",
     "@pandacss/types": "^0.53.3",
     "@types/node": "^22.13.10",
     "@types/react": "^19.1.0",
@@ -44,7 +44,8 @@
     "typescript": "^5.8.2"
   },
   "dependencies": {
-    "@ark-ui/react": "^5.5.0"
+    "@ark-ui/react": "^5.5.0",
+    "commitizen": "4.2.4"
   },
   "peerDependencies": {
     "react": "^18.2.0 || ^19.0.0",

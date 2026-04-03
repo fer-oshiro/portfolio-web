@@ -1,1 +1,1 @@
-import('./Home')
+import('./App')
