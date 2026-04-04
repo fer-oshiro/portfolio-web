@@ -5,7 +5,9 @@ import * as THREE from 'three'
 import roomUrl from '../assets/models/room.glb'
 import roomBaked from '../assets/models/room.png'
 import { CameraManager } from '../components/CameraManager'
+import { Computer } from '../components/Computer'
 import { useStore } from '../store'
+import { useEffect } from 'react'
 
 function Room() {
   const { nodes } = useGLTF(roomUrl)
@@ -25,6 +27,7 @@ function Room() {
 
       <mesh geometry={nodes.screen.geometry}>
         <meshBasicMaterial map={bakedTexture} />
+        <Computer />
       </mesh>
 
       <mesh geometry={nodes.board.geometry}>
@@ -35,7 +38,6 @@ function Room() {
 }
 
 export default function Home() {
-  const { position } = useStore()
   return (
     <div style={{ width: '100vw', height: '100vh' }}>
       <Canvas
@@ -46,8 +48,7 @@ export default function Home() {
         <CameraManager />
 
         <color attach="background" args={['#996754']} />
-        <ambientLight intensity={0.8} />
-        <directionalLight position={[10, 10, 5]} intensity={1.5} />
+        <directionalLight position={[10, 10, 5]} intensity={15} />
 
         <Room />
       </Canvas>

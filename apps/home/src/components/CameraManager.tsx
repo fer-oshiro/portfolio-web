@@ -64,9 +64,9 @@ export const CameraManager = () => {
     }
   })
 
-  useEffect(() => {
-    setCamera('default')
-  }, [])
+  // useEffect(() => {
+  //   setCamera('default')
+  // }, [])
 
   return <OrbitControls ref={orbitRef} enabled={values.control} />
 }

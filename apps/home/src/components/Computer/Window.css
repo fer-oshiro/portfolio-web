@@ -1,0 +1,50 @@
+.window-container {
+  border: 1px solid var(--menu);
+  padding: 12px;
+}
+
+.chat-container {
+  background-color: var(--window);
+  padding: 12px 6px;
+  margin-top: 12px;
+}
+
+.bubble-container {
+  background-color: var(--background);
+  width: fit-content;
+  max-width: 80%;
+  padding: 6px 18px;
+  border-radius: 20px;
+  margin: 20px;
+}
+
+.left-bubble {
+  margin-left: auto;
+}
+
+.window-container textarea {
+  width: 100%;
+  font-size: 1rem;
+  padding: 8px;
+  margin: 0;
+
+  resize: none;
+  outline: none;
+
+  position: relative;
+}
+
+.textarea-wrapper {
+  position: relative;
+  margin: 12px 0px;
+  background-color: white;
+  border: 1px solid var(--menu);
+}
+
+.textarea-wrapper span {
+  font-size: 0.7rem;
+  color: var(--menu);
+  display: flex;
+  justify-content: flex-end;
+  margin: 4px 8px;
+}
