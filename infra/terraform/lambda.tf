@@ -4,8 +4,8 @@ resource "aws_iam_role" "lambda_role" {
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
-      Action = "sts:AssumeRole"
-      Effect = "Allow"
+      Action    = "sts:AssumeRole"
+      Effect    = "Allow"
       Principal = { Service = "lambda.amazonaws.com" }
     }]
   })
@@ -54,5 +54,27 @@ resource "aws_lambda_function" "ws_handler" {
 
 resource "aws_cloudwatch_log_group" "lambda_logs" {
   name              = "/aws/lambda/${aws_lambda_function.ws_handler.function_name}"
+  retention_in_days = 90
+}
+
+
+resource "aws_lambda_function" "chat_handler" {
+  function_name    = "${var.project_name}-chat-handler"
+  role             = aws_iam_role.lambda_role.arn # reaproveitado
+  handler          = "index.handler"
+  runtime          = "nodejs20.x"
+  filename         = "../../apps/chat-api/dist/index.zip"
+  source_code_hash = fileexists("../../apps/chat-api/dist/index.zip") ? filebase64sha256("../../apps/chat-api/dist/index.zip") : null
+
+  environment {
+    variables = {
+      TABLE_NAME   = aws_dynamodb_table.connections.name
+      GROQ_API_KEY = var.groq_api_key # ou OPENAI_API_KEY
+    }
+  }
+}
+
+resource "aws_cloudwatch_log_group" "chat_lambda_logs" {
+  name              = "/aws/lambda/${aws_lambda_function.chat_handler.function_name}"
   retention_in_days = 90
 }

@@ -1,12 +1,19 @@
 .window-container {
   border: 1px solid var(--menu);
   padding: 12px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .chat-container {
   background-color: var(--window);
   padding: 12px 6px;
   margin-top: 12px;
+  flex: 1;
+  overflow: auto;
+  font-size: 1rem;
+  scroll-behavior: smooth;
 }
 
 .bubble-container {

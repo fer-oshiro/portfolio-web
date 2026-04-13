@@ -1,0 +1,22 @@
+{
+  "name": "chat-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "esbuild index.ts --bundle --platform=node --target=node20 --outfile=dist/index.js",
+    "zip": "cd dist && zip -r index.zip index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@aws-sdk/lib-dynamodb": "^3.1026.0",
+    "openai": "^6.33.0"
+  },
+  "devDependencies": {
+    "dotenv": "^8.6.0",
+    "tsx": "^4.21.0"
+  }
+}

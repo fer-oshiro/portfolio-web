@@ -15,3 +15,9 @@ variable "state_bucket" {
   type        = string
   default     = "fer-oshiro-portfolio-terraform-state"
 }
+
+variable "groq_api_key" {
+  description = "A chave secreta da API do Groq"
+  type        = string
+  sensitive   = true # Isso oculta a chave nos logs do terraform plan
+}

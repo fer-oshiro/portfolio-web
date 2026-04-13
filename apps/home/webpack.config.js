@@ -106,7 +106,7 @@ module.exports = (_, argv) => {
       }),
       new DefinePlugin({
         'process.env.WEBPACK_URL': JSON.stringify(
-          isProd ? 'fer-oshiro.com' : `http://${LAN_IP}:3000`,
+          isProd ? 'fer-oshiro.com' : `http://${LAN_IP}:3001`,
         ),
       }),
     ],

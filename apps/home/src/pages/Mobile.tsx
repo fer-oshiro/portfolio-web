@@ -9,7 +9,7 @@ export const Mobile = () => {
   const [searchParams] = useSearchParams()
   const [msg1, setMsg] = useState<string[]>([])
   const [gyroStatus, setGyroStatus] = useState('idle')
-  const { connected, gyro, handleSendGyro } = useMobileRTC(
+  const { connected, gyro, handleSendGyro, readyState } = useMobileRTC(
     (log) => setMsg((prev) => [...prev, log]),
     searchParams.get('roomId') ?? 'error',
   )
@@ -93,6 +93,7 @@ export const Mobile = () => {
     <div style={{ padding: 20, textAlign: 'center' }}>
       <h2>Controle Mobile</h2>
       <p>Status: {connected}</p>
+      <p>{readyState}</p>
 
       <button
         onClick={requestPermission}

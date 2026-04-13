@@ -8,6 +8,7 @@ type Position = {
 
 export interface CameraState {
   moving: boolean
+  focus: CameraCoords
   position: Position
   cameraCoords: {
     default: Position
@@ -24,6 +25,7 @@ export const createCameraSlice: StateCreator<MyStore, [], [], CameraState> = (
   set,
 ) => ({
   moving: true,
+  focus: 'default',
   position: {
     coord: [-13.5, 50.5, 7.5],
     target: [0.75, -0.5, -0.3],
@@ -43,6 +45,10 @@ export const createCameraSlice: StateCreator<MyStore, [], [], CameraState> = (
     },
   },
   setCamera: (pos) =>
-    set((state) => ({ position: state.cameraCoords[pos], moving: true })),
+    set((state) => ({
+      position: state.cameraCoords[pos],
+      moving: true,
+      focus: pos,
+    })),
   setMoving: (moving) => set({ moving }),
 })

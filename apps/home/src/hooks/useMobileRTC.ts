@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import useWebSocket from 'react-use-websocket'
+import useWebSocket, { ReadyState } from 'react-use-websocket'
 
 import { WS_URL } from '../service/constants'
 import { MobileReceiver } from '../service/MobileReceiver'
@@ -11,15 +11,17 @@ export const useMobileRTC = (onLog: (log: string) => void, roomId: string) => {
   const mobileReceiver = useRef<MobileReceiver | null>(null)
   const desktopId = useRef<string | null>(null)
 
-  const { sendJsonMessage, lastJsonMessage } = useWebSocket(
-    `${WS_URL}?role=mobile&roomId=${roomId}`,
-    {
-      onOpen: () => {
-        onLog(`✅ WebSocket conectado ${roomId}`)
-        sendJsonMessage({ action: 'join', roomId })
-      },
-    },
+  const { sendJsonMessage, lastJsonMessage, readyState } = useWebSocket(
+    WS_URL,
+    { share: true },
   )
+
+  useEffect(() => {
+    if (readyState === ReadyState.OPEN) {
+      onLog(`✅ WebSocket conectado ${roomId}`)
+      sendJsonMessage({ action: 'join', roomId, role: 'mobile' })
+    }
+  }, [readyState])
 
   const handleOffer = async (msg: any) => {
     try {
@@ -67,6 +69,8 @@ export const useMobileRTC = (onLog: (log: string) => void, roomId: string) => {
     if (msg.type === 'ice-candidate') {
       mobileReceiver.current?.addIceCandidate(msg.candidate)
     }
+
+    onLog(lastJsonMessage)
   }, [lastJsonMessage])
 
   const handleSendGyro = (input: {
@@ -88,5 +92,6 @@ export const useMobileRTC = (onLog: (log: string) => void, roomId: string) => {
     connected,
     gyro,
     handleSendGyro,
+    readyState: ReadyState[readyState],
   }
 }

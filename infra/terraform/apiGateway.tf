@@ -14,7 +14,6 @@ resource "aws_apigatewayv2_route" "connect" {
   api_id    = aws_apigatewayv2_api.ws.id
   route_key = "$connect"
   target    = "integrations/${aws_apigatewayv2_integration.lambda.id}"
-  authorization_type = "AWS_IAM"
 }
 
 resource "aws_apigatewayv2_route" "disconnect" {

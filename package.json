@@ -3,6 +3,7 @@
   "private": true,
   "scripts": {
     "build": "turbo run build",
+    "dev:back": "tsx watch scripts/local-server.ts",
     "dev": "turbo run dev --parallel",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
@@ -15,6 +16,7 @@
     "commitizen": "^4.2.4",
     "husky": "^9.1.7",
     "prettier": "^3.5.3",
+    "tsx": "^4.21.0",
     "turbo": "^2.5.0",
     "typescript": "5.8.2"
   },

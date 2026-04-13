@@ -1,5 +1,7 @@
 export const WS_URL =
-  'wss://6ga2gesq46.execute-api.us-east-1.amazonaws.com/prod'
+  process.env.NODE_ENV === 'production'
+    ? 'wss://6ga2gesq46.execute-api.us-east-1.amazonaws.com/prod'
+    : 'ws://localhost:8080'
 
 const devIceServers = [{ urls: 'stun:stun.l.google.com:19302' }]
 const prodIceServers = [

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import useWebSocket from 'react-use-websocket'
+import useWebSocket, { ReadyState } from 'react-use-websocket'
 
 import { WS_URL } from '../service/constants'
 import { WebController } from '../service/WebController'
@@ -10,16 +10,20 @@ export const useDesktopRTC = () => {
     useState<RTCPeerConnectionState>('disconnected')
   const [gyro, setGyro] = useState({ alpha: 0, beta: 0, gamma: 0 })
   const webController = useRef<WebController | null>(null)
-  const { sendJsonMessage, lastJsonMessage } = useWebSocket(
-    `${WS_URL}?role=desktop&roomId=${roomId}`,
-    {
-      onOpen: () => {
-        console.log('✅ WebSocket conectado')
-        sendJsonMessage({ action: 'join', roomId: roomId })
-      },
-      onClose: () => console.log('❌ WebSocket desconectado'),
-    },
+  const { sendJsonMessage, lastJsonMessage, readyState } = useWebSocket(
+    WS_URL,
+    { share: true },
   )
+
+  useEffect(() => {
+    if (readyState === ReadyState.OPEN) {
+      console.log(`join ${roomId}`)
+      sendJsonMessage({ action: 'join', roomId, role: 'desktop' })
+    }
+    if (readyState === ReadyState.CLOSED) {
+      console.log('disconnected')
+    }
+  }, [readyState])
 
   const setupPeerConnection = (mobileConnectionId: string) => {
     const controller = new WebController(

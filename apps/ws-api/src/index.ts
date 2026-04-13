@@ -1,18 +1,26 @@
-import { APIGatewayProxyResultV2 } from 'aws-lambda'
-import {
-  DynamoDBClient,
-  PutItemCommand,
-  DeleteItemCommand,
-  ScanCommand,
-  GetItemCommand,
-} from '@aws-sdk/client-dynamodb'
 import {
   ApiGatewayManagementApiClient,
   PostToConnectionCommand,
 } from '@aws-sdk/client-apigatewaymanagementapi'
+import {
+  DeleteItemCommand,
+  DynamoDBClient,
+  PutItemCommand,
+  ScanCommand,
+} from '@aws-sdk/client-dynamodb'
+import { APIGatewayProxyResultV2 } from 'aws-lambda'
 
-const dynamo = new DynamoDBClient({ region: process.env.AWS_REGION })
+const dynamo = new DynamoDBClient({
+  region: process.env.AWS_REGION,
+  endpoint: 'http://localhost:8000',
+  tls: false,
+  credentials: {
+    accessKeyId: 'local',
+    secretAccessKey: 'local',
+  },
+})
 const TABLE_NAME = process.env.TABLE_NAME!
+console.log({ TABLE_NAME })
 
 const sendToConnection = async (
   apigw: ApiGatewayManagementApiClient,
@@ -27,7 +35,11 @@ const sendToConnection = async (
       }),
     )
     .catch((err) =>
-      console.warn(`Stale connection: ${connectionId}`, err.message),
+      console.warn(
+        `Stale connection: ${connectionId}`,
+        err.message,
+        JSON.stringify(err),
+      ),
     )
 }
 
@@ -46,30 +58,15 @@ const getPeersInRoom = async (roomId: string, excludeConnectionId: string) => {
 }
 
 export const handler = async (event: any): Promise<APIGatewayProxyResultV2> => {
-  const { connectionId, routeKey, domainName, stage } =
-    event.requestContext as any
-  const apigw = new ApiGatewayManagementApiClient({
-    endpoint: `https://${domainName}/${stage}`,
-  })
-
   try {
+    const { connectionId, routeKey, domainName, stage } =
+      event.requestContext as any
+    const apigw = new ApiGatewayManagementApiClient({
+      endpoint: `https://${domainName}/${stage}`,
+    })
+
     // $connect
     if (routeKey === '$connect') {
-      const role =
-        event.queryStringParameters?.role === 'desktop' ? 'desktop' : 'mobile'
-      const roomId = event.queryStringParameters?.roomId ?? 'default'
-
-      await dynamo.send(
-        new PutItemCommand({
-          TableName: TABLE_NAME,
-          Item: {
-            connectionId: { S: connectionId },
-            role: { S: role },
-            roomId: { S: roomId },
-          },
-        }),
-      )
-
       return { statusCode: 200, body: 'Connected' }
     }
 
@@ -87,11 +84,19 @@ export const handler = async (event: any): Promise<APIGatewayProxyResultV2> => {
 
     const body = JSON.parse(event.body ?? '{}')
 
-    // join — avisa os outros peers na sala que alguém entrou
     if (routeKey === 'join') {
-      const { roomId } = body
+      const { roomId, role } = body
+      await dynamo.send(
+        new PutItemCommand({
+          TableName: TABLE_NAME,
+          Item: {
+            connectionId: { S: connectionId },
+            role: { S: role },
+            roomId: { S: roomId },
+          },
+        }),
+      )
       const peers = await getPeersInRoom(roomId, connectionId)
-      console.log({ peers: JSON.stringify(peers) })
 
       await Promise.all(
         peers.map((peer) =>
@@ -107,7 +112,7 @@ export const handler = async (event: any): Promise<APIGatewayProxyResultV2> => {
 
     // offer — mobile envia SDP offer pro desktop
     if (routeKey === 'offer') {
-      const { roomId, sdp, targetConnectionId } = body
+      const { sdp, targetConnectionId } = body
 
       await sendToConnection(apigw, targetConnectionId, {
         type: 'offer',
