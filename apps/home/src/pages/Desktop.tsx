@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { useControls } from 'leva'
 
 import { Cursor } from '../components/Cursor'
 import { QRCode } from '../components/QRCode'
@@ -62,7 +61,6 @@ export const Desktop = () => {
           <p>Gamma: {gyro.gamma?.toFixed(2)}°</p>
         </div>
       )}
-
       {connected !== 'connected' && <QRCode roomId={roomId} />}
       <div>
         <p>{x?.toFixed(2)}</p>

@@ -6,6 +6,7 @@ import roomUrl from '../assets/models/room.glb'
 import roomBaked from '../assets/models/room.png'
 import { CameraManager } from '../components/CameraManager'
 import { Computer } from '../components/Computer'
+import { Transition } from '../components/transition'
 
 function Room() {
   const { nodes } = useGLTF(roomUrl)
@@ -41,10 +42,13 @@ function Room() {
   )
 }
 
-export default function Home() {
+function Home() {
   return (
     <div style={{ width: '100vw', height: '100vh' }}>
+      <Transition />
+
       <Canvas
+        dpr={[1, 1.5]}
         camera={{
           fov: 75,
         }}
@@ -59,3 +63,5 @@ export default function Home() {
     </div>
   )
 }
+
+export default Home

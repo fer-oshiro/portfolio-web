@@ -11,7 +11,6 @@
   "license": "MIT",
   "devDependencies": {
     "@charmbyte/typescript-config": "*",
-    "@charmbyte/ui": "*",
     "@swc/core": "^1.4.0",
     "address": "^2.0.3",
     "autoprefixer": "^10.4.21",
@@ -39,6 +38,7 @@
     "react-router": "^7.9.4",
     "react-use-websocket": "^4.13.0",
     "three": "^0.180.0",
+    "tldraw": "^4.5.9",
     "zustand": "^5.0.12"
   }
 }

@@ -6,8 +6,10 @@ import * as THREE from 'three'
 import type { OrbitControls as OrbitControlsImpl } from 'three/examples/jsm/controls/OrbitControls.js'
 
 import { useStore } from '../store'
+import { useNavigate } from 'react-router'
 
 export const CameraManager = () => {
+  const navigate = useNavigate()
   const orbitRef = useRef<OrbitControlsImpl>(null)
   const { position, setCamera, moving, setMoving } = useStore()
 
@@ -16,7 +18,7 @@ export const CameraManager = () => {
   const smoothCameraTarget = useRef(new THREE.Vector3(...position.target))
 
   const [values, set] = useControls('Camera', () => ({
-    control: true,
+    control: false,
     position: {
       value: [0, 5, 10],
       step: 0.1,
@@ -28,6 +30,10 @@ export const CameraManager = () => {
     default: button(() => setCamera('default')),
     pc: button(() => setCamera('pc')),
     board: button(() => setCamera('board')),
+    draw: button(() => {
+      setCamera('draw')
+      navigate('/draw')
+    }),
   }))
 
   useFrame(async (state, delta) => {
