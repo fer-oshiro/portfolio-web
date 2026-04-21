@@ -11,7 +11,7 @@ import { useNavigate } from 'react-router'
 export const CameraManager = () => {
   const navigate = useNavigate()
   const orbitRef = useRef<OrbitControlsImpl>(null)
-  const { position, setCamera, moving, setMoving } = useStore()
+  const { position, setCamera, moving, setMoving, setTransition } = useStore()
 
   const direction = useRef(new THREE.Vector3())
   const smoothCameraPosition = useRef(new THREE.Vector3(...position.coord))
@@ -30,8 +30,10 @@ export const CameraManager = () => {
     default: button(() => setCamera('default')),
     pc: button(() => setCamera('pc')),
     board: button(() => setCamera('board')),
-    draw: button(() => {
+    draw: button(async () => {
       setCamera('draw')
+      setTransition('brush')
+      await new Promise((res) => setTimeout(res, 500))
       navigate('/draw')
     }),
   }))

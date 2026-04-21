@@ -1,5 +1,4 @@
 import { Canvas } from '../components/Canvas'
-import { Transition } from '../components/transition'
 
 function Draw() {
   return (
@@ -12,7 +11,6 @@ function Draw() {
         alignItems: 'center',
       }}
     >
-      <Transition />
       <Canvas />
     </div>
   )

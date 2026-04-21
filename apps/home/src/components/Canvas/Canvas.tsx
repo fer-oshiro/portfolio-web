@@ -24,9 +24,6 @@ export const Canvas = () => {
   })
 
   const ui = useRef<UiHandle>(null)
-  useEffect(() => {
-    console.log(ui.current)
-  }, [ui])
 
   return (
     <div style={{ display: 'flex', gap: '20px' }}>
@@ -55,7 +52,6 @@ export const Canvas = () => {
       <div style={{ display: 'flex', gap: '20px', alignItems: 'self-start' }}>
         <button
           onClick={() => {
-            console.log(ui.current)
             ui.current?.handleColor('black')
           }}
           style={{
@@ -68,7 +64,6 @@ export const Canvas = () => {
         </button>
         <button
           onClick={() => {
-            console.log(ui.current)
             ui.current?.handleErase()
           }}
           style={{

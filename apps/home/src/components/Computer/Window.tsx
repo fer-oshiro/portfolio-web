@@ -28,7 +28,6 @@ export const Window = () => {
   const [buffer, setBuffer] = useState('')
   const { sendJsonMessage, lastJsonMessage, readyState } =
     useWebSocket<IWebsocket>(WS_URL, { share: true })
-  console.log({ readyState, lastJsonMessage })
   const { maxChars } = useControls({
     maxChars: 150,
   })
@@ -81,7 +80,6 @@ export const Window = () => {
 
   return (
     <div className="window-container">
-      sou uma janela
       <div className="chat-container">
         {mess.map((message, index) => (
           <div

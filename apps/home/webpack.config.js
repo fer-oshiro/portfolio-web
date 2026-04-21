@@ -110,5 +110,12 @@ module.exports = (_, argv) => {
         ),
       }),
     ],
+    ignoreWarnings: [
+      {
+        module: /node_modules\/(motion|framer-motion|@react-three)/,
+        message:
+          /Critical dependency: the request of a dependency is an expression/,
+      },
+    ],
   }
 }

@@ -1,4 +1,3 @@
-import '@charmbyte/ui/styles.css'
 import { createRoot } from 'react-dom/client'
 
 import './index.css'
