@@ -10,13 +10,6 @@ const groq = new OpenAI({
   baseURL: 'https://api.groq.com/openai/v1',
 })
 
-// ---- Types ----
-
-type WsMessage =
-  | { type: 'chunk'; text: string }
-  | { type: 'done' }
-  | { type: 'error'; text: string }
-
 // ---- Helpers ----
 
 const IS_LOCAL = 'true'

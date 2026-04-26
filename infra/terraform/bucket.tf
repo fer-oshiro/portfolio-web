@@ -1,0 +1,45 @@
+resource "aws_s3_bucket" "portfolio_bucket" {
+  bucket = "fer-oshiro-portfolio-drawings"
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
+resource "aws_s3_bucket_cors_configuration" "portfolio_bucket" {
+  bucket = aws_s3_bucket.portfolio_bucket.id
+
+  cors_rule {
+    allowed_origins = ["*"]
+    allowed_methods = ["PUT", "POST", "GET"]
+    allowed_headers = ["*"]
+    expose_headers  = ["ETag"]
+    max_age_seconds = 3000
+  }
+}
+
+resource "aws_s3_bucket_public_access_block" "portfolio_bucket" {
+  bucket = aws_s3_bucket.portfolio_bucket.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "portfolio_bucket" {
+  bucket = aws_s3_bucket.portfolio_bucket.id
+
+  rule {
+    id     = "expire-pending"
+    status = "Enabled"
+
+    filter {
+      prefix = "submissions/"
+    }
+
+    expiration {
+      days = 30 # apaga automaticamente após 30 dias se não aprovado
+    }
+  }
+}

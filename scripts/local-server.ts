@@ -3,6 +3,7 @@ import { WebSocketServer } from 'ws'
 import { handler as wsHandler } from '../apps/ws-api/src'
 import { handleChat as chatHandler } from '../apps/chat-api/src'
 import { WebsocketLocalProvider } from './websocket/LocalProvider'
+import { handleDrawings, handleSave } from '../apps/draw-api/src'
 
 const wss = new WebSocketServer({ port: 8080 })
 const clients = new Map()
@@ -33,6 +34,10 @@ wss.on('connection', (ws) => {
       await wsHandler(event, {} as any, () => {})
     } else if (routeKey === 'chat') {
       await chatHandler(connectionId, websocket, data.toString())
+    } else if (routeKey === 'get_drawings') {
+      await handleDrawings(connectionId, websocket, data.toString())
+    } else if (routeKey === 'save_drawing') {
+      await handleSave(connectionId, websocket, data.toString())
     }
   })
 

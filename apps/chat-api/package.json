@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "esbuild index.ts --bundle --platform=node --target=node20 --outfile=dist/index.js",
+    "build": "esbuild src/index.ts --bundle --platform=node --target=node20 --outfile=dist/index.js && npm run zip",
     "zip": "cd dist && zip -r index.zip index.js"
   },
   "keywords": [],

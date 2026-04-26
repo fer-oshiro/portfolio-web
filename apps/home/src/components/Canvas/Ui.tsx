@@ -28,6 +28,7 @@ export type Color =
 export interface UiHandle {
   handleErase: () => void
   handleColor: (color: Color) => void
+  handleExport: () => Promise<Blob>
   colors: {
     [color in Color]: string
   }
@@ -57,6 +58,15 @@ export const Ui = track(({ ref, colors }) => {
       },
       handleErase() {
         editor.setCurrentTool('eraser')
+      },
+      async handleExport() {
+        const shapeIds = editor.getCurrentPageShapeIds()
+        if (shapeIds.size === 0) return alert('No shapes on the canvas')
+        const { blob } = await editor.toImage([...shapeIds], {
+          format: 'svg',
+          background: false,
+        })
+        return blob
       },
     }),
     [],
@@ -96,31 +106,5 @@ export const Ui = track(({ ref, colors }) => {
     }
   })
 
-  return (
-    <div className="custom-layout">
-      <div className="custom-toolbar">
-        <button
-          className="custom-button"
-          data-isactive={editor.getCurrentToolId() === 'select'}
-          onClick={() => editor.setCurrentTool('select')}
-        >
-          Select
-        </button>
-        <button
-          className="custom-button"
-          data-isactive={editor.getCurrentToolId() === 'draw'}
-          onClick={() => editor.setCurrentTool('draw')}
-        >
-          Pencil
-        </button>
-        <button
-          className="custom-button"
-          data-isactive={editor.getCurrentToolId() === 'eraser'}
-          onClick={() => editor.setCurrentTool('eraser')}
-        >
-          Eraser
-        </button>
-      </div>
-    </div>
-  )
+  return <></>
 })
