@@ -6,6 +6,8 @@ import roomUrl from '../assets/models/room.glb'
 import roomBaked from '../assets/models/room.png'
 import { CameraManager } from '../components/CameraManager'
 import { Computer } from '../components/Computer'
+import { Board } from '../components/Board'
+import { Tricked } from '../components/Tricked'
 
 function Room() {
   const { nodes } = useGLTF(roomUrl)
@@ -34,6 +36,7 @@ function Room() {
 
       <mesh geometry={nodes.board.geometry}>
         <meshBasicMaterial map={bakedTexture} />
+        <Board />
       </mesh>
     </group>
   )
@@ -42,6 +45,8 @@ function Room() {
 function Home() {
   return (
     <div style={{ width: '100vw', height: '100vh' }}>
+      <Tricked />
+
       <Canvas
         dpr={[1, 1.5]}
         camera={{

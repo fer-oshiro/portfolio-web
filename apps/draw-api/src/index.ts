@@ -1,4 +1,8 @@
-import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3'
+import {
+  ListObjectsV2Command,
+  PutObjectCommand,
+  S3Client,
+} from '@aws-sdk/client-s3'
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 import type { APIGatewayProxyWebsocketHandlerV2 } from 'aws-lambda'
 import { AwsApiGatewayProvider } from './websocket/AwsProvider'
@@ -8,6 +12,7 @@ import { IWebSocketProvider } from './websocket/IWebsocketProvider'
 
 const IS_LOCAL = 'true'
 const BUCKET = 'fer-oshiro-portfolio-drawings'
+const CDN_DOMAIN = 'fer-oshiro.com'
 console.log({ IS_LOCAL })
 
 export const handleSave = async (
@@ -31,13 +36,32 @@ export const handleSave = async (
   })
 }
 
+const getNameFromKey = (key?: string) => {
+  if (!key) return ''
+  const fileName = key.split('/').pop() ?? ''
+  const name = fileName.replace(/^\d+-/, '').replace('.svg', '')
+  return name
+}
+
 export const handleDrawings = async (
   connectionId: string,
   websocket: IWebSocketProvider,
-  body: string,
 ) => {
-  const { message } = JSON.parse(body) as { message: string }
-  await websocket.sendMessage(connectionId, { message, type: 'done' })
+  const command = new ListObjectsV2Command({
+    Bucket: BUCKET,
+    Prefix: 'gallery/',
+    MaxKeys: 20,
+  })
+  const client = new S3Client({ region: 'us-east-1' })
+  const { Contents } = await client.send(command)
+  const drawings = (Contents || [])
+    .sort((a, b) => (!!a.Key && !!b.Key ? b.Key.localeCompare(a.Key) : 0))
+    .map((item) => ({
+      url: `https://${CDN_DOMAIN}/${item.Key}`,
+      id: getNameFromKey(item.Key),
+    }))
+    .filter((item) => item.id)
+  await websocket.sendMessage(connectionId, { drawings })
 }
 
 // ---- Main Handler ----

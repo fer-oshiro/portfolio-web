@@ -6,12 +6,35 @@ resource "aws_s3_bucket" "portfolio_bucket" {
   }
 }
 
+resource "aws_s3_bucket_policy" "drawings_policy" {
+  bucket = aws_s3_bucket.portfolio_bucket.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Service = "cloudfront.amazonaws.com"
+        }
+        Action   = "s3:GetObject"
+        Resource = "arn:aws:s3:::fer-oshiro-portfolio-drawings/gallery/*"
+        Condition = {
+          StringEquals = {
+            "AWS:SourceArn" = aws_cloudfront_distribution.portfolio.arn
+          }
+        }
+      }
+    ]
+  })
+}
+
 resource "aws_s3_bucket_cors_configuration" "portfolio_bucket" {
   bucket = aws_s3_bucket.portfolio_bucket.id
 
   cors_rule {
     allowed_origins = ["*"]
-    allowed_methods = ["PUT", "POST", "GET"]
+    allowed_methods = ["PUT", "POST", "GET", "HEAD"]
     allowed_headers = ["*"]
     expose_headers  = ["ETag"]
     max_age_seconds = 3000
@@ -41,5 +64,13 @@ resource "aws_s3_bucket_lifecycle_configuration" "portfolio_bucket" {
     expiration {
       days = 30 # apaga automaticamente após 30 dias se não aprovado
     }
+  }
+}
+
+resource "aws_s3_bucket" "site_static" {
+  bucket = "fer-oshiro-portfolio"
+
+  lifecycle {
+    prevent_destroy = true
   }
 }

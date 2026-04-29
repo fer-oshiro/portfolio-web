@@ -17,6 +17,7 @@ export const Computer = () => {
   return (
     <Html
       transform
+      occlude
       distanceFactor={distanceFactor}
       position={position}
       style={{
