@@ -15,6 +15,7 @@ export interface CameraState {
     pc: Position
     board: Position
     draw: Position
+    cat: Position
   }
   setCamera: (pos: CameraCoords) => void
   setMoving: (moving: boolean) => void
@@ -47,6 +48,10 @@ export const createCameraSlice: StateCreator<MyStore, [], [], CameraState> = (
     draw: {
       coord: [3.3, 5.1, 0],
       target: [4, 2, 0],
+    },
+    cat: {
+      coord: [3.2, 9, -2.2],
+      target: [4.75, 7.64, -5.6],
     },
   },
   setCamera: (pos) =>

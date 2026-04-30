@@ -36,6 +36,12 @@ export const CameraManager = () => {
       await new Promise((res) => setTimeout(res, 500))
       navigate('/draw')
     }),
+    cat: button(async () => {
+      setCamera('cat')
+      setTransition('cat')
+      await new Promise((res) => setTimeout(res, 1000))
+      navigate('/cat')
+    }),
   }))
 
   useFrame(async (state, delta) => {
@@ -76,5 +82,12 @@ export const CameraManager = () => {
     setCamera('default')
   }, [])
 
-  return <OrbitControls ref={orbitRef} enabled={values.control} />
+  return (
+    <OrbitControls
+      ref={orbitRef}
+      enabled={values.control}
+      maxDistance={40}
+      minDistance={2}
+    />
+  )
 }

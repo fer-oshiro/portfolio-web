@@ -1,7 +1,7 @@
 import { StateCreator } from 'zustand'
 import { MyStore } from '..'
 
-export type Transition = 'none' | 'brush'
+export type Transition = 'none' | 'brush' | 'cat'
 
 export interface TransitionState {
   transition: Transition
