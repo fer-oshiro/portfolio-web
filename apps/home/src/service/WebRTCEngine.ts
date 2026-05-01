@@ -1,5 +1,3 @@
-import { iceServers } from './constants'
-
 export abstract class WebRTCBase {
   pc: RTCPeerConnection
   dc?: RTCDataChannel
@@ -10,8 +8,9 @@ export abstract class WebRTCBase {
   constructor(
     private onLog: (log: string) => void,
     private onConnectionState: (state: RTCPeerConnectionState) => void,
+    private iceServers: RTCIceServer[],
   ) {
-    this.pc = new RTCPeerConnection({ iceServers })
+    this.pc = new RTCPeerConnection({ iceServers: this.iceServers })
 
     this.pc.oniceconnectionstatechange = () =>
       this.onLog(`ICE: ${this.pc.iceConnectionState}`)

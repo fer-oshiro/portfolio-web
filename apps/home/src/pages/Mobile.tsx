@@ -90,7 +90,14 @@ export const Mobile = () => {
   }
 
   return (
-    <div style={{ padding: 20, textAlign: 'center' }}>
+    <div
+      style={{
+        padding: 20,
+        textAlign: 'center',
+        overflowX: 'scroll',
+        overflowY: 'scroll',
+      }}
+    >
       <h2>Controle Mobile</h2>
       <p>Status: {connected}</p>
       <p>{readyState}</p>
@@ -107,7 +114,9 @@ export const Mobile = () => {
       <p>
         DeviceOrientationEvent: {JSON.stringify(window.DeviceOrientationEvent)}
       </p>
-      <p>{JSON.stringify(msg1)}</p>
+      <p style={{ maxHeight: '60px', overflow: 'scroll' }}>
+        {JSON.stringify(msg1)}
+      </p>
 
       <div>
         <input

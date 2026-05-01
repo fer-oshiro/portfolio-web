@@ -20,7 +20,7 @@ module.exports = (_, argv) => {
     output: {
       publicPath: isProd
         ? 'https://dk341v3ghfif7.cloudfront.net/home/'
-        : `http://${LAN_IP}:3001/`,
+        : 'auto',
       clean: true,
     },
 
@@ -103,11 +103,6 @@ module.exports = (_, argv) => {
       }),
       new Dotenv({
         silent: true,
-      }),
-      new DefinePlugin({
-        'process.env.WEBPACK_URL': JSON.stringify(
-          isProd ? 'fer-oshiro.com' : `http://${LAN_IP}:3001`,
-        ),
       }),
     ],
     ignoreWarnings: [

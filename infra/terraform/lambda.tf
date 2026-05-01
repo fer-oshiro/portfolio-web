@@ -48,6 +48,8 @@ resource "aws_lambda_function" "ws_handler" {
   environment {
     variables = {
       TABLE_NAME = aws_dynamodb_table.connections.name
+      TWILIO_ACCOUNT_SID = var.twilio_account_sid
+      TWILIO_AUTH_TOKEN  = var.twilio_auth_token
     }
   }
 }
@@ -69,7 +71,7 @@ resource "aws_lambda_function" "chat_handler" {
   environment {
     variables = {
       TABLE_NAME   = aws_dynamodb_table.connections.name
-      GROQ_API_KEY = var.groq_api_key # ou OPENAI_API_KEY
+      GROQ_API_KEY = var.groq_api_key
     }
   }
 }

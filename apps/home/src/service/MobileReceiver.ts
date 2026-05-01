@@ -5,8 +5,9 @@ export class MobileReceiver extends WebRTCBase {
     onData: (data: any) => void,
     onConnectionState: (state: RTCPeerConnectionState) => void,
     onLog: (log: string) => void,
+    iceServers: RTCIceServer[],
   ) {
-    super(onLog, onConnectionState)
+    super(onLog, onConnectionState, iceServers)
 
     this.pc.ondatachannel = (event) => {
       this.setupDataChannel(event.channel, onData)

@@ -2,13 +2,13 @@ import { useGLTF, useTexture } from '@react-three/drei'
 import { Canvas } from '@react-three/fiber'
 import * as THREE from 'three'
 
-import roomUrl from '../assets/models/room.glb'
-import roomBaked from '../assets/models/room.png'
+import { Board } from '../components/Board'
 import { CameraManager } from '../components/CameraManager'
 import { Computer } from '../components/Computer'
-import { Board } from '../components/Board'
 import { Tricked } from '../components/Tricked'
-import { Leva } from 'leva'
+
+import roomUrl from '../assets/models/room.glb'
+import roomBaked from '../assets/models/room.png'
 
 function Room() {
   const { nodes } = useGLTF(roomUrl)

@@ -19,5 +19,17 @@ variable "state_bucket" {
 variable "groq_api_key" {
   description = "A chave secreta da API do Groq"
   type        = string
-  sensitive   = true # Isso oculta a chave nos logs do terraform plan
+  sensitive   = true
+}
+
+variable "twilio_account_sid" {
+  description = "A sid da API do Twilio"
+  type        = string
+  sensitive   = true
+}
+
+variable "twilio_auth_token" {
+  description = "A chave secreta da API do Twilio"
+  type        = string
+  sensitive   = true
 }

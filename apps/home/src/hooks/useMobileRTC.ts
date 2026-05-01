@@ -26,10 +26,15 @@ export const useMobileRTC = (onLog: (log: string) => void, roomId: string) => {
   const handleOffer = async (msg: any) => {
     try {
       desktopId.current = msg.from
+
+      onLog(msg)
+      const iceServers = JSON.parse(msg.iceServers)
+
       const receiver = new MobileReceiver(
         () => {},
         (state) => setConnected(state),
         onLog,
+        iceServers,
       )
 
       receiver.pc.onicecandidate = ({ candidate }) => {

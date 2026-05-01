@@ -10,6 +10,7 @@ export const useDesktopRTC = () => {
     useState<RTCPeerConnectionState>('disconnected')
   const [gyro, setGyro] = useState({ alpha: 0, beta: 0, gamma: 0 })
   const webController = useRef<WebController | null>(null)
+  const [iceServers, setIceServers] = useState<RTCIceServer[]>()
   const { sendJsonMessage, lastJsonMessage, readyState } = useWebSocket(
     WS_URL,
     { share: true },
@@ -26,10 +27,12 @@ export const useDesktopRTC = () => {
   }, [readyState])
 
   const setupPeerConnection = (mobileConnectionId: string) => {
+    if (!iceServers) return
     const controller = new WebController(
       setGyro,
       (state) => setConnected(state),
       console.log,
+      iceServers,
     )
 
     controller.pc.onicecandidate = ({ candidate }) => {
@@ -50,10 +53,16 @@ export const useDesktopRTC = () => {
     async function handleLastMessage() {
       if (!lastJsonMessage) return
       const msg = lastJsonMessage as any
+      console.log(lastJsonMessage)
+
+      if (msg.type === 'ice-servers') {
+        setIceServers(msg.iceServers)
+      }
 
       if (msg.type === 'peer-joined') {
         console.log('📱 Mobile detectado:', msg.connectionId)
         const controller = setupPeerConnection(msg.connectionId)
+        if (!controller) return
         const offer = await controller.createOffer()
         sendJsonMessage({
           action: 'offer',

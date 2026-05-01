@@ -9,16 +9,26 @@ import {
   ScanCommand,
 } from '@aws-sdk/client-dynamodb'
 import { APIGatewayProxyResultV2 } from 'aws-lambda'
+import { IceServers } from './twilio'
+import { CreateShortCodeApplicationRequestBusinessInformation } from 'twilio/lib/rest/numbers/v2/application'
 
-const dynamo = new DynamoDBClient({
-  region: process.env.AWS_REGION,
-  endpoint: 'http://localhost:8000',
-  tls: false,
-  credentials: {
-    accessKeyId: 'local',
-    secretAccessKey: 'local',
-  },
-})
+const config =
+  process.env.NODE_ENV === 'development'
+    ? {
+        region: process.env.AWS_REGION,
+        endpoint: 'http://localhost:8000',
+        tls: false,
+        credentials: {
+          accessKeyId: 'local',
+          secretAccessKey: 'local',
+        },
+      }
+    : {
+        region: process.env.AWS_REGION,
+      }
+
+const dynamo = new DynamoDBClient(config)
+
 const TABLE_NAME = process.env.TABLE_NAME!
 console.log({ TABLE_NAME })
 
@@ -57,6 +67,20 @@ const getPeersInRoom = async (roomId: string, excludeConnectionId: string) => {
   return result.Items ?? []
 }
 
+const getPeer = async (connectionId: string) => {
+  const result = await dynamo.send(
+    new ScanCommand({
+      TableName: TABLE_NAME,
+      FilterExpression: 'connectionId = :connectionId',
+      ExpressionAttributeValues: {
+        ':connectionId': { S: connectionId },
+      },
+      Limit: 1,
+    }),
+  )
+  return result.Items?.at(0) ?? null
+}
+
 export const handler = async (event: any): Promise<APIGatewayProxyResultV2> => {
   try {
     const { connectionId, routeKey, domainName, stage } =
@@ -86,6 +110,7 @@ export const handler = async (event: any): Promise<APIGatewayProxyResultV2> => {
 
     if (routeKey === 'join') {
       const { roomId, role } = body
+      const iceServers = role === 'desktop' ? await IceServers() : null
       await dynamo.send(
         new PutItemCommand({
           TableName: TABLE_NAME,
@@ -93,9 +118,17 @@ export const handler = async (event: any): Promise<APIGatewayProxyResultV2> => {
             connectionId: { S: connectionId },
             role: { S: role },
             roomId: { S: roomId },
+            iceServers: { S: JSON.stringify(iceServers) },
           },
         }),
       )
+
+      if (role === 'desktop') {
+        await sendToConnection(apigw, connectionId, {
+          type: 'ice-servers',
+          iceServers,
+        })
+      }
       const peers = await getPeersInRoom(roomId, connectionId)
 
       await Promise.all(
@@ -107,17 +140,18 @@ export const handler = async (event: any): Promise<APIGatewayProxyResultV2> => {
         ),
       )
 
-      return { statusCode: 200, body: 'Joined' }
+      return { statusCode: 200, body: 'joined' }
     }
 
-    // offer — mobile envia SDP offer pro desktop
     if (routeKey === 'offer') {
       const { sdp, targetConnectionId } = body
+      const peer = await getPeer(connectionId)
 
       await sendToConnection(apigw, targetConnectionId, {
         type: 'offer',
         sdp,
         from: connectionId,
+        iceServers: peer?.iceServers?.S!,
       })
 
       return { statusCode: 200, body: 'Offer sent' }
