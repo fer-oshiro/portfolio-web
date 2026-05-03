@@ -71,9 +71,10 @@ const getPeer = async (connectionId: string) => {
   const result = await dynamo.send(
     new ScanCommand({
       TableName: TABLE_NAME,
-      FilterExpression: 'connectionId = :connectionId',
+      FilterExpression: 'connectionId = :connectionId AND role = :role',
       ExpressionAttributeValues: {
         ':connectionId': { S: connectionId },
+        ':role': { S: 'desktop' },
       },
       Limit: 1,
     }),

@@ -5,25 +5,13 @@ import './Transition.css'
 import { ComponentProps } from 'react'
 
 const brushVariant = {
-  idle: {
-    pathLength: 0,
-    strokeWidth: 0,
-    opacity: 1,
-    transition: { duration: 0 },
-  },
   animate: {
-    pathLength: 0,
-    strokeWidth: 0,
+    pathLength: [0, 1, 1, 0],
+    strokeWidth: [0, 120, 120, 0],
   },
   initial: {
-    pathLength: 1,
-    strokeWidth: 120,
-    opacity: 1,
-  },
-  exit: {
-    pathLength: 1,
-    strokeWidth: 120,
-    opacity: 1,
+    pathLength: 0,
+    strokeWidth: 0,
   },
 }
 
@@ -41,7 +29,7 @@ type BrushPathProps = ComponentProps<typeof motion.path> & {
 }
 
 const BrushPath = ({ variant, ...props }: BrushPathProps) => {
-  const { transition } = useStore()
+  const { transition, setTransition } = useStore()
   const d = variant === 1 ? d1 : d2
   return (
     <motion.path
@@ -49,24 +37,21 @@ const BrushPath = ({ variant, ...props }: BrushPathProps) => {
       stroke={`var(--transition-stroke-${variant})`}
       stroke-linecap="round"
       variants={brushVariant}
-      initial={transition === 'brush' ? 'initial' : 'idle'}
-      animate="animate"
-      exit={transition === 'brush' ? 'exit' : 'idle'}
+      initial="initial"
+      animate={transition === 'brush' ? 'animate' : 'initial'}
       transition={{
-        duration: 4,
-        ease: [0.22, 1, 0.36, 1],
+        duration: 6,
       }}
+      onAnimationComplete={() => setTransition('none')}
       {...props}
     />
   )
 }
 
 export const Transition = () => {
-  const { transition } = useStore()
-
   return (
     <>
-      <CatTransition></CatTransition>
+      <CatTransition />
       <div className="transition-svg">
         <svg
           width="374"
@@ -84,7 +69,7 @@ export const Transition = () => {
 }
 
 const CatTransition = () => {
-  const { transition } = useStore()
+  const { transition, setTransition } = useStore()
   return (
     <div className="transition-svg">
       <svg
@@ -98,10 +83,12 @@ const CatTransition = () => {
           d={cat}
           fill="black"
           stroke="black"
-          initial={{ scale: transition === 'cat' ? 2 : 0 }}
-          animate={{ scale: 0 }}
-          exit={{ scale: transition === 'cat' ? 2 : 0 }}
-          transition={{ duration: 4 }}
+          initial={{ scale: 0 }}
+          animate={{
+            scale: transition === 'cat' ? [0, 2, 2, 0] : 0,
+          }}
+          transition={{ duration: 4, ease: 'easeInOut' }}
+          onAnimationComplete={() => setTransition('none')}
         />
       </svg>
     </div>

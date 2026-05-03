@@ -83,5 +83,5 @@ export const useDesktopRTC = () => {
     handleLastMessage()
   }, [lastJsonMessage])
 
-  return { connected, gyro, roomId }
+  return { connected, gyro, roomId, iceServers }
 }

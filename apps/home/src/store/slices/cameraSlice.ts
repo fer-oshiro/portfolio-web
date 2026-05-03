@@ -25,6 +25,7 @@ type CameraCoords = keyof CameraState['cameraCoords']
 
 export const createCameraSlice: StateCreator<MyStore, [], [], CameraState> = (
   set,
+  get,
 ) => ({
   moving: true,
   focus: 'default',
@@ -54,11 +55,14 @@ export const createCameraSlice: StateCreator<MyStore, [], [], CameraState> = (
       target: [4.75, 7.64, -5.6],
     },
   },
-  setCamera: (pos) =>
+  setCamera: (pos) => {
     set((state) => ({
       position: state.cameraCoords[pos],
       moving: true,
       focus: pos,
-    })),
+    }))
+    const { setLocation } = get()
+    if (pos === 'cat' || pos === 'draw') setLocation(pos)
+  },
   setMoving: (moving) => set({ moving }),
 })

@@ -45,9 +45,11 @@ resource "aws_lambda_function" "ws_handler" {
   filename         = "../../apps/ws-api/dist/index.zip"
   source_code_hash = fileexists("../../apps/ws-api/dist/index.zip") ? filebase64sha256("../../apps/ws-api/dist/index.zip") : null
 
+  timeout = 30
+
   environment {
     variables = {
-      TABLE_NAME = aws_dynamodb_table.connections.name
+      TABLE_NAME         = aws_dynamodb_table.connections.name
       TWILIO_ACCOUNT_SID = var.twilio_account_sid
       TWILIO_AUTH_TOKEN  = var.twilio_auth_token
     }

@@ -2,13 +2,13 @@ import { Html } from '@react-three/drei'
 import { useRef } from 'react'
 import * as Tone from 'tone'
 
-import { QRCode } from '../QRCode'
-
 import glass from '../../assets/sounds/glass.mp3'
 import pawn from '../../assets/sounds/pawn_the-grey-room_golden-palms.mp3'
 import wood from '../../assets/sounds/wood.mp3'
+import { useStore } from '../../store'
 
 export const Game = () => {
+  const { setLocation, setTransition } = useStore()
   const musicRef = useRef<Tone.Player>(null)
   const woodRef = useRef(new Audio(wood))
   const glassRef = useRef(new Audio(glass))
@@ -50,7 +50,14 @@ export const Game = () => {
         <button onClick={() => soundEffect('wood')}>Play Wood</button>
         <button onClick={start}>Play Song</button>
         <button onClick={stop}>Stop Song</button>
-        <QRCode roomId="123" />
+        <button
+          onClick={() => {
+            setTransition('cat')
+            setLocation('room')
+          }}
+        >
+          Voltar
+        </button>
       </div>
     </Html>
   )

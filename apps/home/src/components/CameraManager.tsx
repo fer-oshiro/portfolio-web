@@ -6,10 +6,8 @@ import * as THREE from 'three'
 import type { OrbitControls as OrbitControlsImpl } from 'three/examples/jsm/controls/OrbitControls.js'
 
 import { useStore } from '../store'
-import { useNavigate } from 'react-router'
 
 export const CameraManager = () => {
-  const navigate = useNavigate()
   const orbitRef = useRef<OrbitControlsImpl>(null)
   const { position, setCamera, moving, setMoving, setTransition } = useStore()
 
@@ -31,16 +29,12 @@ export const CameraManager = () => {
     pc: button(() => setCamera('pc')),
     board: button(() => setCamera('board')),
     draw: button(async () => {
-      setCamera('draw')
       setTransition('brush')
-      await new Promise((res) => setTimeout(res, 500))
-      navigate('/draw')
+      setCamera('draw')
     }),
     cat: button(async () => {
-      setCamera('cat')
       setTransition('cat')
-      await new Promise((res) => setTimeout(res, 1000))
-      navigate('/cat')
+      setCamera('cat')
     }),
   }))
 
@@ -67,7 +61,7 @@ export const CameraManager = () => {
       const cameraTarget = new THREE.Vector3(...position.target)
 
       smoothCameraPosition.current.lerp(cameraPosition, 2 * delta)
-      smoothCameraTarget.current.lerp(cameraTarget, 2 * delta)
+      smoothCameraTarget.current.lerp(cameraTarget, 5 * delta)
 
       state.camera.position.copy(smoothCameraPosition.current)
 

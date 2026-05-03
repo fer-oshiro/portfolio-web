@@ -1,22 +1,22 @@
 import { useGLTF, useTexture } from '@react-three/drei'
 import { Canvas } from '@react-three/fiber'
+import { Leva } from 'leva'
 import * as THREE from 'three'
 
-import { Board } from '../components/Board'
-import { CameraManager } from '../components/CameraManager'
-import { Computer } from '../components/Computer'
-import { Tricked } from '../components/Tricked'
+import { Board } from '../../components/Board'
+import { CameraManager } from '../../components/CameraManager'
+import { Computer } from '../../components/Computer'
+import { Tricked } from '../../components/Tricked'
 
-import roomUrl from '../assets/models/room.glb'
-import roomBaked from '../assets/models/room.png'
+import roomUrl from '../../assets/models/room.glb'
+import roomBaked from '../../assets/models/room.png'
+import { Transition } from '../../components/Transition'
 
-function Room() {
+function RoomMesh() {
   const { nodes } = useGLTF(roomUrl)
   const bakedTexture = useTexture(roomBaked)
   bakedTexture.colorSpace = THREE.SRGBColorSpace
   bakedTexture.flipY = false
-
-  console.log(nodes)
 
   return (
     <group>
@@ -53,9 +53,16 @@ function Room() {
   )
 }
 
-function Home() {
+function Room({ show }: { show: boolean }) {
   return (
-    <div style={{ width: '100vw', height: '100vh' }}>
+    <div
+      style={{
+        width: '100vw',
+        height: '100vh',
+        display: show ? 'block' : 'none',
+      }}
+    >
+      <Leva />
       <Tricked />
 
       <Canvas
@@ -69,10 +76,10 @@ function Home() {
         <color attach="background" args={['#996754']} />
         <directionalLight position={[10, 10, 5]} intensity={15} />
 
-        <Room />
+        <RoomMesh />
       </Canvas>
     </div>
   )
 }
 
-export default Home
+export default Room
