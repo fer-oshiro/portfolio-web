@@ -1,5 +1,5 @@
 resource "aws_s3_bucket" "portfolio_bucket" {
-  bucket = "fer-oshiro-portfolio-drawings"
+  bucket = var.s3_bucket_name
 
   lifecycle {
     prevent_destroy = true

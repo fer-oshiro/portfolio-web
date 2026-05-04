@@ -10,7 +10,6 @@ import {
 } from '@aws-sdk/client-dynamodb'
 import { APIGatewayProxyResultV2 } from 'aws-lambda'
 import { IceServers } from './twilio'
-import { CreateShortCodeApplicationRequestBusinessInformation } from 'twilio/lib/rest/numbers/v2/application'
 
 const config =
   process.env.NODE_ENV === 'development'

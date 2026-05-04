@@ -10,6 +10,18 @@ resource "aws_apigatewayv2_integration" "lambda" {
   integration_uri  = aws_lambda_function.ws_handler.invoke_arn
 }
 
+resource "aws_apigatewayv2_integration" "lambda-chat" {
+  api_id           = aws_apigatewayv2_api.ws.id
+  integration_type = "AWS_PROXY"
+  integration_uri  = aws_lambda_function.chat_handler.invoke_arn
+}
+
+resource "aws_apigatewayv2_integration" "lambda-draw" {
+  api_id           = aws_apigatewayv2_api.ws.id
+  integration_type = "AWS_PROXY"
+  integration_uri  = aws_lambda_function.draw_handler.invoke_arn
+}
+
 resource "aws_apigatewayv2_route" "connect" {
   api_id    = aws_apigatewayv2_api.ws.id
   route_key = "$connect"
@@ -46,9 +58,41 @@ resource "aws_apigatewayv2_route" "iceCandidate" {
   target    = "integrations/${aws_apigatewayv2_integration.lambda.id}"
 }
 
+resource "aws_apigatewayv2_route" "chat" {
+  api_id    = aws_apigatewayv2_api.ws.id
+  route_key = "chat"
+  target    = "integrations/${aws_apigatewayv2_integration.lambda-chat.id}"
+}
+
+resource "aws_apigatewayv2_route" "get_drawings" {
+  api_id    = aws_apigatewayv2_api.ws.id
+  route_key = "get_drawings"
+  target    = "integrations/${aws_apigatewayv2_integration.lambda-draw.id}"
+}
+
+resource "aws_apigatewayv2_route" "save_drawing" {
+  api_id    = aws_apigatewayv2_api.ws.id
+  route_key = "save_drawing"
+  target    = "integrations/${aws_apigatewayv2_integration.lambda-draw.id}"
+}
+
 resource "aws_lambda_permission" "apigw" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.ws_handler.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_apigatewayv2_api.ws.execution_arn}/*/*"
+}
+
+resource "aws_lambda_permission" "apigw_chat" {
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.chat_handler.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_apigatewayv2_api.ws.execution_arn}/*/*"
+}
+
+resource "aws_lambda_permission" "apigw_draw" {
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.draw_handler.function_name
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_apigatewayv2_api.ws.execution_arn}/*/*"
 }

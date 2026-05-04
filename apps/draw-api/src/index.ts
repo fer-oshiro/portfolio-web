@@ -10,7 +10,7 @@ import { IWebSocketProvider } from './websocket/IWebsocketProvider'
 
 // ---- Helpers ----
 
-const IS_LOCAL = 'true'
+const IS_LOCAL = process.env.NODE_ENV === 'development'
 const BUCKET = 'fer-oshiro-portfolio-drawings'
 const CDN_DOMAIN = 'fer-oshiro.com'
 console.log({ IS_LOCAL })

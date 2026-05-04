@@ -16,6 +16,12 @@ variable "state_bucket" {
   default     = "fer-oshiro-portfolio-terraform-state"
 }
 
+variable "s3_bucket_name" {
+  type        = string
+  description = "Nome do bucket S3 do portfólio"
+  default     = "fer-oshiro-portfolio-drawings"
+}
+
 variable "groq_api_key" {
   description = "A chave secreta da API do Groq"
   type        = string

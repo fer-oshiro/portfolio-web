@@ -32,6 +32,27 @@ resource "aws_iam_role_policy" "lambda_policy" {
         Action   = ["execute-api:ManageConnections"]
         Effect   = "Allow"
         Resource = "arn:aws:execute-api:${var.aws_region}:${data.aws_caller_identity.current.account_id}:${aws_apigatewayv2_api.ws.id}/*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:ListBucket"
+        ]
+        Resource = "arn:aws:s3:::${var.s3_bucket_name}"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:PutObject"
+        ]
+        Resource = "arn:aws:s3:::${var.s3_bucket_name}/submissions/*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject"
+        ]
+        Resource = "arn:aws:s3:::${var.s3_bucket_name}/gallery/*"
       }
     ]
   })
@@ -61,10 +82,9 @@ resource "aws_cloudwatch_log_group" "lambda_logs" {
   retention_in_days = 90
 }
 
-
 resource "aws_lambda_function" "chat_handler" {
   function_name    = "${var.project_name}-chat-handler"
-  role             = aws_iam_role.lambda_role.arn # reaproveitado
+  role             = aws_iam_role.lambda_role.arn
   handler          = "index.handler"
   runtime          = "nodejs20.x"
   filename         = "../../apps/chat-api/dist/index.zip"
@@ -80,5 +100,25 @@ resource "aws_lambda_function" "chat_handler" {
 
 resource "aws_cloudwatch_log_group" "chat_lambda_logs" {
   name              = "/aws/lambda/${aws_lambda_function.chat_handler.function_name}"
+  retention_in_days = 90
+}
+
+resource "aws_lambda_function" "draw_handler" {
+  function_name    = "${var.project_name}-draw-handler"
+  role             = aws_iam_role.lambda_role.arn
+  handler          = "index.handler"
+  runtime          = "nodejs20.x"
+  filename         = "../../apps/draw-api/dist/index.zip"
+  source_code_hash = fileexists("../../apps/draw-api/dist/index.zip") ? filebase64sha256("../../apps/draw-api/dist/index.zip") : null
+
+  environment {
+    variables = {
+      BUCKET = var.s3_bucket_name
+    }
+  }
+}
+
+resource "aws_cloudwatch_log_group" "draw_lambda_logs" {
+  name              = "/aws/lambda/${aws_lambda_function.draw_handler.function_name}"
   retention_in_days = 90
 }
