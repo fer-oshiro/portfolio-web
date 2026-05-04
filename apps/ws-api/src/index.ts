@@ -70,12 +70,13 @@ const getPeer = async (connectionId: string) => {
   const result = await dynamo.send(
     new ScanCommand({
       TableName: TABLE_NAME,
-      FilterExpression: 'connectionId = :connectionId AND role = :role',
+      FilterExpression:
+        'connectionId = :connectionId AND deviceType = :deviceType',
+
       ExpressionAttributeValues: {
         ':connectionId': { S: connectionId },
-        ':role': { S: 'desktop' },
+        ':deviceType': { S: 'desktop' },
       },
-      Limit: 1,
     }),
   )
   return result.Items?.at(0) ?? null
@@ -116,7 +117,7 @@ export const handler = async (event: any): Promise<APIGatewayProxyResultV2> => {
           TableName: TABLE_NAME,
           Item: {
             connectionId: { S: connectionId },
-            role: { S: role },
+            deviceType: { S: role },
             roomId: { S: roomId },
             iceServers: { S: JSON.stringify(iceServers) },
           },
@@ -145,14 +146,21 @@ export const handler = async (event: any): Promise<APIGatewayProxyResultV2> => {
 
     if (routeKey === 'offer') {
       const { sdp, targetConnectionId } = body
-      const peer = await getPeer(connectionId)
+      try {
+        console.log('peer', JSON.stringify(body), connectionId)
 
-      await sendToConnection(apigw, targetConnectionId, {
-        type: 'offer',
-        sdp,
-        from: connectionId,
-        iceServers: peer?.iceServers?.S!,
-      })
+        const peer = await getPeer(connectionId)
+        console.log('peer', JSON.stringify(peer))
+
+        await sendToConnection(apigw, targetConnectionId, {
+          type: 'offer',
+          sdp,
+          from: connectionId,
+          iceServers: peer?.iceServers?.S,
+        })
+      } catch (err) {
+        console.error('error sending offer', err)
+      }
 
       return { statusCode: 200, body: 'Offer sent' }
     }

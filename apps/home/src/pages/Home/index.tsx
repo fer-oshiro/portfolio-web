@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import { Transition } from '../../components/Transition'
 import { WebSocket } from '../../components/WebSocket'
 import { useStore } from '../../store'
@@ -10,10 +11,12 @@ export const Home = () => {
   return (
     <>
       <WebSocket />
-      <Transition />
-      <Room show={location === 'room'} />
-      <Draw show={location === 'draw'} />
-      <CatMiniGame show={location === 'cat'} />
+      <Suspense>
+        <Transition />
+        <Room show={location === 'room'} />
+        <Draw show={location === 'draw'} />
+        <CatMiniGame show={location === 'cat'} />
+      </Suspense>
     </>
   )
 }

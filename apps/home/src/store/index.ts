@@ -6,15 +6,21 @@ import {
   TransitionState,
 } from './slices/transitionSlice'
 import { createTrickedSlice, TrickedState } from './slices/trickedSlice'
+import { createLoadingSlice, LoadingState } from './slices/loadingSlice'
+import { createGyroSlice, GyroState } from './slices/gyroSlice'
 
 export type MyStore = CameraState &
   TransitionState &
   TrickedState &
-  LocationState
+  LocationState &
+  LoadingState &
+  GyroState
 
 export const useStore = create<MyStore>((...a) => ({
   ...createCameraSlice(...a),
   ...createTransitionSlice(...a),
   ...createTrickedSlice(...a),
   ...createLocationSlice(...a),
+  ...createLoadingSlice(...a),
+  ...createGyroSlice(...a),
 }))

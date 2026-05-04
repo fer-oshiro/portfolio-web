@@ -1,10 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
-import { DefaultColorThemePalette, Tldraw } from 'tldraw'
 
-import { Ui, UiHandle } from './Ui'
+import { UiHandle } from './Ui'
 
 import { Leva, useControls } from 'leva'
-import 'tldraw/tldraw.css'
 import useWebSocket from 'react-use-websocket'
 import { WS_URL } from '../../service/constants'
 
@@ -16,21 +14,7 @@ interface IWebsocket {
 
 export const Canvas = () => {
   const [open, setOpen] = useState(false)
-  const colors = useControls('Palette', {
-    black: DefaultColorThemePalette.lightMode.black.solid,
-    grey: DefaultColorThemePalette.lightMode.grey.solid,
-    blue: DefaultColorThemePalette.lightMode.blue.solid,
-    'light-blue': DefaultColorThemePalette.lightMode['light-blue'].solid,
-    green: DefaultColorThemePalette.lightMode.green.solid,
-    'light-green': DefaultColorThemePalette.lightMode['light-green'].solid,
-    red: DefaultColorThemePalette.lightMode.red.solid,
-    'light-red': DefaultColorThemePalette.lightMode['light-red'].solid,
-    orange: DefaultColorThemePalette.lightMode.orange.solid,
-    yellow: DefaultColorThemePalette.lightMode.yellow.solid,
-    violet: DefaultColorThemePalette.lightMode.violet.solid,
-    'light-violet': DefaultColorThemePalette.lightMode['light-violet'].solid,
-    white: DefaultColorThemePalette.lightMode.white.solid,
-  })
+  const colors = useControls('Palette', {})
   const { sendJsonMessage, lastJsonMessage } = useWebSocket<IWebsocket>(
     WS_URL,
     { share: true },
@@ -80,20 +64,7 @@ export const Canvas = () => {
             gap: '16px',
             padding: '12px',
           }}
-        >
-          {Object.keys(colors).map((color) => (
-            <button
-              style={{
-                height: '50px',
-                width: '50px',
-                borderRadius: '50%',
-                backgroundColor: colors[color],
-                border: '2px solid black',
-              }}
-              onClick={() => ui.current?.handleColor(color)}
-            />
-          ))}
-        </div>
+        ></div>
         <div style={{ display: 'flex', gap: '20px', alignItems: 'self-start' }}>
           <button
             onClick={() => {
@@ -132,17 +103,7 @@ export const Canvas = () => {
         </div>
         <div
           style={{ height: '500px', width: '500px', backgroundColor: 'white' }}
-        >
-          <Tldraw
-            options={{
-              maxPages: 1,
-              camera: { isLocked: true },
-            }}
-            hideUi
-          >
-            <Ui ref={ui} colors={colors} />
-          </Tldraw>
-        </div>
+        ></div>
       </div>
 
       {open && (

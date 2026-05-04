@@ -141,7 +141,7 @@ export const Board = () => {
       step: 1,
     },
   })
-  const [imgs, setImgs] = useState<Drawings>([])
+  const [imgs, setImgs] = useState<Drawings[]>([])
   const { sendJsonMessage, lastJsonMessage, readyState } =
     useWebSocket<IWebsocket>(WS_URL, { share: true })
   useEffect(() => {
@@ -161,26 +161,24 @@ export const Board = () => {
   return (
     <>
       <AWS />
-      {[...imgs, ...imgs, ...imgs, ...imgs, ...imgs, ...imgs].map(
-        (img, index) => {
-          let col = index
-          SKIP_POSITIONS.forEach((skip) => {
-            if (col >= skip) col++
-          })
+      {imgs?.map((img, index) => {
+        let col = index
+        SKIP_POSITIONS.forEach((skip) => {
+          if (col >= skip) col++
+        })
 
-          return (
-            <DrawingItem
-              key={img.url}
-              img={img}
-              position={[
-                position[0],
-                Math.floor(col / columns) * -0.5 + position[1],
-                (col % columns) * 0.5 + position[2],
-              ]}
-            />
-          )
-        },
-      )}
+        return (
+          <DrawingItem
+            key={img.url}
+            img={img}
+            position={[
+              position[0],
+              Math.floor(col / columns) * -0.5 + position[1],
+              (col % columns) * 0.5 + position[2],
+            ]}
+          />
+        )
+      })}
     </>
   )
 }

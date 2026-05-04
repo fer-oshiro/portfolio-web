@@ -10,7 +10,6 @@ import { Tricked } from '../../components/Tricked'
 
 import roomUrl from '../../assets/models/room.glb'
 import roomBaked from '../../assets/models/room.png'
-import { Transition } from '../../components/Transition'
 
 function RoomMesh() {
   const { nodes } = useGLTF(roomUrl)

@@ -8,19 +8,13 @@ const {
   zustand: ___,
   ...sharedDeps
 } = deps
-const address = require('address')
-const { DefinePlugin } = require('webpack')
-
-const LAN_IP = address.ip()
 
 module.exports = (_, argv) => {
   const isProd = argv.mode === 'production'
 
   return {
     output: {
-      publicPath: isProd
-        ? 'https://dk341v3ghfif7.cloudfront.net/home/'
-        : 'auto',
+      publicPath: isProd ? 'https://fer-oshiro.com/home/' : 'auto',
       clean: true,
     },
 

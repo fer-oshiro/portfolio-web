@@ -21,7 +21,7 @@ module.exports = (_, argv) => {
   return {
     output: {
       publicPath: isProd
-        ? 'https://dk341v3ghfif7.cloudfront.net/blog/'
+        ? 'https://fer-oshiro.com/blog/'
         : `http://${LAN_IP}:3003/`,
       clean: true,
     },

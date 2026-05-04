@@ -3,9 +3,11 @@ import useWebSocket, { ReadyState } from 'react-use-websocket'
 
 import { WS_URL } from '../service/constants'
 import { WebController } from '../service/WebController'
+import { useStore } from '../store'
 
 const roomId = crypto.randomUUID && crypto.randomUUID()
 export const useDesktopRTC = () => {
+  const { setStatus } = useStore()
   const [connected, setConnected] =
     useState<RTCPeerConnectionState>('disconnected')
   const [gyro, setGyro] = useState({ alpha: 0, beta: 0, gamma: 0 })
@@ -13,7 +15,10 @@ export const useDesktopRTC = () => {
   const [iceServers, setIceServers] = useState<RTCIceServer[]>()
   const { sendJsonMessage, lastJsonMessage, readyState } = useWebSocket(
     WS_URL,
-    { share: true },
+    {
+      share: true,
+      onError: () => setStatus('server_error'),
+    },
   )
 
   useEffect(() => {
@@ -27,6 +32,7 @@ export const useDesktopRTC = () => {
   }, [readyState])
 
   const setupPeerConnection = (mobileConnectionId: string) => {
+    console.log(iceServers)
     if (!iceServers) return
     const controller = new WebController(
       setGyro,
@@ -46,6 +52,7 @@ export const useDesktopRTC = () => {
     }
 
     webController.current = controller
+    console.log('dentro do setupPeerConnection', controller)
     return controller
   }
 
@@ -62,8 +69,10 @@ export const useDesktopRTC = () => {
       if (msg.type === 'peer-joined') {
         console.log('📱 Mobile detectado:', msg.connectionId)
         const controller = setupPeerConnection(msg.connectionId)
+        console.log('fora do setupPeerConnection', controller)
         if (!controller) return
         const offer = await controller.createOffer()
+        console.log('offer')
         sendJsonMessage({
           action: 'offer',
           sdp: offer,
@@ -83,5 +92,5 @@ export const useDesktopRTC = () => {
     handleLastMessage()
   }, [lastJsonMessage])
 
-  return { connected, gyro, roomId, iceServers }
+  return { connected, readyState, gyro, roomId, iceServers }
 }

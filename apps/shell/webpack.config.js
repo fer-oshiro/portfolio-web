@@ -71,13 +71,13 @@ module.exports = (_, argv) => {
         filename: 'remoteEntry.js',
         remotes: {
           home: isProd
-            ? 'home@https://dk341v3ghfif7.cloudfront.net/home/remoteEntry.js'
+            ? 'home@https://fer-oshiro.com/home/remoteEntry.js'
             : `home@http://${LAN_IP}:3001/remoteEntry.js`,
           blog: isProd
-            ? 'blog@https://dk341v3ghfif7.cloudfront.net/blog/remoteEntry.js'
+            ? 'blog@https://fer-oshiro.com/blog/remoteEntry.js'
             : `blog@http://${LAN_IP}:3003/remoteEntry.js`,
           resume: isProd
-            ? 'resume@https://dk341v3ghfif7.cloudfront.net/resume/remoteEntry.js'
+            ? 'resume@https://fer-oshiro.com/resume/remoteEntry.js'
             : `resume@http://${LAN_IP}:3002/remoteEntry.js`,
         },
         exposes: {},

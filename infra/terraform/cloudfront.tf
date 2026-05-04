@@ -40,24 +40,23 @@ resource "aws_cloudfront_distribution" "portfolio" {
     path_pattern           = "/gallery/*"
     target_origin_id       = "drawings-bucket"
     viewer_protocol_policy = "redirect-to-https"
-    allowed_methods        = ["GET", "HEAD"]
+    allowed_methods        = ["GET", "HEAD", "OPTIONS"]
     cached_methods         = ["GET", "HEAD"]
 
-    # Usei o ID da política de cache padrão da AWS (CachingOptimized)
-    # para evitar o erro de "Legacy settings" aqui também
-    cache_policy_id          = "658327ea-f89d-4fab-a63d-7e88639e58f6"
-    origin_request_policy_id = "88a5eaf4-2fd4-4709-b370-b4c650ea3fcf"
+    cache_policy_id            = "658327ea-f89d-4fab-a63d-7e88639e58f6"
+    origin_request_policy_id   = "88a5eaf4-2fd4-4709-b370-b4c650ea3fcf"
+    response_headers_policy_id = "60669652-455b-4ae9-85a4-c4c02393f86c"
   }
 
   default_cache_behavior {
-    allowed_methods        = ["GET", "HEAD"]
-    cached_methods         = ["GET", "HEAD"]
-    target_origin_id       = "fer-oshiro-portfolio.s3.us-east-1.amazonaws.com-mmf5wzx72lg"
-    viewer_protocol_policy = "redirect-to-https"
-    compress               = true
-    cache_policy_id        = "658327ea-f89d-4fab-a63d-7e88639e58f6"
-
-    # forwarded_values REMOVIDO DAQUI
+    allowed_methods            = ["GET", "HEAD", "OPTIONS"]
+    cached_methods             = ["GET", "HEAD"]
+    target_origin_id           = "fer-oshiro-portfolio.s3.us-east-1.amazonaws.com-mmf5wzx72lg"
+    viewer_protocol_policy     = "redirect-to-https"
+    compress                   = true
+    origin_request_policy_id   = "88a5eaf4-2fd4-4709-b370-b4c650ea3fcf"
+    cache_policy_id            = "658327ea-f89d-4fab-a63d-7e88639e58f6"
+    response_headers_policy_id = "60669652-455b-4ae9-85a4-c4c02393f86c"
   }
 
   restrictions {

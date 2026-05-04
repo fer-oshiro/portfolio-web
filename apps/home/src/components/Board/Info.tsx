@@ -1,5 +1,4 @@
 import {
-  Html,
   Image,
   MeshPortalMaterial,
   Stars,
@@ -7,16 +6,15 @@ import {
   useTexture,
 } from '@react-three/drei'
 import { useControls } from 'leva'
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import * as THREE from 'three'
-import YouTube from 'react-youtube'
 
 import SP42 from '../../assets/42SP.png'
 import confia from '../../assets/confia.png'
 import eu from '../../assets/eu.png'
-import yt from '../../assets/yt.png'
 import github from '../../assets/github.png'
 import linkedin from '../../assets/linkedin.png'
+import yt from '../../assets/yt.png'
 import { useStore } from '../../store'
 
 function useSpaceGradient() {

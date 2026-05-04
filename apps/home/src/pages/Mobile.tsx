@@ -34,7 +34,7 @@ export const Mobile = () => {
     setGyroStatus('startGyroscope')
     const handleMotion = (event: DeviceOrientationEvent) => {
       const now = Date.now()
-      if (now - lastSend < 32) return
+      if (now - lastSend < 60) return
       lastSend = now
       handleSendGyro({
         alpha: event.alpha,
