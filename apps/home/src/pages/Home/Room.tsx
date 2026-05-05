@@ -1,17 +1,18 @@
 import { useGLTF, useTexture } from '@react-three/drei'
 import { Canvas } from '@react-three/fiber'
 import { Leva, useControls } from 'leva'
+import { useState } from 'react'
 import * as THREE from 'three'
 
 import { Board } from '../../components/Board'
 import { CameraManager } from '../../components/CameraManager'
 import { Computer } from '../../components/Computer'
+import InteractionManager from '../../components/InteractionManager'
+import SakuraStar from '../../components/Star'
 import { Tricked } from '../../components/Tricked'
 
 import roomUrl from '../../assets/models/room.glb'
 import roomBaked from '../../assets/models/room.png'
-import SakuraStar from '../../components/Star'
-import { useState } from 'react'
 
 function RoomMesh() {
   const { nodes } = useGLTF(roomUrl)
@@ -22,6 +23,7 @@ function RoomMesh() {
     board: false,
     drawing: false,
   })
+
   const { pc, cat, board, draw } = useControls('Stars', {
     pc: {
       value: [0, 5.5, -4],
@@ -35,6 +37,9 @@ function RoomMesh() {
     draw: {
       value: [3.61, 3.56, 1.0],
     },
+  })
+  const { visible } = useControls('Hitbox', {
+    visible: true,
   })
   bakedTexture.colorSpace = THREE.SRGBColorSpace
   bakedTexture.flipY = false
@@ -57,62 +62,80 @@ function RoomMesh() {
         <meshBasicMaterial color="white" />
       </mesh>
 
-      <mesh
-        geometry={nodes.Icosphere.geometry}
-        onPointerEnter={() =>
-          setHover({
-            pc: false,
-            cat: true,
-            board: false,
-            drawing: false,
-          })
-        }
-        onPointerLeave={() => setHover((prev) => ({ ...prev, cat: false }))}
-      >
+      <mesh geometry={nodes.Icosphere.geometry}>
         <meshBasicMaterial color="red" />
-        <SakuraStar position={cat} loc="cat" hover={hover.cat} />
       </mesh>
+      <group position={cat}>
+        <mesh
+          visible={visible}
+          scale={[1.5, 1.5, 1.5]}
+          position={[0, -0.5, 0]}
+          userData={{ focusTarget: 'cat' }}
+        >
+          <boxGeometry args={[1, 1]} />
+          <meshBasicMaterial color="red" wireframe />
+        </mesh>
+        <SakuraStar loc="cat" hover={hover.cat} />
+      </group>
 
-      <mesh
-        geometry={nodes.screen.geometry}
-        onPointerEnter={() =>
-          setHover({
-            pc: true,
-            cat: false,
-            board: false,
-            drawing: false,
-          })
-        }
-        onPointerLeave={() => setHover((prev) => ({ ...prev, pc: false }))}
-      >
+      <mesh geometry={nodes.screen.geometry}>
         <meshBasicMaterial map={bakedTexture} />
-        <SakuraStar position={pc} hover={hover.pc} loc="pc" />
         <Computer />
       </mesh>
+      <group position={pc}>
+        <mesh
+          visible={visible}
+          scale={[2, 2.5, 1.5]}
+          position={[0, -1.25, 0]}
+          userData={{ focusTarget: 'pc' }}
+        >
+          <boxGeometry args={[1, 1]} />
+          <meshBasicMaterial color="red" wireframe />
+        </mesh>
+        <SakuraStar hover={hover.pc} loc="pc" />
+      </group>
 
-      <mesh
-        geometry={nodes.board.geometry}
-        onPointerEnter={() =>
-          setHover({
-            pc: false,
-            cat: false,
-            board: true,
-            drawing: false,
-          })
-        }
-        onPointerLeave={() => setHover((prev) => ({ ...prev, board: false }))}
-      >
+      <mesh geometry={nodes.board.geometry}>
         <meshBasicMaterial map={bakedTexture} />
-        <SakuraStar position={board} loc="board" />
         <Board />
       </mesh>
+      <group position={board}>
+        <mesh
+          visible={visible}
+          scale={[1, 4, 4]}
+          position={[0, -1.8, 0]}
+          userData={{ focusTarget: 'board' }}
+        >
+          <boxGeometry args={[1, 1]} />
+          <meshBasicMaterial color="red" wireframe />
+        </mesh>
+        <SakuraStar loc="board" />
+      </group>
 
-      <SakuraStar position={draw} loc="draw" />
+      <group position={draw}>
+        <mesh
+          visible={visible}
+          scale={[1, 0.5, 4]}
+          position={[-0.4, 0, 0]}
+          userData={{ focusTarget: 'draw' }}
+        >
+          <boxGeometry args={[1, 1]} />
+          <meshBasicMaterial color="red" wireframe />
+        </mesh>
+        <SakuraStar loc="draw" />
+      </group>
     </group>
   )
 }
 
 function Room({ show }: { show: boolean }) {
+  const [position, setPosition] = useState({})
+  const castRay = (x, y) => {
+    setPosition({
+      x,
+      y,
+    })
+  }
   return (
     <div
       style={{
@@ -129,12 +152,17 @@ function Room({ show }: { show: boolean }) {
         camera={{
           fov: 75,
         }}
+        onPointerMove={(e) => castRay(e.clientX, e.clientY)}
       >
         <CameraManager />
+        <InteractionManager
+          customX={position.x}
+          customY={position.y}
+          onFocus={(obj) => console.log('hi', obj?.userData, obj?.name)}
+        />
 
         <color attach="background" args={['#996754']} />
         <directionalLight position={[10, 10, 5]} intensity={15} />
-
         <RoomMesh />
       </Canvas>
     </div>

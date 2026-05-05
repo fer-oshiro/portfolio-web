@@ -1,4 +1,4 @@
-import { OrbitControls } from '@react-three/drei'
+import { Html, OrbitControls } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
 import { button, useControls } from 'leva'
 import { useEffect, useRef } from 'react'

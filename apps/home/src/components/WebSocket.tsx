@@ -1,5 +1,5 @@
 import { useProgress } from '@react-three/drei'
-import { motion } from 'motion/react'
+import { AnimatePresence, motion } from 'motion/react'
 import { useEffect, useState } from 'react'
 
 import { ReadyState } from 'react-use-websocket'
@@ -12,7 +12,7 @@ import { QRCode } from './QRCode'
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
 export const WebSocket = () => {
-  const { status, setConnected } = useStore()
+  const { status, setConnected, focus, setCamera } = useStore()
   const { progress } = useProgress()
   const { roomId, gyro, connected, iceServers, readyState } = useDesktopRTC()
   const [isOpen, setIsOpen] = useState<boolean>(true)
@@ -47,6 +47,43 @@ export const WebSocket = () => {
         alignItems: 'center',
       }}
     >
+      <AnimatePresence mode="wait">
+        {['pc', 'board'].includes(focus) && (
+          <motion.div
+            style={{
+              position: 'fixed',
+              top: '40px',
+              width: '100px',
+              height: '40px',
+              backgroundColor: '#e6b092',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '5px',
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderRadius: '20px',
+              border: 'none',
+              cursor: 'pointer',
+              pointerEvents: 'auto',
+            }}
+            initial={{ left: '-80px' }}
+            animate={{ left: '40px' }}
+            exit={{ left: '-100px' }}
+          >
+            <button
+              style={{
+                width: '100%',
+                height: '100%',
+                border: 'none',
+                background: 'none',
+              }}
+              onClick={() => setCamera('default')}
+            >
+              Voltar
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
       {!isOpen && (
         <button
           style={{
