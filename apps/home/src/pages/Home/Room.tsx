@@ -13,16 +13,12 @@ import { Tricked } from '../../components/Tricked'
 
 import roomUrl from '../../assets/models/room.glb'
 import roomBaked from '../../assets/models/room.png'
+import { useStore } from '../../store'
 
 function RoomMesh() {
   const { nodes } = useGLTF(roomUrl)
   const bakedTexture = useTexture(roomBaked)
-  const [hover, setHover] = useState({
-    pc: false,
-    cat: false,
-    board: false,
-    drawing: false,
-  })
+  const { setCamera } = useStore()
 
   const { pc, cat, board, draw } = useControls('Stars', {
     pc: {
@@ -71,11 +67,14 @@ function RoomMesh() {
           scale={[1.5, 1.5, 1.5]}
           position={[0, -0.5, 0]}
           userData={{ focusTarget: 'cat' }}
+          onClick={() => setCamera('cat')}
+          onPointerEnter={() => (document.body.style.cursor = 'pointer')}
+          onPointerLeave={() => (document.body.style.cursor = 'default')}
         >
           <boxGeometry args={[1, 1]} />
           <meshBasicMaterial color="red" wireframe />
         </mesh>
-        <SakuraStar loc="cat" hover={hover.cat} />
+        <SakuraStar loc="cat" />
       </group>
 
       <mesh geometry={nodes.screen.geometry}>
@@ -88,11 +87,14 @@ function RoomMesh() {
           scale={[2, 2.5, 1.5]}
           position={[0, -1.25, 0]}
           userData={{ focusTarget: 'pc' }}
+          onClick={() => setCamera('pc')}
+          onPointerEnter={() => (document.body.style.cursor = 'pointer')}
+          onPointerLeave={() => (document.body.style.cursor = 'default')}
         >
           <boxGeometry args={[1, 1]} />
           <meshBasicMaterial color="red" wireframe />
         </mesh>
-        <SakuraStar hover={hover.pc} loc="pc" />
+        <SakuraStar loc="pc" />
       </group>
 
       <mesh geometry={nodes.board.geometry}>
@@ -105,6 +107,9 @@ function RoomMesh() {
           scale={[1, 4, 4]}
           position={[0, -1.8, 0]}
           userData={{ focusTarget: 'board' }}
+          onClick={() => setCamera('board')}
+          onPointerEnter={() => (document.body.style.cursor = 'pointer')}
+          onPointerLeave={() => (document.body.style.cursor = 'default')}
         >
           <boxGeometry args={[1, 1]} />
           <meshBasicMaterial color="red" wireframe />
@@ -115,9 +120,12 @@ function RoomMesh() {
       <group position={draw}>
         <mesh
           visible={visible}
-          scale={[1, 0.5, 4]}
+          scale={[1, 1, 4]}
           position={[-0.4, 0, 0]}
           userData={{ focusTarget: 'draw' }}
+          onClick={() => setCamera('draw')}
+          onPointerEnter={() => (document.body.style.cursor = 'pointer')}
+          onPointerLeave={() => (document.body.style.cursor = 'default')}
         >
           <boxGeometry args={[1, 1]} />
           <meshBasicMaterial color="red" wireframe />
@@ -129,7 +137,7 @@ function RoomMesh() {
 }
 
 function Room({ show }: { show: boolean }) {
-  const [position, setPosition] = useState({})
+  const [position, setPosition] = useState()
   const castRay = (x, y) => {
     setPosition({
       x,
@@ -156,9 +164,9 @@ function Room({ show }: { show: boolean }) {
       >
         <CameraManager />
         <InteractionManager
-          customX={position.x}
-          customY={position.y}
-          onFocus={(obj) => console.log('hi', obj?.userData, obj?.name)}
+          customX={position?.x}
+          customY={position?.y}
+          onFocus={(obj) => console.log('hi', obj?.userData)}
         />
 
         <color attach="background" args={['#996754']} />

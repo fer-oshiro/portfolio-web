@@ -1,6 +1,6 @@
 import { Image, RoundedBox, Text } from '@react-three/drei'
 import { useControls } from 'leva'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import useWebSocket from 'react-use-websocket'
 
 import awsDeveloper from '../../assets/aws-developer.png'
@@ -28,9 +28,9 @@ function DrawingItem({
   position: [number, number, number]
 }) {
   const SIZE = 0.25
-  const rotationZ = (Math.random() - 0.5) * 0.2
   const [x, y, z] = position
-  const height = (Math.random() - 0.5) * 0.05
+  const rotationZ = useMemo(() => (Math.random() - 0.5) * 0.2, [])
+  const height = useMemo(() => (Math.random() - 0.5) * 0.05, [])
 
   return (
     <group

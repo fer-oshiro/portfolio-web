@@ -1,5 +1,6 @@
 import { useThree } from '@react-three/fiber'
 import { useEffect } from 'react'
+import { useStore } from '../store'
 
 function InteractionManager({
   customX,
@@ -10,6 +11,7 @@ function InteractionManager({
   customY?: number
   onFocus: (bj: any) => void
 }) {
+  const { setHover } = useStore()
   const { camera, raycaster, size, scene } = useThree()
 
   const castRay = (pixelX, pixelY) => {
@@ -21,6 +23,12 @@ function InteractionManager({
 
     if (hits.length > 0) {
       onFocus(hits[0]?.object)
+
+      if (hits[0]?.object.userData.focusTarget) {
+        setHover(hits[0]?.object.userData.focusTarget)
+      } else {
+        setHover('default')
+      }
     }
   }
 

@@ -8,6 +8,7 @@ type Position = {
 
 export interface CameraState {
   moving: boolean
+  hover: CameraCoords
   focus: CameraCoords
   position: Position
   cameraCoords: {
@@ -19,6 +20,7 @@ export interface CameraState {
   }
   setCamera: (pos: CameraCoords) => void
   setMoving: (moving: boolean) => void
+  setHover: (pos: CameraCoords) => void
 }
 
 export type CameraCoords = keyof CameraState['cameraCoords']
@@ -29,6 +31,7 @@ export const createCameraSlice: StateCreator<MyStore, [], [], CameraState> = (
 ) => ({
   moving: true,
   focus: 'default',
+  hover: 'default',
   position: {
     coord: [-13.5, 50.5, 7.5],
     target: [0.75, -0.5, -0.3],
@@ -61,8 +64,14 @@ export const createCameraSlice: StateCreator<MyStore, [], [], CameraState> = (
       moving: true,
       focus: pos,
     }))
-    const { setLocation } = get()
-    if (pos === 'cat' || pos === 'draw') setLocation(pos)
+    const { setLocation, setHover, setTransition } = get()
+    setHover('default')
+    if (pos === 'cat' || pos === 'draw') {
+      if (pos === 'cat') setTransition('cat')
+      if (pos === 'draw') setTransition('brush')
+      setLocation(pos)
+    }
   },
   setMoving: (moving) => set({ moving }),
+  setHover: (hover) => set({ hover }),
 })

@@ -10,9 +10,9 @@ export const Home = () => {
   const { location } = useStore()
   return (
     <>
+      <Transition />
       <WebSocket />
       <Suspense>
-        <Transition />
         <Room show={location === 'room'} />
         <Draw show={location === 'draw'} />
         <CatMiniGame show={location === 'cat'} />

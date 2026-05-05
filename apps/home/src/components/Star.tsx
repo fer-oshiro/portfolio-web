@@ -10,17 +10,15 @@ function SakuraStar({
   position = [0, 0, 0],
   color = '#FFB7C5',
   size = 0.15,
-  hover = false,
   loc,
 }: {
   position?: [number, number, number]
   color?: string
   size?: number
-  hover?: boolean
   loc: CameraCoords
 }) {
   const progress = useRef(0)
-  const { setCamera, focus } = useStore()
+  const { setCamera, focus, hover } = useStore()
   const { torus } = useControls('Stars', {
     torus: {
       value: [0.2, 0.03, 16],
@@ -57,10 +55,10 @@ function SakuraStar({
       torusRef.current.rotation.y += Math.max(progress.current, 0.1) * 0.2
       torusRef.current.rotation.x += Math.max(progress.current, 0.1) * 0.2
 
-      if (hover && focus !== loc) {
-        progress.current = Math.min(progress.current + delta / 1.7, 1) // 1.2s pra completar
+      if (hover === loc && focus !== loc) {
+        progress.current = Math.min(progress.current + delta / 1.2, 1)
       } else {
-        progress.current = Math.max(progress.current - delta / 1.5, 0) // volta mais rápido
+        progress.current = Math.max(progress.current - delta / 1.2, 0)
       }
 
       torusRef.current.material.color.lerpColors(

@@ -40,7 +40,7 @@ export const WebSocket = () => {
         left: 0,
         height: '100%',
         width: '100%',
-        zIndex: 99999999999,
+        zIndex: 99998,
         pointerEvents: 'none',
         display: 'flex',
         justifyContent: 'center',
@@ -76,6 +76,7 @@ export const WebSocket = () => {
                 height: '100%',
                 border: 'none',
                 background: 'none',
+                cursor: 'pointer',
               }}
               onClick={() => setCamera('default')}
             >
@@ -158,7 +159,7 @@ export const WebSocket = () => {
           >
             x
           </button>
-          {readyState === ReadyState.OPEN && (
+          {readyState === ReadyState.OPEN && status !== 'server_error' && (
             <div>
               <h1>Bem-vindo ao meu quarto ( ദ്ദി ˙ᗜ˙ )</h1>
               <p>Me chamo Fernanda, sou desenvolvedora Front-end</p>
