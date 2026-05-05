@@ -67,14 +67,14 @@ export const handleChat = async (
   })
 
   let buffer = ''
-  const CHUNK_SIZE = 5
+  const CHUNK_SIZE = 150
 
   for await (const chunk of stream) {
     const text = chunk.choices[0]?.delta?.content ?? ''
     if (text) {
       buffer += text
 
-      if (buffer.length > 20) {
+      if (buffer.length >= CHUNK_SIZE) {
         await websocket.sendMessage(connectionId, {
           from: 'ai',
           type: 'chunk',
@@ -119,7 +119,7 @@ export const handler: APIGatewayProxyWebsocketHandlerV2 = async (event) => {
     if (routeKey === 'chat') {
       await apigw.sendMessage(connectionId, {
         type: 'error',
-        text: 'Algo deu errado!',
+        text: JSON.stringify(err),
       })
     }
 

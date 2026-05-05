@@ -4,7 +4,29 @@ import useWebSocket from 'react-use-websocket'
 
 import { WS_URL } from '../../service/constants'
 import { useStore } from '../../store'
+import { TypingDots } from './TypingDots'
+
 import './Window.css'
+
+const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+
+const splitText = (text = '', maxLength = 200) => {
+  const sentences = text.split(/(?<=[.!?])\s+/) // separa após pontuação + espaço
+  const chunks = []
+  let current = ''
+
+  for (const sentence of sentences) {
+    if ((current + sentence).length > maxLength) {
+      if (current) chunks.push(current.trim())
+      current = sentence
+    } else {
+      current += ' ' + sentence
+    }
+  }
+
+  if (current) chunks.push(current.trim())
+  return chunks
+}
 
 interface IMessage {
   from: string
@@ -13,7 +35,7 @@ interface IMessage {
 
 interface IWebsocket {
   from?: string
-  type: 'chunk' | 'done'
+  type: 'chunk' | 'done' | 'error'
   text?: string
 }
 
@@ -26,12 +48,13 @@ export const Window = () => {
     },
   ])
   const [buffer, setBuffer] = useState('')
-  const { sendJsonMessage, lastJsonMessage, readyState } =
-    useWebSocket<IWebsocket>(WS_URL, { share: true })
-  const { maxChars } = useControls({
-    maxChars: 150,
-  })
+  const { sendJsonMessage, lastJsonMessage } = useWebSocket<IWebsocket>(
+    WS_URL,
+    { share: true },
+  )
+  const { maxChars } = useControls({ maxChars: 150 })
   const [text, setText] = useState('')
+  const [waiting, setWaiting] = useState(false)
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const { focus } = useStore()
 
@@ -45,22 +68,49 @@ export const Window = () => {
     if (lastJsonMessage?.from === 'ai' && lastJsonMessage?.type === 'chunk')
       setBuffer((prev) => prev + lastJsonMessage?.text)
     if (lastJsonMessage?.from === 'ai' && lastJsonMessage?.type === 'done') {
-      setMess((prev) => [
-        ...prev,
-        {
-          from: 'ai',
-          text: buffer,
-        },
-      ])
+      handleBotDone()
+    }
+    if (
+      lastJsonMessage?.type === 'error' ||
+      lastJsonMessage?.message === 'Internal server error'
+    ) {
       setBuffer('')
-
+      setWaiting(false)
       setTimeout(function () {
         bottomRef.current?.scrollIntoView()
+        inputRef.current?.focus()
       }, 100)
     }
   }, [lastJsonMessage])
 
-  const handleMessage = () => {
+  const handleBotDone = async () => {
+    console.log(splitText(buffer))
+    for (const text of splitText(buffer)) {
+      await handleAddBotMessage(text, splitText(buffer).at(-1))
+    }
+    setBuffer('')
+    setWaiting(false)
+    setTimeout(function () {
+      bottomRef.current?.scrollIntoView()
+      inputRef.current?.focus()
+    }, 100)
+  }
+
+  const handleAddBotMessage = async (mess: string, lastMess?: string) => {
+    setMess((prev) => [
+      ...prev,
+      {
+        from: 'ai',
+        text: mess,
+      },
+    ])
+    await wait(300)
+    bottomRef.current?.scrollIntoView()
+    if (mess !== lastMess) await wait(4000)
+  }
+
+  const handleSubmit = () => {
+    if (waiting) return
     setMess((prev) => [
       ...prev,
       {
@@ -71,6 +121,7 @@ export const Window = () => {
     setTimeout(function () {
       bottomRef.current?.scrollIntoView()
     }, 100)
+    setWaiting(true)
     sendJsonMessage({
       action: 'chat',
       message: text,
@@ -93,6 +144,7 @@ export const Window = () => {
             {message.text}
           </div>
         ))}
+        {waiting && <TypingDots />}
         <div ref={bottomRef}></div>
       </div>
       <div className="textarea-wrapper">
@@ -100,17 +152,24 @@ export const Window = () => {
           ref={inputRef}
           value={text}
           maxLength={maxChars}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault()
+              handleSubmit()
+            }
+          }}
           onChange={(event) =>
             event.target.value.length - 1 < maxChars
               ? setText(event.target.value)
               : null
           }
+          disabled={waiting}
         />
         <span>
           {maxChars - text.length} / {maxChars} max
         </span>
       </div>
-      <button onClick={handleMessage}>send</button>
+      <button onClick={handleSubmit}>send</button>
     </div>
   )
 }
