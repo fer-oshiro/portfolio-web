@@ -89,6 +89,7 @@ resource "aws_lambda_function" "chat_handler" {
   runtime          = "nodejs20.x"
   filename         = "../../apps/chat-api/dist/index.zip"
   source_code_hash = fileexists("../../apps/chat-api/dist/index.zip") ? filebase64sha256("../../apps/chat-api/dist/index.zip") : null
+  timeout          = 30
 
   environment {
     variables = {

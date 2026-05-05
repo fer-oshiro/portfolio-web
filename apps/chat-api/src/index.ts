@@ -66,15 +66,31 @@ export const handleChat = async (
     ],
   })
 
+  let buffer = ''
+  const CHUNK_SIZE = 5
+
   for await (const chunk of stream) {
     const text = chunk.choices[0]?.delta?.content ?? ''
     if (text) {
-      await websocket.sendMessage(connectionId, {
-        from: 'ai',
-        type: 'chunk',
-        text,
-      })
+      buffer += text
+
+      if (buffer.length > 20) {
+        await websocket.sendMessage(connectionId, {
+          from: 'ai',
+          type: 'chunk',
+          text: buffer,
+        })
+        buffer = ''
+      }
     }
+  }
+
+  if (buffer) {
+    await websocket.sendMessage(connectionId, {
+      from: 'ai',
+      type: 'chunk',
+      text: buffer,
+    })
   }
 
   await websocket.sendMessage(connectionId, { from: 'ai', type: 'done' })

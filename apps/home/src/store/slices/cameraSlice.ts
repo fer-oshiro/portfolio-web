@@ -21,7 +21,7 @@ export interface CameraState {
   setMoving: (moving: boolean) => void
 }
 
-type CameraCoords = keyof CameraState['cameraCoords']
+export type CameraCoords = keyof CameraState['cameraCoords']
 
 export const createCameraSlice: StateCreator<MyStore, [], [], CameraState> = (
   set,
@@ -39,8 +39,8 @@ export const createCameraSlice: StateCreator<MyStore, [], [], CameraState> = (
       target: [0, 0, 0],
     },
     pc: {
-      coord: [0, 4, -1.5],
-      target: [0, 4, -2.5],
+      coord: [0, 4, -3],
+      target: [0, 4, -4],
     },
     board: {
       coord: [1.5, 6, 0.1],
