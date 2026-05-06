@@ -1,6 +1,6 @@
-import { Html, OrbitControls } from '@react-three/drei'
+import { OrbitControls } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
-import { button, useControls } from 'leva'
+import { useControls } from 'leva'
 import { useEffect, useRef } from 'react'
 import * as THREE from 'three'
 import type { OrbitControls as OrbitControlsImpl } from 'three/examples/jsm/controls/OrbitControls.js'
@@ -9,14 +9,14 @@ import { useStore } from '../store'
 
 export const CameraManager = () => {
   const orbitRef = useRef<OrbitControlsImpl>(null)
-  const { position, setCamera, moving, setMoving, setTransition } = useStore()
+  const { position, setCamera, moving, setMoving } = useStore()
 
   const direction = useRef(new THREE.Vector3())
   const smoothCameraPosition = useRef(new THREE.Vector3(...position.coord))
   const smoothCameraTarget = useRef(new THREE.Vector3(...position.target))
 
   const [values, set] = useControls('Camera', () => ({
-    control: false,
+    control: true,
     position: {
       value: [0, 5, 10],
       step: 0.1,
@@ -25,17 +25,6 @@ export const CameraManager = () => {
       value: [0, 0, 0],
       step: 0.01,
     },
-    default: button(() => setCamera('default')),
-    pc: button(() => setCamera('pc')),
-    board: button(() => setCamera('board')),
-    draw: button(async () => {
-      setTransition('brush')
-      setCamera('draw')
-    }),
-    cat: button(async () => {
-      setTransition('cat')
-      setCamera('cat')
-    }),
   }))
 
   useFrame(async (state, delta) => {
