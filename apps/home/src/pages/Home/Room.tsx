@@ -28,7 +28,7 @@ function RoomMesh() {
       value: [3.48, 9.4, -3.39],
     },
     board: {
-      value: [3.48, 8.8, 1.0],
+      value: [4.55, 8.34, 0.33],
     },
     draw: {
       value: [3.61, 3.56, 1.0],

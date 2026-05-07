@@ -3,7 +3,7 @@ import { useStore } from '../store'
 
 export const CameraToDefault = () => {
   const { focus, setCamera } = useStore()
-
+  console.log(focus)
   return (
     <AnimatePresence mode="wait">
       {['pc', 'board'].includes(focus) && (
@@ -23,6 +23,7 @@ export const CameraToDefault = () => {
             border: 'none',
             cursor: 'pointer',
             pointerEvents: 'auto',
+            zIndex: 99999,
           }}
           initial={{ left: '-80px' }}
           animate={{ left: '40px' }}
