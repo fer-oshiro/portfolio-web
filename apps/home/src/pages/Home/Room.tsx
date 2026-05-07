@@ -166,7 +166,7 @@ function Room({ show }: { show: boolean }) {
         <InteractionManager
           customX={position?.x}
           customY={position?.y}
-          onFocus={(obj) => console.log('hi', obj?.userData)}
+          onFocus={(obj) => {}}
         />
 
         <color attach="background" args={['#996754']} />

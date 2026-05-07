@@ -1,23 +1,20 @@
-import { useProgress } from '@react-three/drei'
-import { AnimatePresence, motion } from 'motion/react'
+import { motion } from 'motion/react'
 import { useEffect, useState } from 'react'
-
 import { ReadyState } from 'react-use-websocket'
+
 import github from '../assets/github.png'
 import linkedin from '../assets/linkedin.png'
 import { useDesktopRTC } from '../hooks/useDesktopRTC'
+import { useGyro } from '../hooks/useGyro'
 import { useStore } from '../store'
+import { Cursor } from './Cursor'
 import { QRCode } from './QRCode'
 
-const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
-
 export const WebSocket = () => {
-  const { status, setConnected, focus, setCamera } = useStore()
-  const { progress } = useProgress()
+  const { status, setConnected } = useStore()
   const { roomId, gyro, connected, iceServers, readyState } = useDesktopRTC()
   const [isOpen, setIsOpen] = useState<boolean>(true)
-  const [background, setBackground] = useState(true)
-  console.log(gyro)
+  const { x, y } = useGyro(gyro)
 
   useEffect(() => {
     if (connected === 'connected') {
@@ -25,12 +22,6 @@ export const WebSocket = () => {
       setConnected(true)
     }
   }, [connected])
-
-  useEffect(() => {
-    if (progress === 100 && readyState === ReadyState.OPEN) {
-      wait(3000).then(() => setBackground(false))
-    }
-  }, [progress, readyState])
 
   return (
     <div
@@ -47,44 +38,7 @@ export const WebSocket = () => {
         alignItems: 'center',
       }}
     >
-      <AnimatePresence mode="wait">
-        {['pc', 'board'].includes(focus) && (
-          <motion.div
-            style={{
-              position: 'fixed',
-              top: '40px',
-              width: '100px',
-              height: '40px',
-              backgroundColor: '#e6b092',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '5px',
-              alignItems: 'center',
-              justifyContent: 'center',
-              borderRadius: '20px',
-              border: 'none',
-              cursor: 'pointer',
-              pointerEvents: 'auto',
-            }}
-            initial={{ left: '-80px' }}
-            animate={{ left: '40px' }}
-            exit={{ left: '-100px' }}
-          >
-            <button
-              style={{
-                width: '100%',
-                height: '100%',
-                border: 'none',
-                background: 'none',
-                cursor: 'pointer',
-              }}
-              onClick={() => setCamera('default')}
-            >
-              Voltar
-            </button>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {<Cursor x={`${x.toFixed()}px`} y={`${y.toFixed()}px`} />}
       {!isOpen && (
         <button
           style={{
@@ -120,19 +74,7 @@ export const WebSocket = () => {
           ))}
         </button>
       )}
-      <motion.div
-        style={{
-          position: 'fixed',
-          left: 0,
-          right: 0,
-          bottom: 0,
-          top: 0,
-          backgroundColor: '#603e33',
-        }}
-        initial={{ opacity: '100%' }}
-        animate={{ opacity: background === false ? '0%' : '100%' }}
-        transition={{ duration: 5 }}
-      />
+
       {isOpen && (
         <motion.div
           layout

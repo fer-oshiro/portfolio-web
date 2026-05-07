@@ -13,7 +13,6 @@ const groq = new OpenAI({
 // ---- Helpers ----
 
 const IS_LOCAL = process.env.NODE_ENV === 'development'
-console.log({ IS_LOCAL })
 
 const SYSTEM_PROMPT = `
 Você é o Assistente Virtual da Fernanda Oshiro, desenvolvido para ajudar recrutadores.

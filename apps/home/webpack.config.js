@@ -34,6 +34,14 @@ module.exports = (_, argv) => {
         'Access-Control-Allow-Headers':
           'Origin, X-Requested-With, Content-Type, Accept, Range',
       },
+      proxy: [
+        {
+          context: ['/gallery'],
+          target: 'https://fer-oshiro.com',
+          changeOrigin: true,
+          secure: false, // útil se o certificado SSL da origem for inválido em staging
+        },
+      ],
     },
 
     module: {

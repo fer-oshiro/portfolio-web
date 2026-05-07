@@ -1,8 +1,11 @@
-import { motion } from 'motion/react'
+import { animate, AnimatePresence, motion, useMotionValue } from 'motion/react'
 
 import { useStore } from '../store'
 import './Transition.css'
-import { ComponentProps } from 'react'
+import { ComponentProps, useEffect, useState } from 'react'
+import { useProgress } from '@react-three/drei'
+import useWebSocket, { ReadyState } from 'react-use-websocket'
+import { WS_URL } from '../service/constants'
 
 const brushVariant = {
   animate: {
@@ -48,9 +51,37 @@ const BrushPath = ({ variant, ...props }: BrushPathProps) => {
   )
 }
 
+const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+
 export const Transition = () => {
+  const { status, setCamera } = useStore()
+  const { progress } = useProgress()
+  const opacity = useMotionValue(1)
+
+  useEffect(() => {
+    if (progress === 100 && status === 'ready') {
+      wait(1000).then(() => {
+        setCamera('default')
+        animate(opacity, 0, { duration: 5 })
+      })
+    }
+  }, [progress, status])
+
   return (
     <>
+      <motion.div
+        style={{
+          position: 'fixed',
+          left: 0,
+          right: 0,
+          bottom: 0,
+          top: 0,
+          backgroundColor: '#603e33',
+          zIndex: 9,
+          pointerEvents: 'none',
+          opacity,
+        }}
+      />
       <CatTransition />
       <div className="transition-svg">
         <svg

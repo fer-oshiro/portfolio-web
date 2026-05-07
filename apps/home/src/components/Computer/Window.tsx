@@ -84,7 +84,6 @@ export const Window = () => {
   }, [lastJsonMessage])
 
   const handleBotDone = async () => {
-    console.log(splitText(buffer))
     for (const text of splitText(buffer)) {
       await handleAddBotMessage(text, splitText(buffer).at(-1))
     }

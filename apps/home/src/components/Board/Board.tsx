@@ -8,6 +8,7 @@ import awsPractioner from '../../assets/aws-practioner.png'
 
 import { WS_URL } from '../../service/constants'
 import { Info } from './Info'
+import { useStore } from '../../store'
 
 type Drawings = {
   url: string
@@ -31,6 +32,8 @@ function DrawingItem({
   const [x, y, z] = position
   const rotationZ = useMemo(() => (Math.random() - 0.5) * 0.2, [])
   const height = useMemo(() => (Math.random() - 0.5) * 0.05, [])
+
+  if (process.env.NODE_ENV === 'development') return <></>
 
   return (
     <group
@@ -141,9 +144,12 @@ export const Board = () => {
       step: 1,
     },
   })
+  const { setStatus } = useStore()
   const [imgs, setImgs] = useState<Drawings[]>([])
-  const { sendJsonMessage, lastJsonMessage, readyState } =
-    useWebSocket<IWebsocket>(WS_URL, { share: true })
+  const { sendJsonMessage, lastJsonMessage } = useWebSocket<IWebsocket>(
+    WS_URL,
+    { share: true },
+  )
   useEffect(() => {
     if (imgs.length === 0) {
       sendJsonMessage({
@@ -155,7 +161,8 @@ export const Board = () => {
   useEffect(() => {
     if (lastJsonMessage?.drawings) {
       setImgs(lastJsonMessage.drawings)
-      console.log(lastJsonMessage.drawings)
+      if (lastJsonMessage.drawings.length > 0) setStatus('ready')
+      else setStatus('server_error')
     }
   }, [lastJsonMessage])
   return (

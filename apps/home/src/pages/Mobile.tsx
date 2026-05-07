@@ -124,7 +124,7 @@ export const Mobile = () => {
           id="alpha"
           name="alpha"
           min="0"
-          max="360"
+          max="60"
           value={gyro.alpha}
           onChange={(e) => handleFakeInput({ alpha: Number(e.target.value) })}
         />
@@ -136,8 +136,8 @@ export const Mobile = () => {
           type="range"
           id="beta"
           name="beta"
-          min="-180"
-          max="180"
+          min="-30"
+          max="30"
           value={gyro.beta}
           onChange={(e) => handleFakeInput({ beta: Number(e.target.value) })}
         />

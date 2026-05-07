@@ -13,7 +13,6 @@ import { IWebSocketProvider } from './websocket/IWebsocketProvider'
 const IS_LOCAL = process.env.NODE_ENV === 'development'
 const BUCKET = 'fer-oshiro-portfolio-drawings'
 const CDN_DOMAIN = 'fer-oshiro.com'
-console.log({ IS_LOCAL })
 
 export const handleSave = async (
   connectionId: string,
