@@ -3,16 +3,16 @@ import { useEffect } from 'react'
 import { useStore } from '../store'
 
 function InteractionManager({
-  customX,
-  customY,
   onFocus,
 }: {
   customX?: number
   customY?: number
   onFocus: (bj: any) => void
 }) {
-  const { setHover } = useStore()
+  const { setHover, cursorPosition } = useStore()
   const { camera, raycaster, size, scene } = useThree()
+
+  const { x, y } = cursorPosition
 
   const castRay = (pixelX, pixelY) => {
     const x = (pixelX / size.width) * 2 - 1
@@ -33,10 +33,10 @@ function InteractionManager({
   }
 
   useEffect(() => {
-    if (customX !== undefined && customY !== undefined) {
-      castRay(customX, customY)
+    if (x !== undefined && y !== undefined) {
+      castRay(x, y)
     }
-  }, [customX, customY])
+  }, [x, y])
 
   return null
 }

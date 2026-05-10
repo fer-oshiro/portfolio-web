@@ -10,14 +10,13 @@ export const Computer = () => {
   const { distanceFactor, position } = useControls('PC', {
     distanceFactor: 1.2,
     position: {
-      value: [0, 4.05, -3.65],
+      value: [0, 4.05, -3.6],
     },
   })
 
   return (
     <Html
       transform
-      occlude
       distanceFactor={distanceFactor}
       position={position}
       style={{

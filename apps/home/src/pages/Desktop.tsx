@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-import { Cursor } from '../components/Cursor'
+import { Cursor } from '../components/Cursor/Cursor'
 import { QRCode } from '../components/QRCode'
 import { useDesktopRTC } from '../hooks/useDesktopRTC'
 

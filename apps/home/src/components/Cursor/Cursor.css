@@ -1,0 +1,89 @@
+.magic-glow {
+  position: fixed;
+  pointer-events: none;
+  width: 40px;
+  height: 40px;
+  filter: blur(12px);
+}
+
+/* Blob principal - branco brilhante */
+.magic-glow::before {
+  content: '';
+  position: absolute;
+  width: 120px;
+  height: 80px; /* elipse */
+  top: 40%;
+  left: 30%;
+  background: radial-gradient(
+    ellipse,
+    rgba(255, 255, 255, 1) 0%,
+    rgba(255, 255, 200, 0.8) 40%,
+    transparent 70%
+  );
+  filter: blur(8px);
+  animation: blob 3s ease-in-out infinite;
+}
+
+/* Blob secundário - laranja/dourado */
+.magic-glow::after {
+  content: '';
+  position: absolute;
+  width: 90px;
+  height: 60px; /* elipse menor */
+  top: 50%;
+  left: 40%;
+  background: radial-gradient(
+    ellipse,
+    rgba(255, 180, 80, 0.9) 0%,
+    rgba(255, 140, 50, 0.5) 50%,
+    transparent 70%
+  );
+  filter: blur(10px);
+  animation: blob 4s ease-in-out infinite reverse;
+  animation-delay: 0.5s;
+}
+
+@keyframes blob {
+  0%,
+  100% {
+    border-radius: 60% 40% 70% 30% / 50% 60% 40% 50%;
+    transform: rotate(0deg) scale(1);
+  }
+  50% {
+    border-radius: 30% 70% 40% 60% / 60% 40% 70% 30%;
+    transform: rotate(15deg) scale(1.1);
+  }
+}
+
+/* Cruz de luz */
+.magic-star::before,
+.magic-star::after {
+  content: '';
+  position: absolute;
+  background: rgba(255, 255, 220, 0.9);
+  filter: blur(3px);
+}
+
+.magic-star::before {
+  width: 4px;
+  height: 100%;
+  left: 50%;
+  top: 0;
+}
+
+.magic-star::after {
+  width: 100%;
+  height: 4px;
+  top: 50%;
+  left: 0;
+}
+
+.shape .gradient-bg {
+  fill: url(#header-shape-gradient) #fff;
+}
+
+#header-shape-gradient {
+  --color-pink: #ffd1c3;
+  --color-blue: #f9fffa;
+  --color-yellow: #ffffb9;
+}

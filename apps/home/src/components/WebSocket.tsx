@@ -7,11 +7,11 @@ import linkedin from '../assets/linkedin.png'
 import { useDesktopRTC } from '../hooks/useDesktopRTC'
 import { useGyro } from '../hooks/useGyro'
 import { useStore } from '../store'
-import { Cursor } from './Cursor'
+import { Cursor } from './Cursor/Cursor'
 import { QRCode } from './QRCode'
 
 export const WebSocket = () => {
-  const { status, setConnected } = useStore()
+  const { status, setConnected, setGyro, setCursorPosition } = useStore()
   const { roomId, gyro, connected, iceServers, readyState } = useDesktopRTC()
   const [isOpen, setIsOpen] = useState<boolean>(true)
   const { x, y } = useGyro(gyro)
@@ -22,6 +22,11 @@ export const WebSocket = () => {
       setConnected(true)
     }
   }, [connected])
+
+  useEffect(() => {
+    setGyro(gyro)
+    setCursorPosition({ x, y })
+  }, [x, y])
 
   return (
     <div
@@ -38,7 +43,7 @@ export const WebSocket = () => {
         alignItems: 'center',
       }}
     >
-      {<Cursor x={`${x.toFixed()}px`} y={`${y.toFixed()}px`} />}
+      {connected === 'connected' && <Cursor />}
       {!isOpen && (
         <button
           style={{

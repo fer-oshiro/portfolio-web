@@ -5,7 +5,7 @@ import { WS_URL } from '../service/constants'
 import { WebController } from '../service/WebController'
 import { useStore } from '../store'
 
-const roomId = crypto.randomUUID && crypto.randomUUID()
+const roomId = (crypto.randomUUID && crypto.randomUUID()) ?? '666'
 export const useDesktopRTC = () => {
   const { setStatus } = useStore()
   const [connected, setConnected] =

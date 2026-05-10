@@ -10,8 +10,10 @@ type Gyro = {
 export interface GyroState {
   connected: boolean
   gyro: Gyro
+  cursorPosition: { x: number; y: number }
   setGyro: (gyro: Gyro) => void
   setConnected: (connected: boolean) => void
+  setCursorPosition: (position: { x: number; y: number }) => void
 }
 
 export const createGyroSlice: StateCreator<MyStore, [], [], GyroState> = (
@@ -23,6 +25,8 @@ export const createGyroSlice: StateCreator<MyStore, [], [], GyroState> = (
     beta: 0,
     gamma: 0,
   },
+  cursorPosition: { x: 0, y: 0 },
   setGyro: (gyro) => set({ gyro }),
   setConnected: (connected) => set({ connected }),
+  setCursorPosition: (cursorPosition) => set({ cursorPosition }),
 })

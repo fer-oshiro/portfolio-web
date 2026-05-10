@@ -1,7 +1,6 @@
 import { useGLTF, useTexture } from '@react-three/drei'
 import { Canvas } from '@react-three/fiber'
 import { Leva, useControls } from 'leva'
-import { useState } from 'react'
 import * as THREE from 'three'
 
 import { Board } from '../../components/Board'
@@ -10,10 +9,10 @@ import { Computer } from '../../components/Computer'
 import InteractionManager from '../../components/InteractionManager'
 import SakuraStar from '../../components/Star'
 import { Tricked } from '../../components/Tricked'
+import { useStore } from '../../store'
 
 import roomUrl from '../../assets/models/room.glb'
 import roomBaked from '../../assets/models/room.png'
-import { useStore } from '../../store'
 
 function RoomMesh() {
   const { nodes } = useGLTF(roomUrl)
@@ -137,13 +136,15 @@ function RoomMesh() {
 }
 
 function Room({ show }: { show: boolean }) {
-  const [position, setPosition] = useState()
-  const castRay = (x, y) => {
-    setPosition({
-      x,
-      y,
-    })
+  const { connected, setCursorPosition } = useStore()
+  const castRay = (castX: number, castY: number) => {
+    if (!connected)
+      setCursorPosition({
+        x: castX,
+        y: castY,
+      })
   }
+
   return (
     <div
       style={{
@@ -160,14 +161,11 @@ function Room({ show }: { show: boolean }) {
         camera={{
           fov: 75,
         }}
+        style={{ zIndex: 1 }}
         onPointerMove={(e) => castRay(e.clientX, e.clientY)}
       >
         <CameraManager />
-        <InteractionManager
-          customX={position?.x}
-          customY={position?.y}
-          onFocus={(obj) => {}}
-        />
+        <InteractionManager onFocus={(obj) => {}} />
 
         <color attach="background" args={['#996754']} />
         <directionalLight position={[10, 10, 5]} intensity={15} />
