@@ -182,6 +182,7 @@ export function Canvas() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
+          userSelect: 'none',
         }}
       >
         <svg
