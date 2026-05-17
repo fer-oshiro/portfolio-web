@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState } from 'react'
+import { PointerEvent, useEffect, useRef, useState } from 'react'
 import getStroke from 'perfect-freehand'
 import useWebSocket, { ReadyState } from 'react-use-websocket'
 import { WS_URL } from '../../service/constants'
+import { pre } from 'motion/react-m'
 
 const COLORS = ['#000000', '#ef4444', '#3b82f6', '#22c55e', '#f59e0b']
 
@@ -26,19 +27,26 @@ function getSvgPathFromStroke(stroke) {
 }
 
 export function Canvas() {
-  const svgRef = useRef<SVGElement>(null)
+  const svgRef = useRef<SVGSVGElement>(null)
   const [lines, setLines] = useState<Points[]>([])
   const [currentPoints, setCurrentPoints] = useState<Points | null>(null)
   const [color, setColor] = useState('#000000')
   const [brushSize, setBrushSize] = useState(6)
   const [name, setName] = useState('')
+  const [status, setStatus] = useState<'idle' | 'loading' | 'okay' | 'error'>(
+    'idle',
+  )
+  const [size, setSize] = useState({
+    width: window.innerWidth * 0.8,
+    height: window.innerHeight * 0.5,
+  })
   const { sendJsonMessage, lastJsonMessage, readyState } = useWebSocket(
     WS_URL,
     { share: true },
   )
 
-  const handlePointerDown = (e) => {
-    e.target.setPointerCapture(e.pointerId)
+  const handlePointerDown = (e: PointerEvent<SVGSVGElement>) => {
+    e.currentTarget.setPointerCapture(e.pointerId)
     const rect = e.currentTarget.getBoundingClientRect()
     setCurrentPoints({
       points: [[e.clientX - rect.left, e.clientY - rect.top]],
@@ -47,7 +55,7 @@ export function Canvas() {
     })
   }
 
-  const handlePointerMove = (e) => {
+  const handlePointerMove = (e: PointerEvent<SVGSVGElement>) => {
     if (!currentPoints) return
     const rect = e.currentTarget.getBoundingClientRect()
     setCurrentPoints((prev) => ({
@@ -60,6 +68,7 @@ export function Canvas() {
       ],
     }))
   }
+
   const handlePointerUp = () => {
     if (!currentPoints) return
     setLines((prev) => [...prev, currentPoints])
@@ -70,6 +79,7 @@ export function Canvas() {
 
   const handleSubmit = () => {
     if (readyState !== ReadyState.OPEN) return
+    setStatus('loading')
     sendJsonMessage({ action: 'save_drawing', message: name })
   }
 
@@ -82,19 +92,43 @@ export function Canvas() {
   }
 
   const uploadToS3 = async (presignedUrl) => {
-    const svgStr = exportSVG()
-    if (!svgStr && !presignedUrl) return
+    try {
+      const svgStr = exportSVG()
+      if (!svgStr && !presignedUrl) return
 
-    const blob = new Blob([svgStr], { type: 'image/svg+xml' })
+      const blob = new Blob([svgStr], { type: 'image/svg+xml' })
 
-    await fetch(presignedUrl, {
-      method: 'PUT',
-      body: blob,
-      headers: {
-        'Content-Type': 'image/svg+xml',
-      },
-    })
+      await fetch(presignedUrl, {
+        method: 'PUT',
+        body: blob,
+        headers: {
+          'Content-Type': 'image/svg+xml',
+        },
+      })
+      setStatus('okay')
+    } catch (e) {
+      console.error(e)
+      setStatus('error')
+    }
   }
+
+  const handleUndo = () => {
+    setLines((prev) => prev.slice(0, -1))
+  }
+
+  useEffect(() => {
+    const updateSize = () => {
+      const size = window.innerWidth * 0.8 > 600 ? 600 : window.innerWidth * 0.8
+      setSize({
+        width: size,
+        height: size,
+      })
+    }
+
+    updateSize()
+    window.addEventListener('resize', updateSize)
+    return () => window.removeEventListener('resize', updateSize)
+  }, [])
 
   useEffect(() => {
     if (
@@ -113,6 +147,9 @@ export function Canvas() {
           gap: 8,
           marginBottom: 8,
           alignItems: 'center',
+          justifyContent: 'center',
+          flexWrap: 'wrap',
+          padding: 12,
         }}
       >
         {COLORS.map((c) => (
@@ -136,42 +173,59 @@ export function Canvas() {
           value={brushSize}
           onChange={(e) => setBrushSize(Number(e.target.value))}
         />
+        <button onClick={handleUndo}>Undo</button>
         <button onClick={() => setLines([])}>Limpar</button>
-        <input name="name" onChange={(e) => setName(e.target.value)} />
-        <button onClick={handleSubmit}>Salvar</button>
       </div>
 
-      <svg
-        ref={svgRef}
-        width={500}
-        height={800}
+      <div
         style={{
-          border: '1px solid #ccc',
-          cursor: 'crosshair',
-          touchAction: 'none',
-          backgroundColor: 'white',
-          width: '500px',
-          padding: '16px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
         }}
-        onPointerDown={handlePointerDown}
-        onPointerMove={handlePointerMove}
-        onPointerUp={handlePointerUp}
       >
-        {allLines.map((line, i) => (
-          <path
-            key={i}
-            d={getSvgPathFromStroke(
-              getStroke(line.points, {
-                size: line.brushSize,
-                thinning: 0,
-                smoothing: 0.7,
-                streamline: 0.6,
-              }),
-            )}
-            fill={line.color}
-          />
-        ))}
-      </svg>
+        <svg
+          ref={svgRef}
+          width={size.width}
+          height={size.height}
+          style={{
+            border: '1px solid #ccc',
+            cursor: 'crosshair',
+            touchAction: 'none',
+            backgroundColor: 'white',
+          }}
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={handlePointerUp}
+        >
+          {allLines.map((line, i) => (
+            <path
+              key={i}
+              d={getSvgPathFromStroke(
+                getStroke(line.points, {
+                  size: line.brushSize,
+                  thinning: 0,
+                  smoothing: 0.7,
+                  streamline: 0.6,
+                }),
+              )}
+              fill={line.color}
+            />
+          ))}
+        </svg>
+      </div>
+
+      <div style={{ paddingTop: 24 }}>
+        {status === 'okay' && <div>Obrigada ⸜(｡˃ ᵕ ˂ )⸝♡</div>}
+        {status === 'idle' && (
+          <>
+            <input name="name" onChange={(e) => setName(e.target.value)} />
+            <button onClick={handleSubmit}>Salvar</button>
+          </>
+        )}
+        {status === 'error' && <div>Vish... Erro no servidor (｡ᵕ ◞ _◟)</div>}
+        {status === 'loading' && <div>Enviando ε(´｡•᎑•`)っ━ 📨</div>}
+      </div>
     </div>
   )
 }

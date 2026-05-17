@@ -14,6 +14,24 @@ function Draw({ show }: { show: boolean }) {
       }}
     >
       <button
+        style={{
+          position: 'fixed',
+          top: '40px',
+          left: '40px',
+          width: '100px',
+          height: '40px',
+          backgroundColor: '#e6b092',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '5px',
+          alignItems: 'center',
+          justifyContent: 'center',
+          borderRadius: '20px',
+          border: 'none',
+          cursor: 'pointer',
+          pointerEvents: 'auto',
+          zIndex: 9999,
+        }}
         onClick={() => {
           setTransition('brush')
           setLocation('room')
@@ -21,7 +39,6 @@ function Draw({ show }: { show: boolean }) {
       >
         Voltar
       </button>
-
       <Canvas />
     </div>
   )

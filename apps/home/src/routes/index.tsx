@@ -4,6 +4,7 @@ import { Desktop } from '../pages/Desktop'
 import { Home } from '../pages/Home'
 import { Mobile } from '../pages/Mobile'
 import { Chat } from '../pages/Chat'
+import Draw from '../pages/Home/Draw'
 
 export function HomeRoute() {
   return (
@@ -12,6 +13,7 @@ export function HomeRoute() {
       <Route path="desktop" element={<Desktop />} />
       <Route path="mobile" element={<Mobile />} />
       <Route path="chat" element={<Chat />} />
+      <Route path="draw" element={<Draw show />} />
       <Route path="*" element={<div>404</div>} />
     </Routes>
   )

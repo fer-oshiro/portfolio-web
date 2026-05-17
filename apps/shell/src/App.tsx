@@ -1,7 +1,8 @@
 import { createRoot } from 'react-dom/client'
 
-import './index.css'
 import { AppRoutes } from './router/index.router'
+
+import './index.css'
 
 const App = () => (
   <div className="container">

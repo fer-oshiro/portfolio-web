@@ -1,4 +1,6 @@
 body {
-  background-color: var(--colors-background); ;
+  background-color: var(--colors-background);
   color: var(--colors-rose-50);
+  margin: 0;
+  padding: 0;
 }
