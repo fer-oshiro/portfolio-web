@@ -34,7 +34,7 @@ function RoomMesh() {
     },
   })
   const { visible } = useControls('Hitbox', {
-    visible: true,
+    visible: false,
   })
   bakedTexture.colorSpace = THREE.SRGBColorSpace
   bakedTexture.flipY = false
@@ -153,7 +153,6 @@ function Room({ show }: { show: boolean }) {
         display: show ? 'block' : 'none',
       }}
     >
-      <Leva />
       <Tricked />
 
       <Canvas

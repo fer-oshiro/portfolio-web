@@ -1,7 +1,7 @@
 import { OrbitControls } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
 import { useControls } from 'leva'
-import { useEffect, useRef } from 'react'
+import { useRef } from 'react'
 import * as THREE from 'three'
 import type { OrbitControls as OrbitControlsImpl } from 'three/examples/jsm/controls/OrbitControls.js'
 
@@ -9,14 +9,14 @@ import { useStore } from '../store'
 
 export const CameraManager = () => {
   const orbitRef = useRef<OrbitControlsImpl>(null)
-  const { position, setCamera, moving, setMoving } = useStore()
+  const { position, moving, setMoving } = useStore()
 
   const direction = useRef(new THREE.Vector3())
   const smoothCameraPosition = useRef(new THREE.Vector3(...position.coord))
   const smoothCameraTarget = useRef(new THREE.Vector3(...position.target))
 
   const [values, set] = useControls('Camera', () => ({
-    control: true,
+    control: false,
     position: {
       value: [0, 5, 10],
       step: 0.1,

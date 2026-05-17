@@ -16,6 +16,9 @@ export const useDesktopRTC = () => {
   const { sendJsonMessage, lastJsonMessage, readyState } = useWebSocket(
     WS_URL,
     {
+      shouldReconnect: () => true,
+      reconnectAttempts: 10,
+      reconnectInterval: 3000,
       share: true,
       onError: () => setStatus('server_error'),
     },
