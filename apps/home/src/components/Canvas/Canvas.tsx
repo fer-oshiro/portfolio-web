@@ -1,8 +1,7 @@
 import { PointerEvent, useEffect, useRef, useState } from 'react'
-import getStroke from 'perfect-freehand'
+import getStroke, { Vec2 } from 'perfect-freehand'
 import useWebSocket, { ReadyState } from 'react-use-websocket'
 import { WS_URL } from '../../service/constants'
-import { pre } from 'motion/react-m'
 
 const COLORS = ['#000000', '#ef4444', '#3b82f6', '#22c55e', '#f59e0b']
 
@@ -12,11 +11,11 @@ type Points = {
   brushSize: number
 }
 
-function getSvgPathFromStroke(stroke) {
-  if (!stroke.length) return ''
+function getSvgPathFromStroke(stroke: Vec2[]) {
+  if (!stroke.length || !stroke[0]) return ''
   const d = stroke.reduce(
     (acc, [x0, y0], i, arr) => {
-      const [x1, y1] = arr[(i + 1) % arr.length]
+      const [x1, y1] = arr[(i + 1) % arr.length]!
       acc.push(x0, y0, (x0 + x1) / 2, (y0 + y1) / 2)
       return acc
     },
@@ -40,10 +39,12 @@ export function Canvas() {
     width: window.innerWidth * 0.8,
     height: window.innerHeight * 0.5,
   })
-  const { sendJsonMessage, lastJsonMessage, readyState } = useWebSocket(
-    WS_URL,
-    { share: true },
-  )
+  const { sendJsonMessage, lastJsonMessage, readyState } = useWebSocket<{
+    type: string
+    from: string
+    text: string
+    data: any
+  }>(WS_URL, { share: true })
 
   const handlePointerDown = (e: PointerEvent<SVGSVGElement>) => {
     e.currentTarget.setPointerCapture(e.pointerId)
@@ -91,10 +92,10 @@ export function Canvas() {
     return svgStr
   }
 
-  const uploadToS3 = async (presignedUrl) => {
+  const uploadToS3 = async (presignedUrl: string) => {
     try {
       const svgStr = exportSVG()
-      if (!svgStr && !presignedUrl) return
+      if (!svgStr || !presignedUrl) return
 
       const blob = new Blob([svgStr], { type: 'image/svg+xml' })
 
@@ -182,6 +183,7 @@ export function Canvas() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
+          userSelect: 'none',
         }}
       >
         <svg
