@@ -1,15 +1,11 @@
-# Portifolio
+# Portfólio
+
+## Giroscópio
+
+O acesso ao giroscópio exige HTTPS. Para desenvolvimento:
 
 ```bash
 npm run dev
-```
-
-## Importante pro gyroscopio funcionar
-
-```bash
 ngrok config add-authtoken ...
-```
-
-```bash
 ngrok http 3000
 ```

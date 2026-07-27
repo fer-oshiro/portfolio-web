@@ -21,14 +21,11 @@
     "typescript": "5.8.2"
   },
   "engines": {
-    "node": ">=18"
+    "node": "24.13.1"
   },
-  "packageManager": "npm@10.9.2",
+  "packageManager": "npm@11.8.0",
   "workspaces": [
     "apps/*",
     "packages/*"
-  ],
-  "dependencies": {
-    "@swc/core-darwin-arm64": "^1.15.11"
-  }
+  ]
 }
