@@ -7,20 +7,29 @@ import '@charmbyte/ui/styles.css'
 export default {
   title: 'Example/Button',
   component: Button,
- 
+
   tags: ['autodocs'],
 
-  args: { 
-    onClick: fn() ,
-    children: <>Click Me</>
-    
+  args: {
+    onClick: fn(),
+    children: <>Click Me</>,
   },
 };
 
 export const Primary = {
   args: {
-    primary: true,
-    label: 'Button',
-    
+    variant: 'primary',
+  },
+};
+
+export const Secondary = {
+  args: {
+    variant: 'secondary',
+  },
+};
+
+export const Ghost = {
+  args: {
+    variant: 'ghost',
   },
 };
