@@ -1,3 +1,4 @@
+import { clientMessageSchema } from '@charmbyte/realtime-contract'
 import {
   ListObjectsV2Command,
   PutObjectCommand,
@@ -10,7 +11,6 @@ import { IWebSocketProvider } from './websocket/IWebsocketProvider'
 
 // ---- Helpers ----
 
-const IS_LOCAL = process.env.NODE_ENV === 'development'
 const BUCKET = 'fer-oshiro-portfolio-drawings'
 const CDN_DOMAIN = 'fer-oshiro.com'
 
@@ -19,8 +19,12 @@ export const handleSave = async (
   websocket: IWebSocketProvider,
   body: string,
 ) => {
-  const { message } = JSON.parse(body) as { message: string }
-  const objectKey = `submissions/${Date.now()}-${message}`
+  const value: unknown = JSON.parse(body)
+  const parsed = clientMessageSchema.safeParse(value)
+  if (!parsed.success || parsed.data.action !== 'save_drawing') {
+    throw new Error('Invalid drawing message')
+  }
+  const objectKey = `submissions/${Date.now()}-${parsed.data.name}`
   const client = new S3Client({ region: 'us-east-1' })
   const command = new PutObjectCommand({
     Bucket: BUCKET,
@@ -29,9 +33,8 @@ export const handleSave = async (
   })
   const url = await getSignedUrl(client, command, { expiresIn: 3600 })
   await websocket.sendMessage(connectionId, {
-    from: 'url_draw',
-    text: url,
-    type: 'done',
+    type: 'upload_url',
+    url,
   })
 }
 
@@ -60,7 +63,7 @@ export const handleDrawings = async (
       id: getNameFromKey(item.Key),
     }))
     .filter((item) => item.id)
-  await websocket.sendMessage(connectionId, { drawings })
+  await websocket.sendMessage(connectionId, { type: 'drawings', drawings })
 }
 
 // ---- Main Handler ----
@@ -86,12 +89,12 @@ export const handler: APIGatewayProxyWebsocketHandlerV2 = async (event) => {
   } catch (err) {
     console.error(`[${routeKey}] error:`, err)
 
-    if (routeKey === 'chat') {
-      await apigw.sendMessage(connectionId, {
-        type: 'error',
-        text: 'Algo deu errado!',
-      })
-    }
+    await apigw.sendMessage(connectionId, {
+      type: 'error',
+      source: 'draw',
+      code: 'INTERNAL_ERROR',
+      message: 'Não foi possível processar o desenho.',
+    })
 
     return { statusCode: 500 }
   }

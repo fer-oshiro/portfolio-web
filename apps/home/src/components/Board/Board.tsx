@@ -1,23 +1,14 @@
+import type { Drawing } from '@charmbyte/realtime-contract'
 import { Image, RoundedBox, Text } from '@react-three/drei'
 import { useControls } from 'leva'
 import { useEffect, useMemo, useState } from 'react'
-import useWebSocket from 'react-use-websocket'
 
 import awsDeveloper from '../../assets/aws-developer.png'
 import awsPractioner from '../../assets/aws-practioner.png'
 
-import { WS_URL } from '../../service/constants'
+import { useRealtime, useRealtimeMessage } from '../../service/RealtimeProvider'
 import { Info } from './Info'
 import { useStore } from '../../store'
-
-type Drawings = {
-  url: string
-  id: string | undefined
-}
-interface IWebsocket {
-  drawings: Drawings[]
-  type: 'chunk' | 'done'
-}
 
 const SKIP_POSITIONS = [0, 1, 7, 8, 19, 20, 26, 27]
 
@@ -25,7 +16,7 @@ function DrawingItem({
   img,
   position,
 }: {
-  img: Drawings
+  img: Drawing
   position: [number, number, number]
 }) {
   const SIZE = 0.25
@@ -145,26 +136,21 @@ export const Board = () => {
     },
   })
   const { setStatus } = useStore()
-  const [imgs, setImgs] = useState<Drawings[]>([])
-  const { sendJsonMessage, lastJsonMessage } = useWebSocket<IWebsocket>(
-    WS_URL,
-    { share: true },
-  )
+  const [imgs, setImgs] = useState<Drawing[]>([])
+  const { send } = useRealtime()
   useEffect(() => {
     if (imgs.length === 0) {
-      sendJsonMessage({
+      send({
         action: 'get_drawings',
       })
     }
-  }, [])
+  }, [imgs.length, send])
 
-  useEffect(() => {
-    if (lastJsonMessage?.drawings) {
-      setImgs(lastJsonMessage.drawings)
-      if (lastJsonMessage.drawings.length > 0) setStatus('ready')
-      else setStatus('server_error')
-    }
-  }, [lastJsonMessage])
+  useRealtimeMessage('drawings', ({ drawings }) => {
+    setImgs(drawings)
+    if (drawings.length > 0) setStatus('ready')
+    else setStatus('server_error')
+  })
   return (
     <>
       <AWS />

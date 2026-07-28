@@ -1,11 +1,9 @@
-import { animate, AnimatePresence, motion, useMotionValue } from 'motion/react'
+import { animate, motion, useMotionValue } from 'motion/react'
 
 import { useStore } from '../store'
 import './Transition.css'
-import { ComponentProps, useEffect, useState } from 'react'
+import { ComponentProps, useEffect } from 'react'
 import { useProgress } from '@react-three/drei'
-import useWebSocket, { ReadyState } from 'react-use-websocket'
-import { WS_URL } from '../service/constants'
 
 const brushVariant = {
   animate: {

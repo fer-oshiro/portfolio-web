@@ -6,6 +6,7 @@
     "dev:back": "tsx watch scripts/local-server.ts",
     "dev": "turbo run dev --parallel",
     "lint": "turbo run lint",
+    "test": "turbo run test",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,md}\"",
     "check-types": "turbo run check-types",

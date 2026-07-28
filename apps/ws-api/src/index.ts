@@ -1,3 +1,14 @@
+import type {
+  ClientMessageOf,
+  IceServer,
+  Peer,
+  ServerMessage,
+} from '@charmbyte/realtime-contract'
+import {
+  clientMessageSchema,
+  iceServerSchema,
+  serverMessageSchema,
+} from '@charmbyte/realtime-contract'
 import {
   ApiGatewayManagementApiClient,
   PostToConnectionCommand,
@@ -5,10 +16,13 @@ import {
 import {
   DeleteItemCommand,
   DynamoDBClient,
+  GetItemCommand,
   PutItemCommand,
   ScanCommand,
 } from '@aws-sdk/client-dynamodb'
-import { APIGatewayProxyResultV2 } from 'aws-lambda'
+import type { AttributeValue } from '@aws-sdk/client-dynamodb'
+import type { APIGatewayProxyWebsocketHandlerV2 } from 'aws-lambda'
+
 import { IceServers } from './twilio'
 
 const config =
@@ -27,29 +41,26 @@ const config =
       }
 
 const dynamo = new DynamoDBClient(config)
-
 const TABLE_NAME = process.env.TABLE_NAME!
-console.log({ TABLE_NAME })
+
+type ConnectionItem = Record<string, AttributeValue>
 
 const sendToConnection = async (
   apigw: ApiGatewayManagementApiClient,
   connectionId: string,
-  data: object,
+  data: ServerMessage,
 ) => {
-  await apigw
-    .send(
+  try {
+    await apigw.send(
       new PostToConnectionCommand({
         ConnectionId: connectionId,
-        Data: Buffer.from(JSON.stringify(data)),
+        Data: Buffer.from(JSON.stringify(serverMessageSchema.parse(data))),
       }),
     )
-    .catch((err) =>
-      console.warn(
-        `Stale connection: ${connectionId}`,
-        err.message,
-        JSON.stringify(err),
-      ),
-    )
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error)
+    console.warn(`Stale connection: ${connectionId}`, message)
+  }
 }
 
 const getPeersInRoom = async (roomId: string, excludeConnectionId: string) => {
@@ -66,36 +77,121 @@ const getPeersInRoom = async (roomId: string, excludeConnectionId: string) => {
   return result.Items ?? []
 }
 
-const getPeer = async (connectionId: string) => {
+const getConnection = async (connectionId: string) => {
   const result = await dynamo.send(
-    new ScanCommand({
+    new GetItemCommand({
       TableName: TABLE_NAME,
-      FilterExpression:
-        'connectionId = :connectionId AND deviceType = :deviceType',
+      Key: { connectionId: { S: connectionId } },
+    }),
+  )
+  return result.Item ?? null
+}
 
-      ExpressionAttributeValues: {
-        ':connectionId': { S: connectionId },
-        ':deviceType': { S: 'desktop' },
+const parseIceServers = (item?: ConnectionItem): IceServer[] | null => {
+  const encoded = item?.iceServers?.S
+  if (!encoded) return null
+
+  try {
+    const value: unknown = JSON.parse(encoded)
+    const parsed = iceServerSchema.array().safeParse(value)
+    return parsed.success ? parsed.data : null
+  } catch {
+    return null
+  }
+}
+
+const toPeer = (item: ConnectionItem): Peer | null => {
+  const connectionId = item.connectionId?.S
+  const role = item.deviceType?.S
+  if (!connectionId || (role !== 'desktop' && role !== 'mobile')) return null
+  return { connectionId, role }
+}
+
+const handleJoin = async (
+  apigw: ApiGatewayManagementApiClient,
+  connectionId: string,
+  message: ClientMessageOf<'join'>,
+) => {
+  const peers = await getPeersInRoom(message.roomId, connectionId)
+  const existingIceServers = peers
+    .map((peer) => parseIceServers(peer))
+    .find((servers): servers is IceServer[] => Boolean(servers))
+  const iceServers =
+    existingIceServers ?? iceServerSchema.array().parse(await IceServers())
+
+  await dynamo.send(
+    new PutItemCommand({
+      TableName: TABLE_NAME,
+      Item: {
+        connectionId: { S: connectionId },
+        deviceType: { S: message.role },
+        roomId: { S: message.roomId },
+        iceServers: { S: JSON.stringify(iceServers) },
       },
     }),
   )
-  return result.Items?.at(0) ?? null
+
+  await sendToConnection(apigw, connectionId, {
+    type: 'joined',
+    iceServers,
+    peers: peers.flatMap((peer) => {
+      const parsed = toPeer(peer)
+      return parsed ? [parsed] : []
+    }),
+  })
+
+  await Promise.all(
+    peers.flatMap((peer) => {
+      const peerConnectionId = peer.connectionId?.S
+      if (!peerConnectionId) return []
+      return [
+        sendToConnection(apigw, peerConnectionId, {
+          type: 'peer_joined',
+          peer: { connectionId, role: message.role },
+        }),
+      ]
+    }),
+  )
 }
 
-export const handler = async (event: any): Promise<APIGatewayProxyResultV2> => {
-  try {
-    const { connectionId, routeKey, domainName, stage } =
-      event.requestContext as any
-    const apigw = new ApiGatewayManagementApiClient({
-      endpoint: `https://${domainName}/${stage}`,
-    })
+const handleSignal = async (
+  apigw: ApiGatewayManagementApiClient,
+  connectionId: string,
+  message: ClientMessageOf<'signal'>,
+) => {
+  const [source, target] = await Promise.all([
+    getConnection(connectionId),
+    getConnection(message.targetConnectionId),
+  ])
 
-    // $connect
+  if (!source || !target || source.roomId?.S !== target.roomId?.S) {
+    await sendToConnection(apigw, connectionId, {
+      type: 'error',
+      source: 'signaling',
+      code: 'INVALID_TARGET',
+      message: 'O dispositivo de destino não pertence a esta sala.',
+    })
+    return
+  }
+
+  await sendToConnection(apigw, message.targetConnectionId, {
+    type: 'signal',
+    fromConnectionId: connectionId,
+    signal: message.signal,
+  })
+}
+
+export const handler: APIGatewayProxyWebsocketHandlerV2 = async (event) => {
+  const { connectionId, routeKey, domainName, stage } = event.requestContext
+  const apigw = new ApiGatewayManagementApiClient({
+    endpoint: `https://${domainName}/${stage}`,
+  })
+
+  try {
     if (routeKey === '$connect') {
       return { statusCode: 200, body: 'Connected' }
     }
 
-    // $disconnect
     if (routeKey === '$disconnect') {
       await dynamo.send(
         new DeleteItemCommand({
@@ -103,97 +199,45 @@ export const handler = async (event: any): Promise<APIGatewayProxyResultV2> => {
           Key: { connectionId: { S: connectionId } },
         }),
       )
-
       return { statusCode: 200, body: 'Disconnected' }
     }
 
-    const body = JSON.parse(event.body ?? '{}')
-
-    if (routeKey === 'join') {
-      const { roomId, role } = body
-      const iceServers = role === 'desktop' ? await IceServers() : null
-      await dynamo.send(
-        new PutItemCommand({
-          TableName: TABLE_NAME,
-          Item: {
-            connectionId: { S: connectionId },
-            deviceType: { S: role },
-            roomId: { S: roomId },
-            iceServers: { S: JSON.stringify(iceServers) },
-          },
-        }),
-      )
-
-      if (role === 'desktop') {
-        await sendToConnection(apigw, connectionId, {
-          type: 'ice-servers',
-          iceServers,
-        })
-      }
-      const peers = await getPeersInRoom(roomId, connectionId)
-
-      await Promise.all(
-        peers.map((peer) =>
-          sendToConnection(apigw, peer.connectionId.S!, {
-            type: 'peer-joined',
-            connectionId,
-          }),
-        ),
-      )
-
-      return { statusCode: 200, body: 'joined' }
+    let value: unknown
+    try {
+      value = JSON.parse(event.body ?? '{}')
+    } catch {
+      value = null
     }
-
-    if (routeKey === 'offer') {
-      const { sdp, targetConnectionId } = body
-      try {
-        console.log('peer', JSON.stringify(body), connectionId)
-
-        const peer = await getPeer(connectionId)
-        console.log('peer', JSON.stringify(peer))
-
-        await sendToConnection(apigw, targetConnectionId, {
-          type: 'offer',
-          sdp,
-          from: connectionId,
-          iceServers: peer?.iceServers?.S,
-        })
-      } catch (err) {
-        console.error('error sending offer', err)
-      }
-
-      return { statusCode: 200, body: 'Offer sent' }
-    }
-
-    // answer — desktop responde com SDP answer pro mobile
-    if (routeKey === 'answer') {
-      const { sdp, targetConnectionId } = body
-
-      await sendToConnection(apigw, targetConnectionId, {
-        type: 'answer',
-        sdp,
-        from: connectionId,
+    const parsed = clientMessageSchema.safeParse(value)
+    if (!parsed.success || parsed.data.action !== routeKey) {
+      await sendToConnection(apigw, connectionId, {
+        type: 'error',
+        source: 'signaling',
+        code: 'INVALID_MESSAGE',
+        message: 'Mensagem WebSocket inválida.',
       })
-
-      return { statusCode: 200, body: 'Answer sent' }
+      return { statusCode: 400, body: 'Invalid message' }
     }
 
-    // iceCandidate — troca de candidatos ICE entre os peers
-    if (routeKey === 'iceCandidate') {
-      const { candidate, targetConnectionId } = body
+    if (parsed.data.action === 'join') {
+      await handleJoin(apigw, connectionId, parsed.data)
+      return { statusCode: 200, body: 'Joined' }
+    }
 
-      await sendToConnection(apigw, targetConnectionId, {
-        type: 'ice-candidate',
-        candidate,
-        from: connectionId,
-      })
-
-      return { statusCode: 200, body: 'ICE candidate sent' }
+    if (parsed.data.action === 'signal') {
+      await handleSignal(apigw, connectionId, parsed.data)
+      return { statusCode: 200, body: 'Signal sent' }
     }
 
     return { statusCode: 400, body: 'Unknown route' }
-  } catch (err) {
-    console.error('Error:', err)
+  } catch (error) {
+    console.error('WebSocket signaling error:', error)
+    await sendToConnection(apigw, connectionId, {
+      type: 'error',
+      source: 'signaling',
+      code: 'INTERNAL_ERROR',
+      message: 'Erro interno no servidor.',
+    })
     return { statusCode: 500, body: 'Internal error' }
   }
 }

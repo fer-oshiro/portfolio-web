@@ -1,62 +1,135 @@
 import 'dotenv/config'
-import { WebSocketServer } from 'ws'
-import { handler as wsHandler } from '../apps/ws-api/src'
-import { handleChat as chatHandler } from '../apps/chat-api/src'
-import { WebsocketLocalProvider } from './websocket/LocalProvider'
+
+import type {
+  DeviceRole,
+  IceServer,
+  ServerMessage,
+} from '@charmbyte/realtime-contract'
+import {
+  clientMessageSchema,
+  iceServerSchema,
+} from '@charmbyte/realtime-contract'
+import { WebSocket, WebSocketServer } from 'ws'
+
+import { handleChat } from '../apps/chat-api/src'
 import { handleDrawings, handleSave } from '../apps/draw-api/src'
+import { IceServers } from '../apps/ws-api/src/twilio'
+import { WebsocketLocalProvider } from './websocket/LocalProvider'
+
+type Connection = {
+  iceServers: IceServer[]
+  role: DeviceRole
+  roomId: string
+}
 
 const wss = new WebSocketServer({ port: 8080 })
-const clients = new Map()
+const clients = new Map<string, WebSocket>()
+const connections = new Map<string, Connection>()
 const websocket = new WebsocketLocalProvider(clients)
+
+const send = async (connectionId: string, message: ServerMessage) =>
+  websocket.sendMessage(connectionId, message)
+
+const createIceServers = async () => {
+  try {
+    return iceServerSchema.array().parse(await IceServers())
+  } catch {
+    return [{ urls: 'stun:stun.l.google.com:19302' }]
+  }
+}
 
 console.log('🚀 Servidor WebSocket unificado rodando em ws://localhost:8080')
 
-wss.on('connection', (ws) => {
-  const connectionId = `local_${Math.random().toString(36).substr(2, 9)}`
+wss.on('connection', (socket) => {
+  const connectionId = `local_${crypto.randomUUID()}`
+  clients.set(connectionId, socket)
   console.log(`[${connectionId}] Conectado`)
-  clients.set(connectionId, ws)
 
-  websocket.clients = clients
-  // Simula o evento $connect
-  const connectEvent = createEvent('$connect', connectionId)
-  wsHandler(connectEvent, {} as any, () => {})
+  socket.on('message', async (data) => {
+    let value: unknown
+    try {
+      value = JSON.parse(data.toString())
+    } catch {
+      value = null
+    }
 
-  ws.on('message', async (data) => {
-    const message = JSON.parse(data.toString())
-    const routeKey = message.action // O roteamento acontece aqui!
+    const parsed = clientMessageSchema.safeParse(value)
+    if (!parsed.success) {
+      await send(connectionId, {
+        type: 'error',
+        source: 'signaling',
+        code: 'INVALID_MESSAGE',
+        message: 'Mensagem WebSocket inválida.',
+      })
+      return
+    }
 
-    console.log(`[${connectionId}] Rota: ${routeKey}`)
+    const message = parsed.data
+    console.log(`[${connectionId}] Rota: ${message.action}`)
 
-    const event = createEvent(routeKey, connectionId, data.toString())
+    if (message.action === 'join') {
+      const peers = [...connections.entries()].filter(
+        ([id, peer]) => id !== connectionId && peer.roomId === message.roomId,
+      )
+      const iceServers = peers[0]?.[1].iceServers ?? (await createIceServers())
+      connections.set(connectionId, {
+        roomId: message.roomId,
+        role: message.role,
+        iceServers,
+      })
 
-    // Roteamento manual simulando o API Gateway
-    if (['join', 'offer', 'answer', 'iceCandidate'].includes(routeKey)) {
-      await wsHandler(event, {} as any, () => {})
-    } else if (routeKey === 'chat') {
-      await chatHandler(connectionId, websocket, data.toString())
-    } else if (routeKey === 'get_drawings') {
-      await handleDrawings(connectionId, websocket, data.toString())
-    } else if (routeKey === 'save_drawing') {
-      await handleSave(connectionId, websocket, data.toString())
+      await send(connectionId, {
+        type: 'joined',
+        iceServers,
+        peers: peers.map(([id, peer]) => ({
+          connectionId: id,
+          role: peer.role,
+        })),
+      })
+      await Promise.all(
+        peers.map(([id]) =>
+          send(id, {
+            type: 'peer_joined',
+            peer: { connectionId, role: message.role },
+          }),
+        ),
+      )
+      return
+    }
+
+    if (message.action === 'signal') {
+      const source = connections.get(connectionId)
+      const target = connections.get(message.targetConnectionId)
+      if (!source || !target || source.roomId !== target.roomId) {
+        await send(connectionId, {
+          type: 'error',
+          source: 'signaling',
+          code: 'INVALID_TARGET',
+          message: 'O dispositivo de destino não pertence a esta sala.',
+        })
+        return
+      }
+      await send(message.targetConnectionId, {
+        type: 'signal',
+        fromConnectionId: connectionId,
+        signal: message.signal,
+      })
+      return
+    }
+
+    const body = data.toString()
+    if (message.action === 'chat') {
+      await handleChat(connectionId, websocket, body)
+    } else if (message.action === 'get_drawings') {
+      await handleDrawings(connectionId, websocket)
+    } else if (message.action === 'save_drawing') {
+      await handleSave(connectionId, websocket, body)
     }
   })
 
-  ws.on('close', () => {
-    const disconnectEvent = createEvent('$disconnect', connectionId)
-    wsHandler(disconnectEvent, {} as any, () => {})
+  socket.on('close', () => {
+    clients.delete(connectionId)
+    connections.delete(connectionId)
     console.log(`[${connectionId}] Desconectado`)
   })
 })
-
-// Helper para criar o objeto 'event' que a Lambda espera
-function createEvent(routeKey: string, connectionId: string, body?: string) {
-  return {
-    requestContext: {
-      routeKey,
-      connectionId,
-      domainName: 'localhost',
-      stage: 'local',
-    },
-    body,
-  } as any
-}

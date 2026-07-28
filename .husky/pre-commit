@@ -4,3 +4,5 @@ if ! git diff --cached --quiet --diff-filter=ACMR -- '*.ts' '*.tsx' '*.md'; then
   git diff --cached --name-only --diff-filter=ACMR -z -- '*.ts' '*.tsx' '*.md' |
     xargs -0 npx prettier --check
 fi
+
+npm test --workspace=@charmbyte/realtime-contract

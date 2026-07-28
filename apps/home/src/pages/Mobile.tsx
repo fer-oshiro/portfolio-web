@@ -4,6 +4,9 @@ import { useSearchParams } from 'react-router'
 import { useMobileRTC } from '../hooks/useMobileRTC'
 
 let lastSend = 0
+type DeviceOrientationConstructor = typeof DeviceOrientationEvent & {
+  requestPermission?: () => Promise<'denied' | 'granted'>
+}
 
 export const Mobile = () => {
   const [searchParams] = useSearchParams()
@@ -25,8 +28,8 @@ export const Mobile = () => {
           console.log('Wake Lock liberado')
         })
       }
-    } catch (err: any) {
-      console.error(`${err.name}, ${err.message}`)
+    } catch (error: unknown) {
+      console.error(error instanceof Error ? error.message : String(error))
     }
   }
 
@@ -47,20 +50,19 @@ export const Mobile = () => {
 
   const requestPermission = async () => {
     setGyroStatus('ask permission')
-    if (
-      typeof (DeviceOrientationEvent as any).requestPermission === 'function'
-    ) {
+    const requestOrientationPermission = (
+      DeviceOrientationEvent as DeviceOrientationConstructor
+    ).requestPermission
+    if (typeof requestOrientationPermission === 'function') {
       try {
-        const permission = await (
-          DeviceOrientationEvent as any
-        ).requestPermission()
+        const permission = await requestOrientationPermission()
         setGyroStatus(permission)
         if (permission === 'granted') startGyroscope()
-      } catch (e: any) {
+      } catch (error: unknown) {
         setGyroStatus('Permissão Negada')
         setMsg((prev) => [
           ...prev,
-          `Error: ${e?.message || e?.name || String(e)}`,
+          `Error: ${error instanceof Error ? error.message : String(error)}`,
         ])
       }
       await requestWakeLock()
