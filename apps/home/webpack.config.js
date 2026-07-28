@@ -4,7 +4,7 @@ const Dotenv = require('dotenv-webpack')
 const path = require('path')
 const deps = require('./package.json').dependencies
 const {
-  '@charmbyte/ui': ____,
+  '@fer-oshiro/ui': ____,
   'qrcode.react': _,
   'react-use-websocket': __,
   zustand: ___,
@@ -23,7 +23,7 @@ module.exports = (_, argv) => {
     resolve: {
       extensions: ['.tsx', '.ts', '.jsx', '.js', '.json'],
       alias: {
-        '@charmbyte/ui$': path.resolve(
+        '@fer-oshiro/ui$': path.resolve(
           __dirname,
           '../../packages/ui/src/index.tsx',
         ),

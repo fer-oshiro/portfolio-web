@@ -5,4 +5,4 @@ if ! git diff --cached --quiet --diff-filter=ACMR -- '*.ts' '*.tsx' '*.md'; then
     xargs -0 npx prettier --check
 fi
 
-npm test --workspace=@charmbyte/realtime-contract
+npm test --workspace=@fer-oshiro/realtime-contract

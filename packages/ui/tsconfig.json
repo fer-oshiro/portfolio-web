@@ -1,5 +1,5 @@
 {
-  "extends": "@charmbyte/typescript-config/react-library.json",
+  "extends": "@fer-oshiro/typescript-config/react-library.json",
   "compilerOptions": {
     "rootDir": "src",             
     "outDir": "dist",

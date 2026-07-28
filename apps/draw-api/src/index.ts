@@ -1,4 +1,4 @@
-import { clientMessageSchema } from '@charmbyte/realtime-contract'
+import { clientMessageSchema } from '@fer-oshiro/realtime-contract'
 import {
   ListObjectsV2Command,
   PutObjectCommand,

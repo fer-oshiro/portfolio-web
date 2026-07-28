@@ -4,11 +4,11 @@ import type {
   DeviceRole,
   IceServer,
   ServerMessage,
-} from '@charmbyte/realtime-contract'
+} from '@fer-oshiro/realtime-contract'
 import {
   clientMessageSchema,
   iceServerSchema,
-} from '@charmbyte/realtime-contract'
+} from '@fer-oshiro/realtime-contract'
 import { WebSocket, WebSocketServer } from 'ws'
 
 import { handleChat } from '../apps/chat-api/src'

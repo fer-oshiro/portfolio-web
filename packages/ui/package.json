@@ -1,5 +1,5 @@
 {
-  "name": "@charmbyte/ui",
+  "name": "@fer-oshiro/ui",
   "version": "0.1.0",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -28,8 +28,8 @@
     "access": "public"
   },
   "devDependencies": {
-    "@charmbyte/eslint-config": "*",
-    "@charmbyte/typescript-config": "*",
+    "@fer-oshiro/eslint-config": "*",
+    "@fer-oshiro/typescript-config": "*",
     "@tailwindcss/cli": "^4.3.3",
     "@types/node": "^24.13.3",
     "@types/react": "^19.1.0",

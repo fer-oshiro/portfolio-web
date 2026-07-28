@@ -2,8 +2,8 @@ import {
   ApiGatewayManagementApiClient,
   PostToConnectionCommand,
 } from '@aws-sdk/client-apigatewaymanagementapi'
-import type { ServerMessage } from '@charmbyte/realtime-contract'
-import { serverMessageSchema } from '@charmbyte/realtime-contract'
+import type { ServerMessage } from '@fer-oshiro/realtime-contract'
+import { serverMessageSchema } from '@fer-oshiro/realtime-contract'
 import { IWebSocketProvider } from './IWebsocketProvider'
 
 export class AwsApiGatewayProvider implements IWebSocketProvider {

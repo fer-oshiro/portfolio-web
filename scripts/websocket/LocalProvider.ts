@@ -1,5 +1,5 @@
-import type { ServerMessage } from '@charmbyte/realtime-contract'
-import { serverMessageSchema } from '@charmbyte/realtime-contract'
+import type { ServerMessage } from '@fer-oshiro/realtime-contract'
+import { serverMessageSchema } from '@fer-oshiro/realtime-contract'
 import type { WebSocket } from 'ws'
 
 import { IWebSocketProvider } from './IWebsocketProvider'

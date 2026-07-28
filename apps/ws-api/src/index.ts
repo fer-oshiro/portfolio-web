@@ -3,12 +3,12 @@ import type {
   IceServer,
   Peer,
   ServerMessage,
-} from '@charmbyte/realtime-contract'
+} from '@fer-oshiro/realtime-contract'
 import {
   clientMessageSchema,
   iceServerSchema,
   serverMessageSchema,
-} from '@charmbyte/realtime-contract'
+} from '@fer-oshiro/realtime-contract'
 import {
   ApiGatewayManagementApiClient,
   PostToConnectionCommand,

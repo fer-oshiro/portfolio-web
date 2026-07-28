@@ -1,4 +1,4 @@
-import { clientMessageSchema } from '@charmbyte/realtime-contract'
+import { clientMessageSchema } from '@fer-oshiro/realtime-contract'
 import type { APIGatewayProxyWebsocketHandlerV2 } from 'aws-lambda'
 import OpenAI from 'openai'
 import { AwsApiGatewayProvider } from './websocket/AwsProvider'
