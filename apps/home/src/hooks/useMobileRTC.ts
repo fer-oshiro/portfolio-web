@@ -75,7 +75,7 @@ export const useMobileRTC = (onLog: (log: string) => void, roomId: string) => {
       mobileReceiver.current?.addIceCandidate(msg.candidate)
     }
 
-    onLog(lastJsonMessage)
+    onLog(JSON.stringify(lastJsonMessage))
   }, [lastJsonMessage])
 
   const handleSendGyro = (input: {

@@ -1,0 +1,5 @@
+set -e
+
+npm run format:check
+npm run check-types
+npm run lint

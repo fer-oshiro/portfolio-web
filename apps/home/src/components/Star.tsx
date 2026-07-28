@@ -24,8 +24,14 @@ function SakuraStar({
       value: [0.2, 0.03, 16],
     },
   })
-  const ref = useRef(null)
-  const torusRef = useRef(null)
+  const ref = useRef<THREE.Mesh<
+    THREE.ShapeGeometry,
+    THREE.MeshBasicMaterial
+  > | null>(null)
+  const torusRef = useRef<THREE.Mesh<
+    THREE.TorusGeometry,
+    THREE.MeshBasicMaterial
+  > | null>(null)
   const colorA = useMemo(() => new THREE.Color('#FFB7C5'), [])
   const colorB = useMemo(() => new THREE.Color('#d9687f'), [])
   const colorC = useMemo(() => new THREE.Color('#fcf768'), [])

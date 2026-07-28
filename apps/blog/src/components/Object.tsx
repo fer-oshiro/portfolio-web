@@ -21,7 +21,7 @@ export function LoadObject({
 
   useEffect(() => {
     api.start({ scale })
-  }, [api])
+  }, [api, scale])
   if (texture) {
     const tex = useTexture(texture)
     tex.colorSpace = SRGBColorSpace
@@ -33,7 +33,11 @@ export function LoadObject({
   }
 
   return (
-    <a.group scale={springs.scale.to((s) => [s, s, s])}>
+    <a.group
+      scale-x={springs.scale}
+      scale-y={springs.scale}
+      scale-z={springs.scale}
+    >
       <primitive object={scene} />
     </a.group>
   )

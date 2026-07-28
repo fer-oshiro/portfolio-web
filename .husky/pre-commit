@@ -1,1 +1,6 @@
-npm run lint && npm run format 
+set -e
+
+if ! git diff --cached --quiet --diff-filter=ACMR -- '*.ts' '*.tsx' '*.md'; then
+  git diff --cached --name-only --diff-filter=ACMR -z -- '*.ts' '*.tsx' '*.md' |
+    xargs -0 npx prettier --check
+fi

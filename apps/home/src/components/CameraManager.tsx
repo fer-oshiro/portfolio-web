@@ -3,12 +3,12 @@ import { useFrame } from '@react-three/fiber'
 import { useControls } from 'leva'
 import { useRef } from 'react'
 import * as THREE from 'three'
-import type { OrbitControls as OrbitControlsImpl } from 'three/examples/jsm/controls/OrbitControls.js'
+import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib'
 
 import { useStore } from '../store'
 
 export const CameraManager = () => {
-  const orbitRef = useRef<OrbitControlsImpl>(null)
+  const orbitRef = useRef<OrbitControlsImpl | null>(null)
   const { position, moving, setMoving } = useStore()
 
   const direction = useRef(new THREE.Vector3())

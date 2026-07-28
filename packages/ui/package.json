@@ -20,6 +20,7 @@
     "build": "tsup src/index.tsx --format esm,cjs --dts --external react",
     "dev": "npm run css:watch & tsup src/index.tsx --format esm,cjs --dts --watch",
     "lint": "eslint .",
+    "check-types": "tsc --noEmit",
     "css:build": "tailwindcss -i ./src/styles.css -o ./styles.css --minify",
     "css:watch": "tailwindcss -i ./src/styles.css -o ./styles.css --watch"
   },

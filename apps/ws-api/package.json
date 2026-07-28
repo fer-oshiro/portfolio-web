@@ -5,6 +5,8 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc && bash build.sh",
+    "lint": "eslint . --config ../../eslint.config.mjs",
+    "check-types": "tsc --noEmit",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {

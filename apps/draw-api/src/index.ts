@@ -72,7 +72,7 @@ export const handler: APIGatewayProxyWebsocketHandlerV2 = async (event) => {
   try {
     switch (routeKey) {
       case 'get_drawings':
-        await handleDrawings(connectionId, apigw, event.body ?? '{}')
+        await handleDrawings(connectionId, apigw)
         break
       case 'save_drawing':
         await handleSave(connectionId, apigw, event.body ?? '{}')

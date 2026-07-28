@@ -37,6 +37,7 @@ interface IWebsocket {
   from?: string
   type: 'chunk' | 'done' | 'error'
   text?: string
+  message?: string
 }
 
 export const Window = () => {
