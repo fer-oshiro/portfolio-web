@@ -1,8 +1,7 @@
 import { useControls } from 'leva'
 import { useEffect, useRef, useState } from 'react'
-import useWebSocket from 'react-use-websocket'
 
-import { WS_URL } from '../../service/constants'
+import { useRealtime, useRealtimeMessage } from '../../service/RealtimeProvider'
 import { useStore } from '../../store'
 import { TypingDots } from './TypingDots'
 
@@ -33,12 +32,6 @@ interface IMessage {
   text: string
 }
 
-interface IWebsocket {
-  from?: string
-  type: 'chunk' | 'done' | 'error'
-  text?: string
-}
-
 export const Window = () => {
   const bottomRef = useRef<HTMLDivElement>(null)
   const [mess, setMess] = useState<IMessage[]>([
@@ -47,11 +40,8 @@ export const Window = () => {
       text: 'Olá, eu sou o assistente virtual da Fernanda Oshiro. Como posso ajudar você hoje?',
     },
   ])
-  const [buffer, setBuffer] = useState('')
-  const { sendJsonMessage, lastJsonMessage } = useWebSocket<IWebsocket>(
-    WS_URL,
-    { share: true },
-  )
+  const bufferRef = useRef('')
+  const { send } = useRealtime()
   const { maxChars } = useControls({ maxChars: 150 })
   const [text, setText] = useState('')
   const [waiting, setWaiting] = useState(false)
@@ -63,37 +53,6 @@ export const Window = () => {
       inputRef.current?.focus()
     }
   }, [focus])
-
-  useEffect(() => {
-    if (lastJsonMessage?.from === 'ai' && lastJsonMessage?.type === 'chunk')
-      setBuffer((prev) => prev + lastJsonMessage?.text)
-    if (lastJsonMessage?.from === 'ai' && lastJsonMessage?.type === 'done') {
-      handleBotDone()
-    }
-    if (
-      lastJsonMessage?.type === 'error' ||
-      lastJsonMessage?.message === 'Internal server error'
-    ) {
-      setBuffer('')
-      setWaiting(false)
-      setTimeout(function () {
-        bottomRef.current?.scrollIntoView()
-        inputRef.current?.focus()
-      }, 100)
-    }
-  }, [lastJsonMessage])
-
-  const handleBotDone = async () => {
-    for (const text of splitText(buffer)) {
-      await handleAddBotMessage(text, splitText(buffer).at(-1))
-    }
-    setBuffer('')
-    setWaiting(false)
-    setTimeout(function () {
-      bottomRef.current?.scrollIntoView()
-      inputRef.current?.focus()
-    }, 100)
-  }
 
   const handleAddBotMessage = async (mess: string, lastMess?: string) => {
     setMess((prev) => [
@@ -108,22 +67,50 @@ export const Window = () => {
     if (mess !== lastMess) await wait(4000)
   }
 
+  const handleBotDone = async () => {
+    const response = bufferRef.current
+    bufferRef.current = ''
+    for (const text of splitText(response)) {
+      await handleAddBotMessage(text, splitText(response).at(-1))
+    }
+    setWaiting(false)
+    setTimeout(function () {
+      bottomRef.current?.scrollIntoView()
+      inputRef.current?.focus()
+    }, 100)
+  }
+
+  useRealtimeMessage('chat_chunk', ({ text }) => {
+    bufferRef.current += text
+  })
+  useRealtimeMessage('chat_done', () => handleBotDone())
+  useRealtimeMessage('error', ({ source }) => {
+    if (source !== 'chat') return
+    bufferRef.current = ''
+    setWaiting(false)
+    setTimeout(function () {
+      bottomRef.current?.scrollIntoView()
+      inputRef.current?.focus()
+    }, 100)
+  })
+
   const handleSubmit = () => {
-    if (waiting) return
+    const message = text.trim().slice(0, 150)
+    if (waiting || !message) return
     setMess((prev) => [
       ...prev,
       {
         from: 'user',
-        text,
+        text: message,
       },
     ])
     setTimeout(function () {
       bottomRef.current?.scrollIntoView()
     }, 100)
     setWaiting(true)
-    sendJsonMessage({
+    send({
       action: 'chat',
-      message: text,
+      message,
     })
     setText('')
   }

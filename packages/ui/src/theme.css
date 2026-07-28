@@ -1,0 +1,18 @@
+@theme {
+  --color-background: #140f1d;
+
+  --color-rose-100: #f6cdc4;
+  --color-rose-200: #f7adad;
+  --color-rose-300: #e6b0b5;
+  --color-rose-400: #d57a84;
+  --color-rose-500: #b46a6b;
+
+  --color-magic-glow: #7fddde;
+  --color-magic-light: #e5e4e1;
+
+  --color-staff-gold: #deb844;
+  --color-staff-bronze: #b3893b;
+  --color-staff-wood: #b87055;
+  --color-staff-ruby: #942d26;
+  --color-staff-gem: #ebb6ae;
+}

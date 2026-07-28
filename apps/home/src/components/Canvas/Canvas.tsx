@@ -1,7 +1,8 @@
 import { PointerEvent, useEffect, useRef, useState } from 'react'
 import getStroke, { Vec2 } from 'perfect-freehand'
-import useWebSocket, { ReadyState } from 'react-use-websocket'
-import { WS_URL } from '../../service/constants'
+import { ReadyState } from 'react-use-websocket'
+
+import { useRealtime, useRealtimeMessage } from '../../service/RealtimeProvider'
 
 const COLORS = ['#000000', '#ef4444', '#3b82f6', '#22c55e', '#f59e0b']
 
@@ -39,12 +40,7 @@ export function Canvas() {
     width: window.innerWidth * 0.8,
     height: window.innerHeight * 0.5,
   })
-  const { sendJsonMessage, lastJsonMessage, readyState } = useWebSocket<{
-    type: string
-    from: string
-    text: string
-    data: any
-  }>(WS_URL, { share: true })
+  const { send, readyState } = useRealtime()
 
   const handlePointerDown = (e: PointerEvent<SVGSVGElement>) => {
     e.currentTarget.setPointerCapture(e.pointerId)
@@ -81,7 +77,7 @@ export function Canvas() {
   const handleSubmit = () => {
     if (readyState !== ReadyState.OPEN) return
     setStatus('loading')
-    sendJsonMessage({ action: 'save_drawing', message: name })
+    send({ action: 'save_drawing', name: name.slice(0, 100) })
   }
 
   const exportSVG = () => {
@@ -131,14 +127,10 @@ export function Canvas() {
     return () => window.removeEventListener('resize', updateSize)
   }, [])
 
-  useEffect(() => {
-    if (
-      lastJsonMessage?.from === 'url_draw' &&
-      lastJsonMessage?.type === 'done'
-    ) {
-      uploadToS3(lastJsonMessage?.text)
-    }
-  }, [lastJsonMessage])
+  useRealtimeMessage('upload_url', ({ url }) => uploadToS3(url))
+  useRealtimeMessage('error', ({ source }) => {
+    if (source === 'draw') setStatus('error')
+  })
 
   return (
     <div>
@@ -221,7 +213,11 @@ export function Canvas() {
         {status === 'okay' && <div>Obrigada ⸜(｡˃ ᵕ ˂ )⸝♡</div>}
         {status === 'idle' && (
           <>
-            <input name="name" onChange={(e) => setName(e.target.value)} />
+            <input
+              name="name"
+              maxLength={100}
+              onChange={(e) => setName(e.target.value)}
+            />
             <button onClick={handleSubmit}>Salvar</button>
           </>
         )}

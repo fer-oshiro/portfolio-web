@@ -2,6 +2,8 @@ import {
   ApiGatewayManagementApiClient,
   PostToConnectionCommand,
 } from '@aws-sdk/client-apigatewaymanagementapi'
+import type { ServerMessage } from '@charmbyte/realtime-contract'
+import { serverMessageSchema } from '@charmbyte/realtime-contract'
 import { IWebSocketProvider } from './IWebsocketProvider'
 
 export class AwsApiGatewayProvider implements IWebSocketProvider {
@@ -13,10 +15,13 @@ export class AwsApiGatewayProvider implements IWebSocketProvider {
     })
   }
 
-  async sendMessage(connectionId: string, payload: any): Promise<void> {
+  async sendMessage(
+    connectionId: string,
+    payload: ServerMessage,
+  ): Promise<void> {
     const command = new PostToConnectionCommand({
       ConnectionId: connectionId,
-      Data: JSON.stringify(payload),
+      Data: JSON.stringify(serverMessageSchema.parse(payload)),
     })
     await this.client.send(command)
   }

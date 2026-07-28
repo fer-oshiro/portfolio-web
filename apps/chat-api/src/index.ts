@@ -1,3 +1,4 @@
+import { clientMessageSchema } from '@charmbyte/realtime-contract'
 import type { APIGatewayProxyWebsocketHandlerV2 } from 'aws-lambda'
 import OpenAI from 'openai'
 import { AwsApiGatewayProvider } from './websocket/AwsProvider'
@@ -11,8 +12,6 @@ const groq = new OpenAI({
 })
 
 // ---- Helpers ----
-
-const IS_LOCAL = process.env.NODE_ENV === 'development'
 
 const SYSTEM_PROMPT = `
 Você é o Assistente Virtual da Fernanda Oshiro, desenvolvido para ajudar recrutadores.
@@ -53,7 +52,12 @@ export const handleChat = async (
   websocket: IWebSocketProvider,
   body: string,
 ) => {
-  const { message } = JSON.parse(body) as { message: string }
+  const value: unknown = JSON.parse(body)
+  const parsed = clientMessageSchema.safeParse(value)
+  if (!parsed.success || parsed.data.action !== 'chat') {
+    throw new Error('Invalid chat message')
+  }
+  const { message } = parsed.data
 
   const stream = await groq.chat.completions.create({
     model: 'llama-3.1-8b-instant',
@@ -75,8 +79,7 @@ export const handleChat = async (
 
       if (buffer.length >= CHUNK_SIZE) {
         await websocket.sendMessage(connectionId, {
-          from: 'ai',
-          type: 'chunk',
+          type: 'chat_chunk',
           text: buffer,
         })
         buffer = ''
@@ -86,13 +89,12 @@ export const handleChat = async (
 
   if (buffer) {
     await websocket.sendMessage(connectionId, {
-      from: 'ai',
-      type: 'chunk',
+      type: 'chat_chunk',
       text: buffer,
     })
   }
 
-  await websocket.sendMessage(connectionId, { from: 'ai', type: 'done' })
+  await websocket.sendMessage(connectionId, { type: 'chat_done' })
 }
 
 // ---- Main Handler ----
@@ -118,7 +120,9 @@ export const handler: APIGatewayProxyWebsocketHandlerV2 = async (event) => {
     if (routeKey === 'chat') {
       await apigw.sendMessage(connectionId, {
         type: 'error',
-        text: JSON.stringify(err),
+        source: 'chat',
+        code: 'INTERNAL_ERROR',
+        message: 'Não foi possível responder agora.',
       })
     }
 

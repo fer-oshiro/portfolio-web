@@ -27,6 +27,6 @@ export const config = [
     },
   },
   {
-    ignores: ["dist/**", "styled-system/**", "storybook-static/**"],
+    ignores: ["dist/**", "storybook-static/**"],
   },
 ];

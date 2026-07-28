@@ -1,5 +1,7 @@
 import { useThree } from '@react-three/fiber'
 import { useEffect } from 'react'
+import * as THREE from 'three'
+
 import { useStore } from '../store'
 
 function InteractionManager({
@@ -7,25 +9,26 @@ function InteractionManager({
 }: {
   customX?: number
   customY?: number
-  onFocus: (bj: any) => void
+  onFocus: (object: THREE.Object3D) => void
 }) {
   const { setHover, cursorPosition } = useStore()
   const { camera, raycaster, size, scene } = useThree()
 
   const { x, y } = cursorPosition
 
-  const castRay = (pixelX, pixelY) => {
+  const castRay = (pixelX: number, pixelY: number) => {
     const x = (pixelX / size.width) * 2 - 1
     const y = -(pixelY / size.height) * 2 + 1
 
-    raycaster.setFromCamera({ x, y }, camera)
+    raycaster.setFromCamera(new THREE.Vector2(x, y), camera)
     const hits = raycaster.intersectObjects(scene.children, true)
+    const firstHit = hits[0]
 
-    if (hits.length > 0) {
-      onFocus(hits[0]?.object)
+    if (firstHit) {
+      onFocus(firstHit.object)
 
-      if (hits[0]?.object.userData.focusTarget) {
-        setHover(hits[0]?.object.userData.focusTarget)
+      if (firstHit.object.userData.focusTarget) {
+        setHover(firstHit.object.userData.focusTarget)
       } else {
         setHover('default')
       }

@@ -5,11 +5,8 @@
     "outDir": "dist",
     "declaration": true,          
     "declarationDir": "dist",     
-    "emitDeclarationOnly": false, 
-    "paths": {
-      "styled-system/*": ["./styled-system/*"]
-    }
+    "emitDeclarationOnly": false
   },
-  "include": ["src", "styled-system"],
+  "include": ["src"],
   "exclude": ["node_modules", "dist"]
 }

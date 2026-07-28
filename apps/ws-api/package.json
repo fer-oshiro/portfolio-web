@@ -4,17 +4,21 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "tsc && bash build.sh",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "esbuild src/index.ts --bundle --platform=node --target=node20 --outfile=dist/index.js && npm run zip",
+    "zip": "cd dist && zip -r index.zip index.js",
+    "lint": "eslint . --config ../../eslint.config.mjs",
+    "check-types": "tsc --noEmit"
   },
   "devDependencies": {
     "@aws-sdk/client-apigatewaymanagementapi": "^3.0.0",
     "@aws-sdk/client-dynamodb": "^3.0.0",
     "@types/aws-lambda": "^8.10.131",
     "@types/node": "^20.0.0",
+    "esbuild": "^0.28.1",
     "typescript": "^5.9.3"
   },
   "dependencies": {
+    "@charmbyte/realtime-contract": "*",
     "twilio": "^6.0.0"
   },
   "keywords": [],

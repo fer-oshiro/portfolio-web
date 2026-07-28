@@ -1,6 +1,6 @@
 import { useGLTF, useTexture } from '@react-three/drei'
 import { Canvas } from '@react-three/fiber'
-import { Leva, useControls } from 'leva'
+import { useControls } from 'leva'
 import * as THREE from 'three'
 
 import { Board } from '../../components/Board'
@@ -16,6 +16,16 @@ import roomBaked from '../../assets/models/room.png'
 
 function RoomMesh() {
   const { nodes } = useGLTF(roomUrl)
+  const roomNodes = nodes as Record<
+    | 'Cube'
+    | 'Cube001'
+    | 'Cube002'
+    | 'Cube003'
+    | 'Icosphere'
+    | 'screen'
+    | 'board',
+    THREE.Mesh
+  >
   const bakedTexture = useTexture(roomBaked)
   const { setCamera } = useStore()
 
@@ -41,23 +51,23 @@ function RoomMesh() {
 
   return (
     <group>
-      <mesh geometry={nodes.Cube.geometry}>
+      <mesh geometry={roomNodes.Cube.geometry}>
         <meshBasicMaterial map={bakedTexture} />
       </mesh>
 
-      <mesh geometry={nodes.Cube001.geometry}>
+      <mesh geometry={roomNodes.Cube001.geometry}>
         <meshBasicMaterial map={bakedTexture} />
       </mesh>
 
-      <mesh geometry={nodes.Cube002.geometry}>
+      <mesh geometry={roomNodes.Cube002.geometry}>
         <meshBasicMaterial map={bakedTexture} />
       </mesh>
 
-      <mesh geometry={nodes.Cube003.geometry}>
+      <mesh geometry={roomNodes.Cube003.geometry}>
         <meshBasicMaterial color="white" />
       </mesh>
 
-      <mesh geometry={nodes.Icosphere.geometry}>
+      <mesh geometry={roomNodes.Icosphere.geometry}>
         <meshBasicMaterial color="red" />
       </mesh>
       <group position={cat}>
@@ -76,7 +86,7 @@ function RoomMesh() {
         <SakuraStar loc="cat" />
       </group>
 
-      <mesh geometry={nodes.screen.geometry}>
+      <mesh geometry={roomNodes.screen.geometry}>
         <meshBasicMaterial map={bakedTexture} />
         <Computer />
       </mesh>
@@ -96,7 +106,7 @@ function RoomMesh() {
         <SakuraStar loc="pc" />
       </group>
 
-      <mesh geometry={nodes.board.geometry}>
+      <mesh geometry={roomNodes.board.geometry}>
         <meshBasicMaterial map={bakedTexture} />
         <Board />
       </mesh>

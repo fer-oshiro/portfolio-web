@@ -40,21 +40,9 @@ resource "aws_apigatewayv2_route" "join" {
   target    = "integrations/${aws_apigatewayv2_integration.lambda.id}"
 }
 
-resource "aws_apigatewayv2_route" "offer" {
+resource "aws_apigatewayv2_route" "signal" {
   api_id    = aws_apigatewayv2_api.ws.id
-  route_key = "offer"
-  target    = "integrations/${aws_apigatewayv2_integration.lambda.id}"
-}
-
-resource "aws_apigatewayv2_route" "answer" {
-  api_id    = aws_apigatewayv2_api.ws.id
-  route_key = "answer"
-  target    = "integrations/${aws_apigatewayv2_integration.lambda.id}"
-}
-
-resource "aws_apigatewayv2_route" "iceCandidate" {
-  api_id    = aws_apigatewayv2_api.ws.id
-  route_key = "iceCandidate"
+  route_key = "signal"
   target    = "integrations/${aws_apigatewayv2_integration.lambda.id}"
 }
 

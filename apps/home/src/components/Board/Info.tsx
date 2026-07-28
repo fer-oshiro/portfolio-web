@@ -24,6 +24,9 @@ function useSpaceGradient() {
     canvas.height = 256
 
     const ctx = canvas.getContext('2d')
+    if (!ctx) {
+      throw new Error('Canvas 2D context is not available')
+    }
     const gradient = ctx.createLinearGradient(0, 0, 0, 256)
     gradient.addColorStop(0, '#0a0a2e') // azul escuro (topo)
     gradient.addColorStop(0.4, '#1a1060') // azul médio

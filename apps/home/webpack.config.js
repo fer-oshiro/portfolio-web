@@ -1,8 +1,10 @@
 const HtmlWebPackPlugin = require('html-webpack-plugin')
 const ModuleFederationPlugin = require('webpack/lib/container/ModuleFederationPlugin')
 const Dotenv = require('dotenv-webpack')
+const path = require('path')
 const deps = require('./package.json').dependencies
 const {
+  '@charmbyte/ui': ____,
   'qrcode.react': _,
   'react-use-websocket': __,
   zustand: ___,
@@ -20,6 +22,12 @@ module.exports = (_, argv) => {
 
     resolve: {
       extensions: ['.tsx', '.ts', '.jsx', '.js', '.json'],
+      alias: {
+        '@charmbyte/ui$': path.resolve(
+          __dirname,
+          '../../packages/ui/src/index.tsx',
+        ),
+      },
     },
 
     devServer: {
@@ -27,7 +35,10 @@ module.exports = (_, argv) => {
       historyApiFallback: true,
       allowedHosts: 'all',
       hot: true,
-      watchFiles: ['src/**/*'],
+      watchFiles: [
+        'src/**/*',
+        path.resolve(__dirname, '../../packages/ui/src/**/*'),
+      ],
       headers: {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'GET, HEAD, OPTIONS',
@@ -56,7 +67,20 @@ module.exports = (_, argv) => {
         { test: /\.(glb|gltf|bin|png|mp3)$/i, type: 'asset/resource' },
         {
           test: /\.(css|s[ac]ss)$/i,
-          use: ['style-loader', 'css-loader'],
+          use: [
+            'style-loader',
+            'css-loader',
+            {
+              loader: 'postcss-loader',
+              options: {
+                postcssOptions: {
+                  plugins: {
+                    '@tailwindcss/postcss': {},
+                  },
+                },
+              },
+            },
+          ],
         },
         {
           test: /\.[jt]sx?$/,
