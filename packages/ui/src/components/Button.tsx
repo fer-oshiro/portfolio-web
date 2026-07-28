@@ -8,7 +8,10 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     return (
       <ark.button
         ref={ref}
-        className={['bg-blue-500 hover:cursor-pointer', className]
+        className={[
+          'rounded-lg bg-rose-500 px-4 py-2 font-semibold text-white transition-colors hover:cursor-pointer hover:bg-rose-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-500',
+          className,
+        ]
           .filter(Boolean)
           .join(' ')}
         {...props}

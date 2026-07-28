@@ -1,3 +1,4 @@
+import { Button } from '@charmbyte/ui'
 import { motion } from 'motion/react'
 import { useEffect, useState } from 'react'
 import { ReadyState } from 'react-use-websocket'
@@ -128,6 +129,9 @@ export const WebSocket = () => {
                   Esse é meu portfolio, e se sinta a vontade a explorar o meu
                   quarto
                 </p>
+                <Button type="button" onClick={() => setIsOpen(false)}>
+                  Começar a explorar
+                </Button>
                 <p>Para uma melhor experiencia aponte a camera pro QRCode</p>
                 <div
                   style={{
