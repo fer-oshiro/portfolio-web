@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "private": true,
+  "type": "module",
   "scripts": {
     "clean": "rm -rf node_modules/.cache",
     "dev": "npm run clean && storybook dev -p 6006",
@@ -15,19 +16,18 @@
   "devDependencies": {
     "@charmbyte/typescript-config": "*",
     "@charmbyte/ui": "*",
-    "@chromatic-com/storybook": "^3.2.6",
-    "@storybook/addon-essentials": "^8.6.12",
-    "@storybook/blocks": "^8.6.12",
-    "@storybook/experimental-addon-test": "^8.6.12",
-    "@storybook/react": "^8.6.12",
-    "@storybook/react-vite": "^8.6.12",
-    "@storybook/test": "^8.6.12",
-    "@vitest/browser": "^3.1.1",
-    "@vitest/coverage-v8": "^3.1.1",
+    "@chromatic-com/storybook": "^5.2.1",
+    "@storybook/addon-docs": "^10.5.5",
+    "@storybook/addon-vitest": "^10.5.5",
+    "@storybook/react": "^10.5.5",
+    "@storybook/react-vite": "^10.5.5",
+    "@vitest/browser": "^4.1.10",
+    "@vitest/browser-playwright": "^4.1.10",
+    "@vitest/coverage-v8": "^4.1.10",
     "playwright": "^1.51.1",
     "prop-types": "^15.8.1",
-    "storybook": "^8.6.12",
-    "vitest": "^3.1.1"
+    "storybook": "^10.5.5",
+    "vitest": "^4.1.10"
   },
   "dependencies": {
     "polished": "^4.3.1"

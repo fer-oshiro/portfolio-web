@@ -13,10 +13,9 @@
   "type": "commonjs",
   "dependencies": {
     "@aws-sdk/lib-dynamodb": "^3.1026.0",
-    "openai": "^6.33.0"
+    "openai": "^7.0.0"
   },
   "devDependencies": {
-    "dotenv": "^8.6.0",
     "tsx": "^4.21.0"
   }
 }

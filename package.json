@@ -18,7 +18,7 @@
     "prettier": "^3.5.3",
     "tsx": "^4.21.0",
     "turbo": "^2.5.0",
-    "typescript": "5.8.2"
+    "typescript": "^5.9.3"
   },
   "engines": {
     "node": "24.13.1"
@@ -30,11 +30,11 @@
     "@rollup/rollup-linux-arm-gnueabihf": "4.59.0",
     "@rollup/rollup-linux-arm64-gnu": "4.59.0",
     "@rollup/rollup-linux-x64-gnu": "4.59.0",
-    "@swc/core-darwin-arm64": "1.15.17",
-    "@swc/core-darwin-x64": "1.15.17",
-    "@swc/core-linux-arm-gnueabihf": "1.15.17",
-    "@swc/core-linux-arm64-gnu": "1.15.17",
-    "@swc/core-linux-x64-gnu": "1.15.17"
+    "@swc/core-darwin-arm64": "^1.15.46",
+    "@swc/core-darwin-x64": "^1.15.46",
+    "@swc/core-linux-arm-gnueabihf": "^1.15.46",
+    "@swc/core-linux-arm64-gnu": "^1.15.46",
+    "@swc/core-linux-x64-gnu": "^1.15.46"
   },
   "workspaces": [
     "apps/*",
