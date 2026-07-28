@@ -1,4 +1,4 @@
-import '@charmbyte/ui/styles.css'
+import './tailwind.css'
 
 import { HomeRoute } from './routes'
 

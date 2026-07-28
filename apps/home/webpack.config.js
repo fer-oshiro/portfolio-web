@@ -27,10 +27,6 @@ module.exports = (_, argv) => {
           __dirname,
           '../../packages/ui/src/index.tsx',
         ),
-        '@charmbyte/ui/styles.css$': path.resolve(
-          __dirname,
-          '../../packages/ui/src/styles.css',
-        ),
       },
     },
 
@@ -39,7 +35,10 @@ module.exports = (_, argv) => {
       historyApiFallback: true,
       allowedHosts: 'all',
       hot: true,
-      watchFiles: ['src/**/*'],
+      watchFiles: [
+        'src/**/*',
+        path.resolve(__dirname, '../../packages/ui/src/**/*'),
+      ],
       headers: {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'GET, HEAD, OPTIONS',
