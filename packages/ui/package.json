@@ -21,6 +21,7 @@
     "prebuild": "panda build && npm run css:build",
     "build": "tsup src/index.tsx --format esm,cjs --dts --external react",
     "dev": "panda watch & npm run css:watch & tsup src/index.tsx --format esm,cjs --dts --watch",
+    "lint": "eslint .",
     "css:build": "panda cssgen --outfile ./styles.css",
     "css:watch": "panda cssgen --outfile ./styles.css --watch"
   },
@@ -30,22 +31,21 @@
   "devDependencies": {
     "@charmbyte/eslint-config": "*",
     "@charmbyte/typescript-config": "*",
-    "@pandacss/dev": "^0.53.0",
-    "@pandacss/types": "^0.53.3",
-    "@types/node": "^22.13.10",
+    "@pandacss/dev": "^1.11.5",
+    "@pandacss/types": "^1.11.5",
+    "@types/node": "^24.13.3",
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.1",
-    "eslint": "^9.23.0",
-    "postcss": "^8.5.3",
+    "eslint": "^10.8.0",
+    "postcss": "^8.5.23",
     "postcss-cli": "^11.0.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "tsup": "^8.4.0",
-    "typescript": "^5.8.2"
+    "typescript": "^5.9.3"
   },
   "dependencies": {
-    "@ark-ui/react": "^5.5.0",
-    "commitizen": "4.2.4"
+    "@ark-ui/react": "^5.5.0"
   },
   "peerDependencies": {
     "react": "^18.2.0 || ^19.0.0",

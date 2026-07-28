@@ -12,7 +12,7 @@
     "@aws-sdk/client-dynamodb": "^3.0.0",
     "@types/aws-lambda": "^8.10.131",
     "@types/node": "^20.0.0",
-    "typescript": "^5.0.0"
+    "typescript": "^5.9.3"
   },
   "dependencies": {
     "twilio": "^6.0.0"

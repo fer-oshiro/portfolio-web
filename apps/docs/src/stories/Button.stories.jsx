@@ -1,5 +1,5 @@
 import React from 'react';
-import { fn } from '@storybook/test';
+import { fn } from 'storybook/test';
 
 import { Button } from '@charmbyte/ui';
 import '@charmbyte/ui/styles.css'
