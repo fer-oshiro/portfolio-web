@@ -1,7 +1,10 @@
-import { styled } from 'styled-system/jsx'
-import type { HTMLStyledProps } from 'styled-system/types'
+import { ark, type HTMLArkProps } from '@ark-ui/react/factory'
+import { forwardRef } from 'react'
 
-export const Box = styled('div')
-export type BoxProps = HTMLStyledProps<'div'>
+export type BoxProps = HTMLArkProps<'div'>
+
+export const Box = forwardRef<HTMLDivElement, BoxProps>((props, ref) => (
+  <ark.div ref={ref} {...props} />
+))
 
 Box.displayName = 'Box'

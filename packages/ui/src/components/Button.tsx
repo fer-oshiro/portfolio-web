@@ -1,23 +1,20 @@
+import { ark, type HTMLArkProps } from '@ark-ui/react/factory'
 import { forwardRef } from 'react'
-import { css } from 'styled-system/css'
 
-type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement>
+export type ButtonProps = HTMLArkProps<'button'>
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ children, ...props }, ref) => {
+  ({ children, className, ...props }, ref) => {
     return (
-      <button
+      <ark.button
         ref={ref}
-        className={css({
-          bg: 'blue.500',
-          _hover: {
-            cursor: 'pointer',
-          },
-        })}
+        className={['bg-blue-500 hover:cursor-pointer', className]
+          .filter(Boolean)
+          .join(' ')}
         {...props}
       >
         {children}
-      </button>
+      </ark.button>
     )
   },
 )
