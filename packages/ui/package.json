@@ -21,6 +21,7 @@
     "prebuild": "panda build && npm run css:build",
     "build": "tsup src/index.tsx --format esm,cjs --dts --external react",
     "dev": "panda watch & npm run css:watch & tsup src/index.tsx --format esm,cjs --dts --watch",
+    "lint": "eslint .",
     "css:build": "panda cssgen --outfile ./styles.css",
     "css:watch": "panda cssgen --outfile ./styles.css --watch"
   },
@@ -35,8 +36,8 @@
     "@types/node": "^24.13.3",
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.1",
-    "eslint": "^9.23.0",
-    "postcss": "^8.5.3",
+    "eslint": "^10.8.0",
+    "postcss": "^8.5.23",
     "postcss-cli": "^11.0.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
