@@ -1,4 +1,4 @@
-import { Button } from '@charmbyte/ui'
+import { Button } from '@fer-oshiro/ui'
 import { motion } from 'motion/react'
 import { useEffect, useState } from 'react'
 import { ReadyState } from 'react-use-websocket'

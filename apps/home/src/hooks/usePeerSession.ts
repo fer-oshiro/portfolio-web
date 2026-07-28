@@ -2,11 +2,11 @@ import type {
   DeviceRole,
   GyroscopeData,
   IceServer,
-} from '@charmbyte/realtime-contract'
+} from '@fer-oshiro/realtime-contract'
 import {
   gyroscopeDataSchema,
   signalDataSchema,
-} from '@charmbyte/realtime-contract'
+} from '@fer-oshiro/realtime-contract'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { ReadyState } from 'react-use-websocket'
 import Peer from 'simple-peer'

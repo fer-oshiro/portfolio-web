@@ -18,7 +18,7 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
-    "@charmbyte/realtime-contract": "*",
+    "@fer-oshiro/realtime-contract": "*",
     "twilio": "^6.0.0"
   },
   "keywords": [],

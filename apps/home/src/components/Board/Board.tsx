@@ -1,4 +1,4 @@
-import type { Drawing } from '@charmbyte/realtime-contract'
+import type { Drawing } from '@fer-oshiro/realtime-contract'
 import { Image, RoundedBox, Text } from '@react-three/drei'
 import { useControls } from 'leva'
 import { useEffect, useMemo, useState } from 'react'

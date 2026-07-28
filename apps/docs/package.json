@@ -1,5 +1,5 @@
 {
-  "name": "@charmbyte/docs",
+  "name": "@fer-oshiro/docs",
   "version": "1.0.0",
   "main": "index.js",
   "private": true,
@@ -16,8 +16,8 @@
   "license": "ISC",
   "description": "",
   "devDependencies": {
-    "@charmbyte/typescript-config": "*",
-    "@charmbyte/ui": "*",
+    "@fer-oshiro/typescript-config": "*",
+    "@fer-oshiro/ui": "*",
     "@chromatic-com/storybook": "^5.2.1",
     "@storybook/addon-docs": "^10.5.5",
     "@storybook/addon-vitest": "^10.5.5",

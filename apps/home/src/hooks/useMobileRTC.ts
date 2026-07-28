@@ -1,4 +1,4 @@
-import type { GyroscopeData } from '@charmbyte/realtime-contract'
+import type { GyroscopeData } from '@fer-oshiro/realtime-contract'
 import { useState } from 'react'
 import { ReadyState } from 'react-use-websocket'
 

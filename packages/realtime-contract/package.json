@@ -1,5 +1,5 @@
 {
-  "name": "@charmbyte/realtime-contract",
+  "name": "@fer-oshiro/realtime-contract",
   "version": "0.1.0",
   "private": true,
   "main": "./src/index.ts",
@@ -16,7 +16,7 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@charmbyte/typescript-config": "*",
+    "@fer-oshiro/typescript-config": "*",
     "tsup": "^8.4.0",
     "typescript": "^5.9.3",
     "vitest": "^4.1.10"

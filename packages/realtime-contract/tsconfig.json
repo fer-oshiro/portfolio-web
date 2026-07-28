@@ -1,5 +1,5 @@
 {
-  "extends": "@charmbyte/typescript-config/base.json",
+  "extends": "@fer-oshiro/typescript-config/base.json",
   "compilerOptions": {
     "module": "ESNext",
     "moduleResolution": "Bundler",

@@ -2,11 +2,11 @@ import type {
   ClientMessage,
   ServerMessage,
   ServerMessageOf,
-} from '@charmbyte/realtime-contract'
+} from '@fer-oshiro/realtime-contract'
 import {
   clientMessageSchema,
   serverMessageSchema,
-} from '@charmbyte/realtime-contract'
+} from '@fer-oshiro/realtime-contract'
 import {
   PropsWithChildren,
   useEffect,

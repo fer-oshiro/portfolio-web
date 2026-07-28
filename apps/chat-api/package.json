@@ -14,7 +14,7 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
-    "@charmbyte/realtime-contract": "*",
+    "@fer-oshiro/realtime-contract": "*",
     "@aws-sdk/lib-dynamodb": "^3.1026.0",
     "openai": "^7.0.0"
   },

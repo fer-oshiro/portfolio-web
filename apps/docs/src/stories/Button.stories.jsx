@@ -1,8 +1,8 @@
 import React from 'react';
 import { fn } from 'storybook/test';
 
-import { Button } from '@charmbyte/ui';
-import '@charmbyte/ui/styles.css'
+import { Button } from '@fer-oshiro/ui';
+import '@fer-oshiro/ui/styles.css'
 
 export default {
   title: 'Example/Button',

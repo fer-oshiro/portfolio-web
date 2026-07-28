@@ -1,5 +1,5 @@
 import React from 'react'
-import { colors } from '@charmbyte/ui'
+import { colors } from '@fer-oshiro/ui'
 import { getContrast } from 'polished'
 
 export function ColorsGrid() {
