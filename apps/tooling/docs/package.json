@@ -8,7 +8,7 @@
     "clean": "rm -rf node_modules/.cache",
     "dev": "npm run clean && storybook dev -p 6006",
     "build": "storybook build",
-    "lint": "eslint . --config ../../eslint.config.mjs",
+    "lint": "eslint . --config ../../../eslint.config.mjs",
     "check-types": "tsc --noEmit"
   },
   "keywords": [],

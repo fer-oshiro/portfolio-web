@@ -25,7 +25,7 @@ module.exports = (_, argv) => {
       alias: {
         '@fer-oshiro/ui$': path.resolve(
           __dirname,
-          '../../packages/ui/src/index.tsx',
+          '../../../packages/ui/src/index.tsx',
         ),
       },
     },
@@ -37,7 +37,7 @@ module.exports = (_, argv) => {
       hot: true,
       watchFiles: [
         'src/**/*',
-        path.resolve(__dirname, '../../packages/ui/src/**/*'),
+        path.resolve(__dirname, '../../../packages/ui/src/**/*'),
       ],
       headers: {
         'Access-Control-Allow-Origin': '*',

@@ -1,19 +1,21 @@
 {
-  "name": "@fer-oshiro/shell",
+  "name": "@fer-oshiro/home",
   "version": "1.0.0",
   "scripts": {
     "build": "webpack --mode production",
     "build:dev": "webpack --mode development",
     "build:start": "cd dist && PORT=8080 npx serve",
-    "dev": "webpack serve --open --mode development",
-    "dev:live": "webpack serve --open --mode development --live-reload --hot",
-    "lint": "eslint . --config ../../eslint.config.mjs",
+    "dev": "webpack serve --mode development",
+    "dev:live": "webpack serve --mode development --live-reload --hot",
+    "lint": "eslint . --config ../../../eslint.config.mjs",
     "check-types": "tsc --noEmit"
   },
   "license": "MIT",
   "devDependencies": {
     "@fer-oshiro/typescript-config": "*",
     "@swc/core": "^1.4.0",
+    "@types/simple-peer": "^9.11.9",
+    "@tailwindcss/postcss": "^4.3.3",
     "address": "^2.0.3",
     "autoprefixer": "^10.4.21",
     "css-loader": "^7.1.2",
@@ -29,8 +31,23 @@
     "webpack-dev-server": "^6.0.0"
   },
   "dependencies": {
+    "@fer-oshiro/realtime-contract": "*",
+    "@fer-oshiro/ui": "*",
+    "@react-three/drei": "^10.7.7",
+    "@react-three/fiber": "^9.5.0",
+    "leva": "^0.10.1",
+    "motion": "^12.6.3",
+    "perfect-freehand": "^1.2.3",
+    "postprocessing": "^6.38.3",
+    "qrcode.react": "^4.2.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "react-router": "^8.3.0"
+    "react-router": "^8.3.0",
+    "react-use-websocket": "^4.13.0",
+    "react-youtube": "^10.1.0",
+    "three": "^0.185.1",
+    "simple-peer": "^9.11.1",
+    "tone": "^15.1.22",
+    "zustand": "^5.0.12"
   }
 }

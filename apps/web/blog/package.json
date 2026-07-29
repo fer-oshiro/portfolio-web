@@ -1,5 +1,5 @@
 {
-  "name": "@fer-oshiro/resume",
+  "name": "@fer-oshiro/blog",
   "version": "1.0.0",
   "scripts": {
     "build": "webpack --mode production",
@@ -7,7 +7,7 @@
     "build:start": "cd dist && PORT=8080 npx serve",
     "dev": "webpack serve --mode development",
     "dev:live": "webpack serve --mode development --live-reload --hot",
-    "lint": "eslint . --config ../../eslint.config.mjs",
+    "lint": "eslint . --config ../../../eslint.config.mjs",
     "check-types": "tsc --noEmit"
   },
   "license": "MIT",
@@ -28,7 +28,13 @@
     "webpack-dev-server": "^6.0.0"
   },
   "dependencies": {
+    "@react-spring/three": "^10.0.3",
+    "@react-spring/web": "^10.0.3",
+    "@react-three/drei": "^10.7.6",
+    "@react-three/fiber": "^9.3.0",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react-dom": "^19.1.0",
+    "react-router": "^8.3.0",
+    "three": "^0.185.1"
   }
 }

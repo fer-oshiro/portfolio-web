@@ -57,12 +57,12 @@ O uso do cache é parte desta linha de base: os comandos não foram forçados co
 
 Arquivos e ocorrências relevantes:
 
-- `apps/blog/src/components/Object.tsx`: `useTexture` condicional e mutação da
+- `apps/web/blog/src/components/Object.tsx`: `useTexture` condicional e mutação da
   textura retornada pelo hook;
-- `apps/home/src/components/Board/Board.tsx`: `Math.random` durante render;
-- `apps/home/src/components/WebSocket.tsx` e
-  `apps/home/src/hooks/useGyro.ts`: atualização síncrona de estado em effect;
-- `apps/home/src/pages/Home/Room.tsx`: mutação da textura retornada pelo hook;
+- `apps/web/home/src/components/Board/Board.tsx`: `Math.random` durante render;
+- `apps/web/home/src/components/WebSocket.tsx` e
+  `apps/web/home/src/hooks/useGyro.ts`: atualização síncrona de estado em effect;
+- `apps/web/home/src/pages/Home/Room.tsx`: mutação da textura retornada pelo hook;
 - vários effects do `home`: dependências ausentes;
 - variáveis de ambiente não declaradas no `turbo.json`;
 - arquivos `webpack.config.js`: uso de `require()`.
@@ -184,11 +184,11 @@ Nenhum valor foi registrado.
 
 O build confirmou três artefatos válidos:
 
-| Artefato                       |         Tamanho | Entradas no ZIP |
-| ------------------------------ | --------------: | --------------: |
-| `apps/ws-api/dist/index.zip`   | 5.594.384 bytes |           2.977 |
-| `apps/chat-api/dist/index.zip` |   332.236 bytes |               1 |
-| `apps/draw-api/dist/index.zip` |   333.168 bytes |               1 |
+| Artefato                               |         Tamanho | Entradas no ZIP |
+| -------------------------------------- | --------------: | --------------: |
+| `apps/backend/ws-api/dist/index.zip`   | 5.594.384 bytes |           2.977 |
+| `apps/backend/chat-api/dist/index.zip` |   332.236 bytes |               1 |
+| `apps/backend/draw-api/dist/index.zip` |   333.168 bytes |               1 |
 
 `unzip -tq` não encontrou erro de integridade. O ZIP de `ws-api` contém, além
 do bundle, arquivos previamente acumulados sob `node_modules` e outros
@@ -198,9 +198,9 @@ Isso foi apenas registrado.
 Partindo de `infra/terraform`, os três paths usados em `lambda.tf` existem:
 
 ```text
-../../apps/ws-api/dist/index.zip
-../../apps/chat-api/dist/index.zip
-../../apps/draw-api/dist/index.zip
+../../apps/backend/ws-api/dist/index.zip
+../../apps/backend/chat-api/dist/index.zip
+../../apps/backend/draw-api/dist/index.zip
 ```
 
 Eles alimentam, respectivamente, `ws_handler`, `chat_handler` e

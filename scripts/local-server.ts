@@ -11,9 +11,9 @@ import {
 } from '@fer-oshiro/realtime-contract'
 import { WebSocket, WebSocketServer } from 'ws'
 
-import { handleChat } from '../apps/chat-api/src'
-import { handleDrawings, handleSave } from '../apps/draw-api/src'
-import { IceServers } from '../apps/ws-api/src/twilio'
+import { handleChat } from '../apps/backend/chat-api/src'
+import { handleDrawings, handleSave } from '../apps/backend/draw-api/src'
+import { IceServers } from '../apps/backend/ws-api/src/twilio'
 import { WebsocketLocalProvider } from './websocket/LocalProvider'
 
 type Connection = {

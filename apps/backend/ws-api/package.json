@@ -6,7 +6,7 @@
   "scripts": {
     "build": "esbuild src/index.ts --bundle --platform=node --target=node20 --outfile=dist/index.js && npm run zip",
     "zip": "cd dist && zip -r index.zip index.js",
-    "lint": "eslint . --config ../../eslint.config.mjs",
+    "lint": "eslint . --config ../../../eslint.config.mjs",
     "check-types": "tsc --noEmit"
   },
   "devDependencies": {

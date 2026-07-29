@@ -47,7 +47,9 @@
     }
   },
   "workspaces": [
-    "apps/*",
+    "apps/web/*",
+    "apps/backend/*",
+    "apps/tooling/*",
     "packages/*"
   ]
 }
