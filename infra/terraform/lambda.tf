@@ -63,8 +63,8 @@ resource "aws_lambda_function" "ws_handler" {
   role             = aws_iam_role.lambda_role.arn
   handler          = "index.handler"
   runtime          = "nodejs20.x"
-  filename         = "../../apps/backend/ws-api/dist/index.zip"
-  source_code_hash = fileexists("../../apps/backend/ws-api/dist/index.zip") ? filebase64sha256("../../apps/backend/ws-api/dist/index.zip") : null
+  filename         = "../../apps/backend/realtime/dist/aws/signaling.zip"
+  source_code_hash = fileexists("../../apps/backend/realtime/dist/aws/signaling.zip") ? filebase64sha256("../../apps/backend/realtime/dist/aws/signaling.zip") : null
 
   timeout = 30
 
@@ -87,8 +87,8 @@ resource "aws_lambda_function" "chat_handler" {
   role             = aws_iam_role.lambda_role.arn
   handler          = "index.handler"
   runtime          = "nodejs20.x"
-  filename         = "../../apps/backend/chat-api/dist/index.zip"
-  source_code_hash = fileexists("../../apps/backend/chat-api/dist/index.zip") ? filebase64sha256("../../apps/backend/chat-api/dist/index.zip") : null
+  filename         = "../../apps/backend/realtime/dist/aws/chat.zip"
+  source_code_hash = fileexists("../../apps/backend/realtime/dist/aws/chat.zip") ? filebase64sha256("../../apps/backend/realtime/dist/aws/chat.zip") : null
   timeout          = 30
 
   environment {
@@ -109,8 +109,8 @@ resource "aws_lambda_function" "draw_handler" {
   role             = aws_iam_role.lambda_role.arn
   handler          = "index.handler"
   runtime          = "nodejs20.x"
-  filename         = "../../apps/backend/draw-api/dist/index.zip"
-  source_code_hash = fileexists("../../apps/backend/draw-api/dist/index.zip") ? filebase64sha256("../../apps/backend/draw-api/dist/index.zip") : null
+  filename         = "../../apps/backend/realtime/dist/aws/drawing.zip"
+  source_code_hash = fileexists("../../apps/backend/realtime/dist/aws/drawing.zip") ? filebase64sha256("../../apps/backend/realtime/dist/aws/drawing.zip") : null
 
   environment {
     variables = {
