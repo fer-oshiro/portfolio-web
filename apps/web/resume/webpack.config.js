@@ -88,10 +88,9 @@ module.exports = (_, argv) => {
         filename: 'remoteEntry.js',
         remotes: {},
         exposes: {
-          './Resume': './src/Resume',
+          './Resume': './src/app/ResumeRemote',
         },
         shared: {
-          ...deps,
           react: {
             singleton: true,
             requiredVersion: deps.react,

@@ -3,13 +3,6 @@ const ModuleFederationPlugin = require('webpack/lib/container/ModuleFederationPl
 const Dotenv = require('dotenv-webpack')
 const path = require('path')
 const deps = require('./package.json').dependencies
-const {
-  '@fer-oshiro/ui': ____,
-  'qrcode.react': _,
-  'react-use-websocket': __,
-  zustand: ___,
-  ...sharedDeps
-} = deps
 
 module.exports = (_, argv) => {
   const isProd = argv.mode === 'production'
@@ -110,10 +103,9 @@ module.exports = (_, argv) => {
         name: 'home',
         filename: 'remoteEntry.js',
         exposes: {
-          './Home': './src/Home',
+          './Home': './src/app/HomeRemote',
         },
         shared: {
-          ...sharedDeps,
           react: {
             singleton: true,
             requiredVersion: deps.react,
@@ -121,6 +113,10 @@ module.exports = (_, argv) => {
           'react-dom': {
             singleton: true,
             requiredVersion: deps['react-dom'],
+          },
+          'react-router': {
+            singleton: true,
+            requiredVersion: deps['react-router'],
           },
         },
       }),

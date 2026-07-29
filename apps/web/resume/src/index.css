@@ -1,8 +1,5 @@
-body {
+.resume-root {
   font-family: Arial, Helvetica, sans-serif;
-}
-
-.container {
   font-size: 3rem;
   margin: auto;
   max-width: 800px;

@@ -2,6 +2,7 @@ const HtmlWebPackPlugin = require('html-webpack-plugin')
 const ModuleFederationPlugin = require('webpack/lib/container/ModuleFederationPlugin')
 const Dotenv = require('dotenv-webpack')
 const deps = require('./package.json').dependencies
+const { createRemoteEntries } = require('./src/config/remotes')
 
 const address = require('address')
 const LAN_IP = address.ip()
@@ -69,17 +70,10 @@ module.exports = (_, argv) => {
       new ModuleFederationPlugin({
         name: 'shell',
         filename: 'remoteEntry.js',
-        remotes: {
-          home: isProd
-            ? 'home@https://fer-oshiro.com/home/remoteEntry.js'
-            : `home@http://${LAN_IP}:3001/remoteEntry.js`,
-          blog: isProd
-            ? 'blog@https://fer-oshiro.com/blog/remoteEntry.js'
-            : `blog@http://${LAN_IP}:3003/remoteEntry.js`,
-          resume: isProd
-            ? 'resume@https://fer-oshiro.com/resume/remoteEntry.js'
-            : `resume@http://${LAN_IP}:3002/remoteEntry.js`,
-        },
+        remotes: createRemoteEntries({
+          isProduction: isProd,
+          lanIp: LAN_IP,
+        }),
         exposes: {},
         shared: {
           ...deps,

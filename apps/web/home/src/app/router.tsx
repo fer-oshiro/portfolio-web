@@ -1,11 +1,11 @@
 import { Route, Routes } from 'react-router'
 
-import { Home } from '../pages/Home'
-import { Mobile } from '../pages/Mobile'
 import { Chat } from '../pages/Chat'
 import Draw from '../pages/Home/Draw'
+import { Home } from '../pages/Home'
+import { Mobile } from '../pages/Mobile'
 
-export function HomeRoute() {
+export function HomeRouter() {
   return (
     <Routes>
       <Route index element={<Home />} />

@@ -88,10 +88,9 @@ module.exports = (_, argv) => {
         filename: 'remoteEntry.js',
         remotes: {},
         exposes: {
-          './Blog': './src/Blog',
+          './Blog': './src/app/BlogRemote',
         },
         shared: {
-          ...deps,
           react: {
             singleton: true,
             requiredVersion: deps.react,
@@ -99,6 +98,10 @@ module.exports = (_, argv) => {
           'react-dom': {
             singleton: true,
             requiredVersion: deps['react-dom'],
+          },
+          'react-router': {
+            singleton: true,
+            requiredVersion: deps['react-router'],
           },
         },
       }),
