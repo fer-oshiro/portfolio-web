@@ -1,5 +1,5 @@
 import { Outlet } from 'react-router'
-import { Transition } from './Transition'
+import { Transition } from '../features/scene-navigation'
 
 export const Layout = () => {
   return (

@@ -1,11 +1,17 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "ui": "tui",
+  "globalEnv": ["BUCKET"],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": ["dist/**", ".next/**", "!.next/cache/**", "storybook-static/**"]
+      "outputs": [
+        "dist/**",
+        ".next/**",
+        "!.next/cache/**",
+        "storybook-static/**"
+      ]
     },
     "lint": {
       "dependsOn": ["^lint"]
@@ -20,6 +26,11 @@
     "dev": {
       "cache": false,
       "persistent": true
+    },
+    "@fer-oshiro/realtime#dev": {
+      "cache": false,
+      "persistent": true,
+      "passThroughEnv": ["GROQ_API_KEY", "PORT", "REALTIME_HOST"]
     }
   }
 }

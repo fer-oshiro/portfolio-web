@@ -1,1 +1,1 @@
-export * from './Board'
+export { Board } from '../../features/room'

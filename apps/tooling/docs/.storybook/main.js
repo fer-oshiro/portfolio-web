@@ -1,4 +1,3 @@
-
 import { createRequire } from 'node:module'
 import { dirname, join } from 'node:path'
 
@@ -8,10 +7,7 @@ const getAbsolutePath = (packageName) =>
 
 /** @type { import('@storybook/react-vite').StorybookConfig } */
 const config = {
-  stories: [
-    '../src/*/**/*.mdx',
-    '../src/*/**/*.stories.@(js|jsx|mjs|ts|tsx)',
-  ],
+  stories: ['../src/*/**/*.mdx', '../src/*/**/*.stories.@(js|jsx|mjs|ts|tsx)'],
   addons: [
     getAbsolutePath('@storybook/addon-docs'),
     getAbsolutePath('@chromatic-com/storybook'),

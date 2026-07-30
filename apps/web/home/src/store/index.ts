@@ -1,10 +1,16 @@
 import { create } from 'zustand'
-import { CameraState, createCameraSlice } from './slices/cameraSlice'
-import { createLocationSlice, LocationState } from './slices/locationSlice'
+import {
+  CameraState,
+  createCameraSlice,
+} from '../features/scene-navigation/camera/cameraSlice'
+import {
+  createLocationSlice,
+  LocationState,
+} from '../features/scene-navigation/locationSlice'
 import {
   createTransitionSlice,
   TransitionState,
-} from './slices/transitionSlice'
+} from '../features/scene-navigation/transitionSlice'
 import { createTrickedSlice, TrickedState } from './slices/trickedSlice'
 import { createLoadingSlice, LoadingState } from './slices/loadingSlice'
 import { createGyroSlice, GyroState } from './slices/gyroSlice'

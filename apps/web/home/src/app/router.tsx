@@ -1,9 +1,9 @@
 import { Route, Routes } from 'react-router'
 
+import { Draw } from '../features/drawing'
+import { Mobile } from '../features/remote-control'
 import { Chat } from '../pages/Chat'
-import Draw from '../pages/Home/Draw'
 import { Home } from '../pages/Home'
-import { Mobile } from '../pages/Mobile'
 
 export function HomeRouter() {
   return (

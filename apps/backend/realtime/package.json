@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "build": "npm run clean && npm run build:signaling && npm run build:chat && npm run build:drawing",
+    "dev": "tsx watch src/entrypoints/local.ts",
     "build:signaling": "npm run bundle:signaling && npm run zip:signaling",
     "build:chat": "npm run bundle:chat && npm run zip:chat",
     "build:drawing": "npm run bundle:drawing && npm run zip:drawing",
@@ -15,6 +16,7 @@
     "zip:drawing": "zip -q -FS -j dist/aws/drawing.zip dist/aws/drawing/index.js",
     "clean": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\"",
     "lint": "eslint . --config ../../../eslint.config.mjs",
+    "test": "node --import tsx --test \"src/**/*.test.ts\"",
     "check-types": "tsc --noEmit"
   },
   "dependencies": {

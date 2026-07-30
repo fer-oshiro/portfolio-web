@@ -1,10 +1,10 @@
-import { Window } from '../components/Computer/Window'
 import '../components/Computer/Computer.css'
+import { AssistantWindow } from '../features/assistant'
 
 export const Chat = () => {
   return (
     <div className="htmlscreen">
-      <Window />
+      <AssistantWindow />
     </div>
   )
 }

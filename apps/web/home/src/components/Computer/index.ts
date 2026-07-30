@@ -1,1 +1,1 @@
-export * from './Computer'
+export { Computer } from '../../features/room'

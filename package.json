@@ -3,8 +3,10 @@
   "private": true,
   "scripts": {
     "build": "turbo run build",
-    "dev:back": "tsx watch scripts/local-server.ts",
-    "dev": "turbo run dev --parallel",
+    "dev": "turbo run dev --filter=@fer-oshiro/shell --filter=@fer-oshiro/home --filter=@fer-oshiro/blog --filter=@fer-oshiro/resume --filter=@fer-oshiro/realtime",
+    "dev:web": "turbo run dev --filter=@fer-oshiro/shell --filter=@fer-oshiro/home --filter=@fer-oshiro/blog --filter=@fer-oshiro/resume",
+    "dev:back": "turbo run dev --filter=@fer-oshiro/realtime",
+    "dev:docs": "turbo run dev --filter=@fer-oshiro/docs",
     "lint": "turbo run lint",
     "test": "turbo run test",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
@@ -20,7 +22,6 @@
     "husky": "^9.1.7",
     "postcss": "^8.5.23",
     "prettier": "^3.5.3",
-    "tsx": "^4.21.0",
     "turbo": "^2.5.0",
     "typescript": "^5.9.3"
   },

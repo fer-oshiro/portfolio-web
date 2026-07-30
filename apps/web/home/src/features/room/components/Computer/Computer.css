@@ -1,0 +1,20 @@
+.htmlscreen {
+  --background: #fcecdf;
+  --menu: #a38063;
+  --window: #e6b092;
+  --font: #603e33;
+
+  background-color: var(--background);
+  color: var(--font);
+  border-radius: 4px;
+  border: none;
+  width: 500px;
+  height: 500px;
+  transform: scale(1);
+  outline: 1px solid transparent;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+
+  padding: 20px;
+  font-size: 1.2rem;
+}
