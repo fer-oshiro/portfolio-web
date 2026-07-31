@@ -30,7 +30,8 @@
     "@fer-oshiro/realtime#dev": {
       "cache": false,
       "persistent": true,
-      "passThroughEnv": ["GROQ_API_KEY", "PORT", "REALTIME_HOST"]
+      "env": ["PORT", "REALTIME_HOST"],
+      "passThroughEnv": ["GROQ_API_KEY"]
     }
   }
 }

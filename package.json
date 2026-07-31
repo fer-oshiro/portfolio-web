@@ -3,9 +3,9 @@
   "private": true,
   "scripts": {
     "build": "turbo run build",
-    "dev": "turbo run dev --filter=@fer-oshiro/shell --filter=@fer-oshiro/home --filter=@fer-oshiro/blog --filter=@fer-oshiro/resume --filter=@fer-oshiro/realtime",
+    "dev": "node --env-file-if-exists=.env node_modules/turbo/bin/turbo run dev --filter=@fer-oshiro/shell --filter=@fer-oshiro/home --filter=@fer-oshiro/blog --filter=@fer-oshiro/resume --filter=@fer-oshiro/realtime",
     "dev:web": "turbo run dev --filter=@fer-oshiro/shell --filter=@fer-oshiro/home --filter=@fer-oshiro/blog --filter=@fer-oshiro/resume",
-    "dev:back": "turbo run dev --filter=@fer-oshiro/realtime",
+    "dev:back": "node --env-file-if-exists=.env node_modules/turbo/bin/turbo run dev --filter=@fer-oshiro/realtime",
     "dev:docs": "turbo run dev --filter=@fer-oshiro/docs",
     "lint": "turbo run lint",
     "test": "turbo run test",

@@ -8,6 +8,7 @@
     "dev": "webpack serve --mode development",
     "dev:live": "webpack serve --mode development --live-reload --hot",
     "lint": "eslint . --config ../../../eslint.config.mjs",
+    "test": "vitest run",
     "check-types": "tsc --noEmit"
   },
   "license": "MIT",
@@ -26,6 +27,7 @@
     "style-loader": "^4.0.0",
     "swc-loader": "^0.2.4",
     "typescript": "^5.9.3",
+    "vitest": "^4.1.10",
     "webpack": "^5.98.0",
     "webpack-cli": "^7.2.1",
     "webpack-dev-server": "^6.0.0"
