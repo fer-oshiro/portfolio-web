@@ -3,7 +3,6 @@ import { useSearchParams } from 'react-router'
 
 import { useMobileRTC } from '../hooks/use-mobile-rtc'
 
-let lastSend = 0
 type DeviceOrientationConstructor = typeof DeviceOrientationEvent & {
   requestPermission?: () => Promise<'denied' | 'granted'>
 }
@@ -12,6 +11,10 @@ export const Mobile = () => {
   const [searchParams] = useSearchParams()
   const [msg1, setMsg] = useState<string[]>([])
   const [gyroStatus, setGyroStatus] = useState('idle')
+  const lastSend = useRef(0)
+  const orientationListener = useRef<
+    ((event: DeviceOrientationEvent) => void) | null
+  >(null)
   const { connected, gyro, handleSendGyro, readyState } = useMobileRTC(
     (log) => setMsg((prev) => [...prev, log]),
     searchParams.get('roomId') ?? 'error',
@@ -35,16 +38,24 @@ export const Mobile = () => {
 
   const startGyroscope = () => {
     setGyroStatus('startGyroscope')
+    if (orientationListener.current) {
+      window.removeEventListener(
+        'deviceorientation',
+        orientationListener.current,
+      )
+    }
+
     const handleMotion = (event: DeviceOrientationEvent) => {
       const now = Date.now()
-      if (now - lastSend < 60) return
-      lastSend = now
+      if (now - lastSend.current < 60) return
+      lastSend.current = now
       handleSendGyro({
         alpha: event.alpha,
         beta: event.beta,
         gamma: event.gamma,
       })
     }
+    orientationListener.current = handleMotion
     window.addEventListener('deviceorientation', handleMotion)
   }
 
@@ -78,8 +89,18 @@ export const Mobile = () => {
       }
     }
     document.addEventListener('visibilitychange', handleVisibilityChange)
-    return () =>
+    return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange)
+      if (orientationListener.current) {
+        window.removeEventListener(
+          'deviceorientation',
+          orientationListener.current,
+        )
+        orientationListener.current = null
+      }
+      void wakeLock.current?.release()
+      wakeLock.current = null
+    }
   }, [])
 
   const handleFakeInput = (input: {

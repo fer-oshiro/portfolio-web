@@ -11,7 +11,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { ReadyState } from 'react-use-websocket'
 import Peer from 'simple-peer'
 
-import { useRealtime, useRealtimeMessage } from '../realtime/RealtimeProvider'
+import { useRealtime, useRealtimeMessage } from '../realtime'
 
 type UsePeerSessionOptions = {
   onData: (data: GyroscopeData) => void

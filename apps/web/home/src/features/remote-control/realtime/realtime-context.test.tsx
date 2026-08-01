@@ -6,11 +6,7 @@ import { describe, expect, it, vi } from 'vitest'
 vi.mock('./constants', () => ({ WS_URL: 'ws://localhost' }))
 
 import { RealtimeProvider, useRealtime } from './RealtimeProvider'
-import {
-  getCompatibilityRealtimeClient,
-  RealtimeContextProvider,
-  useRealtimeClient,
-} from './realtime-context'
+import { RealtimeContextProvider, useRealtimeClient } from './realtime-context'
 import { RealtimeClient } from './realtime-client'
 
 describe('RealtimeContext', () => {
@@ -111,27 +107,14 @@ describe('RealtimeContext', () => {
     expect(secondListener).not.toHaveBeenCalled()
   })
 
-  it('preserva o hook público para consumidores ainda fora do provider', () => {
-    const compatibilityClient = getCompatibilityRealtimeClient()
-    const send = vi.fn()
-    const disconnect = compatibilityClient.connect(send)
-    compatibilityClient.setReadyState(ReadyState.OPEN)
-    let snapshot: ReturnType<typeof useRealtime> | undefined
-
+  it('falha de forma explícita quando o hook é usado fora do provider', () => {
     const Probe = () => {
-      snapshot = useRealtime()
+      useRealtime()
       return null
     }
 
-    renderToStaticMarkup(<Probe />)
-    snapshot?.send({ action: 'chat', message: 'Compatibilidade' })
-
-    expect(snapshot?.readyState).toBe(ReadyState.OPEN)
-    expect(send).toHaveBeenCalledWith({
-      action: 'chat',
-      message: 'Compatibilidade',
-    })
-
-    disconnect()
+    expect(() => renderToStaticMarkup(<Probe />)).toThrow(
+      'useRealtime deve ser usado dentro de RealtimeProvider',
+    )
   })
 })

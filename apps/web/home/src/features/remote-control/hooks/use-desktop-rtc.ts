@@ -12,11 +12,10 @@ const createRoomId = () => {
     .join('-')
 }
 
-const roomId = createRoomId()
-
 export const useDesktopRTC = () => {
   const { setStatus } = useStore()
   const [gyro, setGyro] = useState({ alpha: 0, beta: 0, gamma: 0 })
+  const [roomId] = useState(createRoomId)
   const { connected, iceServers, readyState } = usePeerSession({
     role: 'desktop',
     roomId,

@@ -2,10 +2,7 @@ import { PropsWithChildren, useEffect, useState } from 'react'
 import useWebSocket from 'react-use-websocket'
 
 import { WS_URL } from './constants'
-import {
-  getCompatibilityRealtimeClient,
-  RealtimeContextProvider,
-} from './realtime-context'
+import { RealtimeContextProvider } from './realtime-context'
 import { RealtimeClient } from './realtime-client'
 
 export { useRealtime } from './use-realtime'
@@ -13,7 +10,6 @@ export { useRealtimeMessage } from './use-realtime-message'
 
 export const RealtimeProvider = ({ children }: PropsWithChildren) => {
   const [realtimeClient] = useState(() => new RealtimeClient())
-  const compatibilityRealtimeClient = getCompatibilityRealtimeClient()
   const { sendJsonMessage, readyState } = useWebSocket(WS_URL, {
     reconnectAttempts: 10,
     reconnectInterval: 3000,
@@ -23,7 +19,6 @@ export const RealtimeProvider = ({ children }: PropsWithChildren) => {
       try {
         const value: unknown = JSON.parse(String(event.data))
         const result = realtimeClient.receive(value)
-        compatibilityRealtimeClient.receive(value)
         if (!result.success) {
           console.warn('Mensagem WebSocket inválida', result.error)
         }
@@ -37,20 +32,13 @@ export const RealtimeProvider = ({ children }: PropsWithChildren) => {
     const disconnectClient = realtimeClient.connect((message) =>
       sendJsonMessage(message),
     )
-    const disconnectCompatibilityClient = compatibilityRealtimeClient.connect(
-      (message) => sendJsonMessage(message),
-    )
 
-    return () => {
-      disconnectClient()
-      disconnectCompatibilityClient()
-    }
-  }, [compatibilityRealtimeClient, realtimeClient, sendJsonMessage])
+    return disconnectClient
+  }, [realtimeClient, sendJsonMessage])
 
   useEffect(() => {
     realtimeClient.setReadyState(readyState)
-    compatibilityRealtimeClient.setReadyState(readyState)
-  }, [compatibilityRealtimeClient, readyState, realtimeClient])
+  }, [readyState, realtimeClient])
 
   return (
     <RealtimeContextProvider client={realtimeClient}>
