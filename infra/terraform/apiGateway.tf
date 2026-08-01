@@ -87,7 +87,7 @@ resource "aws_lambda_permission" "apigw_draw" {
 
 resource "aws_apigatewayv2_stage" "prod" {
   api_id      = aws_apigatewayv2_api.ws.id
-  name        = "prod"
+  name        = local.websocket_stage_name
   auto_deploy = true
 
   default_route_settings {
