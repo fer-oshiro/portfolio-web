@@ -1,8 +1,11 @@
+import { useStore } from 'zustand'
+
+import { navigationStore } from '../../scene-navigation/navigation-store'
 import { Canvas } from '../components/Canvas'
-import { useStore } from '../../../store'
 
 function Draw({ show }: { show: boolean }) {
-  const { setLocation, setTransition } = useStore()
+  const navigate = useStore(navigationStore, (state) => state.navigate)
+
   return (
     <div
       style={{
@@ -32,10 +35,7 @@ function Draw({ show }: { show: boolean }) {
           pointerEvents: 'auto',
           zIndex: 9999,
         }}
-        onClick={() => {
-          setTransition('brush')
-          setLocation('room')
-        }}
+        onClick={() => navigate('room', 'brush')}
       >
         Voltar
       </button>

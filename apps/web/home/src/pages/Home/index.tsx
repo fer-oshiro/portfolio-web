@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useState } from 'react'
+import { Suspense, useEffect } from 'react'
 import { CatMiniGame } from '../../features/cat-game'
 import { Draw } from '../../features/drawing'
 import { WebSocket } from '../../features/remote-control'
@@ -10,15 +10,15 @@ import { useLocation } from 'react-router'
 
 export const Home = () => {
   const loc = useLocation()
-  const { location, setMobile, mobile } = useStore()
+  const { location, setViewport, viewport } = useStore()
   useEffect(() => {
-    if (window.innerWidth > 700) setMobile(false)
-  }, [])
+    if (window.innerWidth > 700) setViewport('desktop')
+  }, [setViewport])
 
   return (
     <>
       <Transition />
-      {!mobile && <WebSocket />}
+      {viewport === 'desktop' && <WebSocket />}
       <Leva hidden={!loc.hash.includes('leva')} />
       <CameraToDefault />
       <Suspense>

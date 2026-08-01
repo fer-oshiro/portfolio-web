@@ -3,7 +3,7 @@ import { Canvas } from '@react-three/fiber'
 import { useControls } from 'leva'
 import * as THREE from 'three'
 
-import { CameraManager, InteractionManager } from '../../scene-navigation'
+import { CameraController, InteractionManager } from '../../scene-navigation'
 import { Tricked } from '../../../components/Tricked'
 import { useStore } from '../../../store'
 import { Board } from '../components/Board/Board'
@@ -172,7 +172,7 @@ function Room({ show }: { show: boolean }) {
         style={{ zIndex: 1 }}
         onPointerMove={(e) => castRay(e.clientX, e.clientY)}
       >
-        <CameraManager />
+        <CameraController />
         <InteractionManager onFocus={(obj) => {}} />
 
         <color attach="background" args={['#996754']} />

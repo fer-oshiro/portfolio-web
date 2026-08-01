@@ -19,7 +19,7 @@ export const createLocationSlice: StateCreator<
   location: 'room',
   setLocation: async (location, time = 1000) => {
     const { setCamera } = get()
-    await wait(time)
+    if (time > 0) await wait(time)
     set({ location })
     if (location == 'room') {
       await wait(2500)

@@ -1,20 +1,13 @@
 import { animate, motion, useMotionValue } from 'motion/react'
+import { ComponentProps, useEffect } from 'react'
+import { useStore as useNavigationStore } from 'zustand'
 
 import { useStore } from '../../../store'
+import { getBrushAnimation } from '../brush-transition'
+import { getCatAnimation } from '../cat-transition'
+import { navigationStore } from '../navigation-store'
 import './Transition.css'
-import { ComponentProps, useEffect } from 'react'
 import { useProgress } from '@react-three/drei'
-
-const brushVariant = {
-  animate: {
-    pathLength: [0, 1, 1, 0],
-    strokeWidth: [0, 120, 120, 0],
-  },
-  initial: {
-    pathLength: 0,
-    strokeWidth: 0,
-  },
-}
 
 const d1 =
   'M53.7183 30.0664C22.2812 55.0475 7.52971 68.9601 18.7183 92.5664C53.7183 108.456 75.0002 80.8146 123 49.4564C173.047 16.7613 201 1.45634 232.5 30.0664C250.5 76.4563 180.93 123.461 132 136.066C10.8044 182.088 20.6423 185.967 18.7183 219.566C62.3911 259.673 109.01 220.809 192.218 173.066C240.218 145.526 273.125 109.456 297.218 136.066C321.311 162.677 286 196.859 207 230.456C102.553 274.876 89.908 308.015 94.7183 339.066C119.372 357.748 134.854 341.36 207 297.956C257.954 258.152 300.021 246.801 342.218 266.066C358.476 287.091 372.5 297.956 330.718 315.566L253 339.066'
@@ -27,25 +20,71 @@ const cat =
 
 type BrushPathProps = ComponentProps<typeof motion.path> & {
   variant: 1 | 2
+  animation: ReturnType<typeof getBrushAnimation>
 }
 
-const BrushPath = ({ variant, ...props }: BrushPathProps) => {
-  const { transition, setTransition } = useStore()
+const BrushPath = ({ variant, animation, ...props }: BrushPathProps) => {
   const d = variant === 1 ? d1 : d2
+
   return (
     <motion.path
       d={d}
       stroke={`var(--transition-stroke-${variant})`}
       stroke-linecap="round"
-      variants={brushVariant}
-      initial="initial"
-      animate={transition === 'brush' ? 'animate' : 'initial'}
-      transition={{
-        duration: 6,
+      initial={{ pathLength: 0, strokeWidth: 0 }}
+      animate={{
+        pathLength: animation.pathLength,
+        strokeWidth: animation.strokeWidth,
       }}
-      onAnimationComplete={() => setTransition('none')}
+      transition={{
+        duration: animation.duration,
+        delay: animation.delay,
+      }}
       {...props}
     />
+  )
+}
+
+const BrushTransition = () => {
+  const effect = useNavigationStore(navigationStore, (state) => state.effect)
+  const phase = useNavigationStore(navigationStore, (state) => state.phase)
+  const setLocation = useStore((state) => state.setLocation)
+  const animation = getBrushAnimation({ effect, phase })
+
+  const completeAnimation = () => {
+    const state = navigationStore.getState()
+    const { completionEvent } = getBrushAnimation(state)
+
+    if (completionEvent === 'coverFinished' && state.targetScene) {
+      const targetScene = state.targetScene
+
+      state.coverFinished()
+      // Location remains the render source until the SceneController migration.
+      void setLocation(targetScene, 0)
+    }
+
+    if (completionEvent === 'revealFinished') {
+      state.revealFinished()
+    }
+  }
+
+  return (
+    <div className="transition-svg">
+      <svg
+        width="374"
+        height="362"
+        viewBox="0 0 374 362"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <BrushPath variant={1} animation={animation} />
+        <BrushPath
+          variant={2}
+          animation={animation}
+          onAnimationComplete={completeAnimation}
+        />
+      </svg>
+    </div>
   )
 }
 
@@ -81,24 +120,34 @@ export const Transition = () => {
         }}
       />
       <CatTransition />
-      <div className="transition-svg">
-        <svg
-          width="374"
-          height="362"
-          viewBox="0 0 374 362"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <BrushPath variant={1} />
-          <BrushPath variant={2} />
-        </svg>
-      </div>
+      <BrushTransition />
     </>
   )
 }
 
 const CatTransition = () => {
-  const { transition, setTransition } = useStore()
+  const effect = useNavigationStore(navigationStore, (state) => state.effect)
+  const phase = useNavigationStore(navigationStore, (state) => state.phase)
+  const setLocation = useStore((state) => state.setLocation)
+  const animation = getCatAnimation({ effect, phase })
+
+  const completeAnimation = () => {
+    const state = navigationStore.getState()
+    const { completionEvent } = getCatAnimation(state)
+
+    if (completionEvent === 'coverFinished' && state.targetScene) {
+      const targetScene = state.targetScene
+
+      state.coverFinished()
+      // Location remains the render source until the SceneController migration.
+      void setLocation(targetScene, 0)
+    }
+
+    if (completionEvent === 'revealFinished') {
+      state.revealFinished()
+    }
+  }
+
   return (
     <div className="transition-svg">
       <svg
@@ -113,11 +162,13 @@ const CatTransition = () => {
           fill="black"
           stroke="black"
           initial={{ scale: 0 }}
-          animate={{
-            scale: transition === 'cat' ? [0, 2, 2, 0] : 0,
+          animate={{ scale: animation.scale }}
+          transition={{
+            duration: animation.duration,
+            delay: animation.delay,
+            ease: 'easeInOut',
           }}
-          transition={{ duration: 4, ease: 'easeInOut' }}
-          onAnimationComplete={() => setTransition('none')}
+          onAnimationComplete={completeAnimation}
         />
       </svg>
     </div>
