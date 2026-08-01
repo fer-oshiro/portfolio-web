@@ -35,13 +35,8 @@ export const Cursor = () => {
     <motion.svg
       className="shape"
       style={{
-        position: 'fixed',
         left: springX,
         top: springY,
-        translate: '-50% -50%',
-        pointerEvents: 'none',
-        zIndex: 999,
-        filter: 'blur(1px)',
       }}
       animate={{ rotate: -360, scale: [1, 1.2, 1] }}
       transition={{
@@ -58,7 +53,7 @@ export const Cursor = () => {
           cx={s.cx}
           cy={s.cy}
           r={s.r}
-          style={{ filter: 'blur(2px)' }}
+          className="shape__sparkle"
           initial={{ fill: s.initial }}
           animate={{
             scale: [0.8, 1.4, 0.8],

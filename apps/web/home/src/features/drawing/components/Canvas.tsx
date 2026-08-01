@@ -4,7 +4,15 @@ import { ReadyState } from 'react-use-websocket'
 
 import { useRealtime, useRealtimeMessage } from '../../remote-control/realtime'
 
-const COLORS = ['#000000', '#ef4444', '#3b82f6', '#22c55e', '#f59e0b']
+import './Canvas.css'
+
+const COLORS = [
+  { className: 'drawing-color--black', value: '#000000' },
+  { className: 'drawing-color--red', value: '#ef4444' },
+  { className: 'drawing-color--blue', value: '#3b82f6' },
+  { className: 'drawing-color--green', value: '#22c55e' },
+  { className: 'drawing-color--amber', value: '#f59e0b' },
+]
 
 type Points = {
   points: [number, number][]
@@ -134,29 +142,13 @@ export function Canvas() {
 
   return (
     <div>
-      <div
-        style={{
-          display: 'flex',
-          gap: 8,
-          marginBottom: 8,
-          alignItems: 'center',
-          justifyContent: 'center',
-          flexWrap: 'wrap',
-          padding: 12,
-        }}
-      >
-        {COLORS.map((c) => (
+      <div className="drawing-toolbar">
+        {COLORS.map(({ className, value }) => (
           <button
-            key={c}
-            onClick={() => setColor(c)}
-            style={{
-              width: 32,
-              height: 32,
-              borderRadius: '50%',
-              background: c,
-              border: color === c ? '3px solid #000' : '2px solid #ccc',
-              cursor: 'pointer',
-            }}
+            key={value}
+            className={`drawing-color ${className}`}
+            aria-pressed={color === value}
+            onClick={() => setColor(value)}
           />
         ))}
         <input
@@ -170,24 +162,12 @@ export function Canvas() {
         <button onClick={() => setLines([])}>Limpar</button>
       </div>
 
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          userSelect: 'none',
-        }}
-      >
+      <div className="drawing-canvas-container">
         <svg
           ref={svgRef}
           width={size.width}
           height={size.height}
-          style={{
-            border: '1px solid #ccc',
-            cursor: 'crosshair',
-            touchAction: 'none',
-            backgroundColor: 'white',
-          }}
+          className="drawing-canvas"
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
@@ -209,7 +189,7 @@ export function Canvas() {
         </svg>
       </div>
 
-      <div style={{ paddingTop: 24 }}>
+      <div className="drawing-status">
         {status === 'okay' && <div>Obrigada ⸜(｡˃ ᵕ ˂ )⸝♡</div>}
         {status === 'idle' && (
           <>

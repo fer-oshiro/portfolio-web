@@ -1,0 +1,23 @@
+.mobile-controller {
+  padding: 20px;
+  overflow: scroll;
+  text-align: center;
+}
+
+.mobile-controller__gyro-data {
+  padding: 30px;
+}
+
+.mobile-controller__activate {
+  padding: 15px 30px;
+  font-size: 18px;
+}
+
+.mobile-controller__gyro-status {
+  padding-top: 20px;
+}
+
+.mobile-controller__logs {
+  max-height: 60px;
+  overflow: scroll;
+}

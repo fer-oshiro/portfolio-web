@@ -1,3 +1,15 @@
+.shape {
+  position: fixed;
+  z-index: 999;
+  filter: blur(1px);
+  translate: -50% -50%;
+  pointer-events: none;
+}
+
+.shape__sparkle {
+  filter: blur(2px);
+}
+
 .magic-glow {
   position: fixed;
   pointer-events: none;

@@ -4,6 +4,8 @@ import { useSearchParams } from 'react-router'
 
 import { useMobileRTC } from '../hooks/use-mobile-rtc'
 
+import './MobileControllerPage.css'
+
 type DeviceOrientationConstructor = typeof DeviceOrientationEvent & {
   requestPermission?: () => Promise<'denied' | 'granted'>
 }
@@ -35,7 +37,7 @@ const GyroControls = ({
 
   return (
     <>
-      <p style={{ padding: '30px' }}>{JSON.stringify(gyro)}</p>
+      <p className="mobile-controller__gyro-data">{JSON.stringify(gyro)}</p>
 
       <div>
         <input
@@ -182,32 +184,23 @@ export const Mobile = () => {
   }, [])
 
   return (
-    <div
-      style={{
-        padding: 20,
-        textAlign: 'center',
-        overflowX: 'scroll',
-        overflowY: 'scroll',
-      }}
-    >
+    <div className="mobile-controller">
       <h2>Controle Mobile</h2>
       <p>Status: {connected}</p>
       <p>{readyState}</p>
 
       <button
         onClick={requestPermission}
-        style={{ padding: '15px 30px', fontSize: 18 }}
+        className="mobile-controller__activate"
       >
         Ativar Giroscópio
       </button>
 
-      <p style={{ paddingTop: '20px' }}>{gyroStatus}</p>
+      <p className="mobile-controller__gyro-status">{gyroStatus}</p>
       <p>
         DeviceOrientationEvent: {JSON.stringify(window.DeviceOrientationEvent)}
       </p>
-      <p style={{ maxHeight: '60px', overflow: 'scroll' }}>
-        {JSON.stringify(msg1)}
-      </p>
+      <p className="mobile-controller__logs">{JSON.stringify(msg1)}</p>
 
       <GyroControls
         getGyroSnapshot={getGyroSnapshot}

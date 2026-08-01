@@ -12,6 +12,8 @@ import { remoteControlStore } from '../remote-control-store'
 import { Cursor } from './RemoteCursor'
 import { QRCode } from './RoomQRCode'
 
+import './ConnectionPanel.css'
+
 export const WebSocket = () => {
   const status = useStore(remoteControlStore, (state) => state.status)
   const setConnected = useStore(
@@ -44,53 +46,15 @@ export const WebSocket = () => {
   )
 
   return (
-    <div
-      style={{
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        height: '100%',
-        width: '100%',
-        zIndex: 99998,
-        pointerEvents: 'none',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-      }}
-    >
+    <div className="connection-panel-layer">
       {connected === 'connected' && <Cursor />}
       {!isOpen && (
         <button
-          style={{
-            position: 'fixed',
-            top: '20px',
-            right: '20px',
-            width: '60px',
-            height: '60px',
-            backgroundColor: '#e6b092',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '5px',
-            alignItems: 'center',
-            justifyContent: 'center',
-            borderRadius: '5px',
-            border: 'none',
-            cursor: 'pointer',
-            pointerEvents: 'auto',
-          }}
+          className="connection-panel-menu"
           onClick={() => setIsOpen(true)}
         >
           {[1, 2, 3].map((value) => (
-            <span
-              key={value}
-              style={{
-                width: '80%',
-                height: '5px',
-                backgroundColor: 'black',
-                opacity: '70%',
-                borderRadius: '20px',
-              }}
-            />
+            <span key={value} className="connection-panel-menu__line" />
           ))}
         </button>
       )}
@@ -98,39 +62,12 @@ export const WebSocket = () => {
       {isOpen && (
         <>
           <div
-            style={{
-              pointerEvents: 'all',
-              position: 'fixed',
-              top: 0,
-              left: 0,
-              height: '10000px',
-              width: '10000px',
-              opacity: '60%',
-              backgroundColor: 'black',
-            }}
+            className="connection-panel-backdrop"
             onClick={() => setIsOpen(false)}
           />
-          <motion.div
-            layout
-            style={{
-              width: '500px',
-              margin: '20px',
-              backgroundColor: '#e6b092',
-              borderRadius: '20px',
-              padding: '20px',
-              position: 'relative',
-              pointerEvents: 'auto',
-              minHeight: '500px',
-            }}
-          >
+          <motion.div layout className="connection-panel">
             <button
-              style={{
-                position: 'absolute',
-                padding: '5px 10px',
-                borderRadius: '15px',
-                top: '-10px',
-                right: '-10px',
-              }}
+              className="connection-panel__close"
               onClick={() => setIsOpen(false)}
             >
               x
@@ -147,13 +84,7 @@ export const WebSocket = () => {
                   Começar a explorar
                 </Button>
                 <p>Para uma melhor experiencia aponte a camera pro QRCode</p>
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
+                <div className="connection-panel__qr-code">
                   {iceServers ? (
                     <QRCode roomId={roomId} />
                   ) : (
@@ -164,24 +95,16 @@ export const WebSocket = () => {
                   Caso queira saber mais sobre mim de uma forma rápida, acesse
                   as minhas redes sociais.
                 </p>
-                <ul
-                  style={{
-                    margin: '10px 0',
-                    padding: 0,
-                    listStyle: 'none',
-                    display: 'flex',
-                    gap: '20px',
-                  }}
-                >
+                <ul className="connection-panel__social-list">
                   <li>
                     <a
                       href="https://www.linkedin.com/in/fernanda-oshiro/"
                       target="_blank"
-                      style={{ width: '46px', height: '46px' }}
+                      className="connection-panel__social-link"
                     >
                       <img
                         src={linkedin}
-                        style={{ width: '46px', height: '46px' }}
+                        className="connection-panel__social-icon"
                       />
                     </a>
                   </li>
@@ -189,11 +112,11 @@ export const WebSocket = () => {
                     <a
                       href="https://github.com/fer-oshiro/"
                       target="_blank"
-                      style={{ width: '46px', height: '46px' }}
+                      className="connection-panel__social-link"
                     >
                       <img
                         src={github}
-                        style={{ width: '46px', height: '46px' }}
+                        className="connection-panel__social-icon"
                       />
                     </a>
                   </li>
@@ -203,7 +126,8 @@ export const WebSocket = () => {
             {status === 'server_error' && (
               <div>
                 <h1>
-                  Vish... <span style={{ margin: '0 30px' }}>(๑-﹏-๑)</span>
+                  Vish...{' '}
+                  <span className="connection-panel__error-face">(๑-﹏-๑)</span>
                 </h1>
                 <p>
                   Parece que o nosso servidor está passando por instabilidades
@@ -215,21 +139,21 @@ export const WebSocket = () => {
                   <a
                     href="https://www.linkedin.com/in/fernanda-oshiro/"
                     target="_blank"
-                    style={{ width: '46px', height: '46px' }}
+                    className="connection-panel__social-link"
                   >
                     <img
                       src={linkedin}
-                      style={{ width: '46px', height: '46px' }}
+                      className="connection-panel__social-icon"
                     />
                   </a>
                   <a
                     href="https://github.com/fer-oshiro/"
                     target="_blank"
-                    style={{ width: '46px', height: '46px' }}
+                    className="connection-panel__social-link"
                   >
                     <img
                       src={github}
-                      style={{ width: '46px', height: '46px' }}
+                      className="connection-panel__social-icon"
                     />
                   </a>
                 </div>

@@ -1,0 +1,30 @@
+.draw-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100dvh;
+  background-color: #996754;
+}
+
+.draw-page[hidden] {
+  display: none;
+}
+
+.draw-page__back {
+  position: fixed;
+  z-index: 9999;
+  top: 40px;
+  left: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  align-items: center;
+  justify-content: center;
+  width: 100px;
+  height: 40px;
+  border: none;
+  border-radius: 20px;
+  background-color: #e6b092;
+  cursor: pointer;
+  pointer-events: auto;
+}

@@ -1,0 +1,75 @@
+.colors-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.colors-grid__swatch {
+  padding: 2rem;
+}
+
+.colors-grid__swatch--background-DEFAULT {
+  background-color: #140f1d;
+}
+
+.colors-grid__swatch--rose-100 {
+  background-color: #f6cdc4;
+}
+
+.colors-grid__swatch--rose-200 {
+  background-color: #f7adad;
+}
+
+.colors-grid__swatch--rose-300 {
+  background-color: #e6b0b5;
+}
+
+.colors-grid__swatch--rose-400 {
+  background-color: #d57a84;
+}
+
+.colors-grid__swatch--rose-500 {
+  background-color: #b46a6b;
+}
+
+.colors-grid__swatch--magic-glow {
+  background-color: #7fddde;
+}
+
+.colors-grid__swatch--magic-light {
+  background-color: #e5e4e1;
+}
+
+.colors-grid__swatch--staff-gold {
+  background-color: #deb844;
+}
+
+.colors-grid__swatch--staff-bronze {
+  background-color: #b3893b;
+}
+
+.colors-grid__swatch--staff-wood {
+  background-color: #b87055;
+}
+
+.colors-grid__swatch--staff-ruby {
+  background-color: #942d26;
+}
+
+.colors-grid__swatch--staff-gem {
+  background-color: #ebb6ae;
+}
+
+.colors-grid__label {
+  display: flex;
+  justify-content: space-between;
+  font-family: monospace;
+}
+
+.colors-grid__label--dark {
+  color: #000;
+}
+
+.colors-grid__label--light {
+  color: #fff;
+}

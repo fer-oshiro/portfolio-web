@@ -1,0 +1,59 @@
+.drawing-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8px;
+  padding: 12px;
+}
+
+.drawing-color {
+  width: 32px;
+  height: 32px;
+  border: 2px solid #ccc;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.drawing-color[aria-pressed='true'] {
+  border: 3px solid #000;
+}
+
+.drawing-color--black {
+  background: #000;
+}
+
+.drawing-color--red {
+  background: #ef4444;
+}
+
+.drawing-color--blue {
+  background: #3b82f6;
+}
+
+.drawing-color--green {
+  background: #22c55e;
+}
+
+.drawing-color--amber {
+  background: #f59e0b;
+}
+
+.drawing-canvas-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+}
+
+.drawing-canvas {
+  border: 1px solid #ccc;
+  background-color: white;
+  cursor: crosshair;
+  touch-action: none;
+}
+
+.drawing-status {
+  padding-top: 24px;
+}
