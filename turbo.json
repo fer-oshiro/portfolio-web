@@ -27,6 +27,20 @@
       "cache": false,
       "persistent": true
     },
+    "@fer-oshiro/home#dev": {
+      "cache": false,
+      "dependsOn": ["@fer-oshiro/ui#build"],
+      "persistent": true,
+      "with": ["@fer-oshiro/ui#dev:js", "@fer-oshiro/ui#css:watch"]
+    },
+    "@fer-oshiro/ui#dev:js": {
+      "cache": false,
+      "persistent": true
+    },
+    "@fer-oshiro/ui#css:watch": {
+      "cache": false,
+      "persistent": true
+    },
     "@fer-oshiro/realtime#dev": {
       "cache": false,
       "persistent": true,

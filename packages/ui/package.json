@@ -10,6 +10,7 @@
   ],
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
       "require": "./dist/index.js"
     },
@@ -18,11 +19,12 @@
   "scripts": {
     "prebuild": "npm run css:build",
     "build": "tsup src/index.tsx --format esm,cjs --dts --external react",
-    "dev": "npm run css:watch & tsup src/index.tsx --format esm,cjs --dts --watch",
+    "dev": "npm run css:watch & npm run dev:js",
+    "dev:js": "tsup src/index.tsx --format esm,cjs --dts --watch",
     "lint": "eslint .",
     "check-types": "tsc --noEmit",
     "css:build": "tailwindcss -i ./src/styles.css -o ./styles.css --minify",
-    "css:watch": "tailwindcss -i ./src/styles.css -o ./styles.css --watch"
+    "css:watch": "tailwindcss -i ./src/styles.css -o ./styles.css --watch --poll --minify"
   },
   "publishConfig": {
     "access": "public"
