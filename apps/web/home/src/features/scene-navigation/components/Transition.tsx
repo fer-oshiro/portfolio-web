@@ -83,8 +83,6 @@ const BrushTransition = () => {
   )
 }
 
-const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
-
 export const Transition = () => {
   const { status, setCamera } = useStore()
   const { progress } = useProgress()
@@ -92,12 +90,21 @@ export const Transition = () => {
 
   useEffect(() => {
     if (progress === 100 && status === 'ready') {
-      wait(1000).then(() => {
-        setCamera('default')
-        animate(opacity, 0, { duration: 5 })
+      let cameraReset = false
+      const intro = animate(opacity, [1, 1, 0], {
+        duration: 6,
+        times: [0, 1 / 6, 1],
+        onUpdate: (latest) => {
+          if (cameraReset || latest === 1) return
+
+          cameraReset = true
+          setCamera('default')
+        },
       })
+
+      return () => intro.stop()
     }
-  }, [progress, status])
+  }, [opacity, progress, setCamera, status])
 
   return (
     <>

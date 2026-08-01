@@ -41,8 +41,3 @@ export type {
   TransitionEffect,
   TransitionPhase,
 } from './navigation-types'
-export type { LocationState } from './locationSlice'
-export type {
-  Transition as TransitionType,
-  TransitionState,
-} from './transitionSlice'
