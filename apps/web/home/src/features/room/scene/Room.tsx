@@ -3,7 +3,12 @@ import { Canvas } from '@react-three/fiber'
 import { useControls } from 'leva'
 import * as THREE from 'three'
 
-import { CameraController, InteractionManager } from '../../scene-navigation'
+import {
+  CameraController,
+  InteractionManager,
+  type RoomHotspot,
+  useSceneController,
+} from '../../scene-navigation'
 import { Tricked } from '../../../components/Tricked'
 import { useStore } from '../../../store'
 import { Board } from '../components/Board/Board'
@@ -13,7 +18,11 @@ import SakuraStar from '../components/SakuraStar'
 import roomUrl from '../assets/models/room.glb'
 import roomBaked from '../assets/models/room.png'
 
-function RoomMesh() {
+function RoomMesh({
+  onHotspotActivated,
+}: {
+  onHotspotActivated: (hotspot: RoomHotspot) => void
+}) {
   const { nodes } = useGLTF(roomUrl)
   const roomNodes = nodes as Record<
     | 'Cube'
@@ -26,7 +35,6 @@ function RoomMesh() {
     THREE.Mesh
   >
   const bakedTexture = useTexture(roomBaked)
-  const { setCamera } = useStore()
 
   const { pc, cat, board, draw } = useControls('Stars', {
     pc: {
@@ -75,14 +83,14 @@ function RoomMesh() {
           scale={[1.5, 1.5, 1.5]}
           position={[0, -0.5, 0]}
           userData={{ focusTarget: 'cat' }}
-          onClick={() => setCamera('cat')}
+          onClick={() => onHotspotActivated('cat')}
           onPointerEnter={() => (document.body.style.cursor = 'pointer')}
           onPointerLeave={() => (document.body.style.cursor = 'default')}
         >
           <boxGeometry args={[1, 1]} />
           <meshBasicMaterial color="red" wireframe />
         </mesh>
-        <SakuraStar loc="cat" />
+        <SakuraStar loc="cat" onActivate={() => onHotspotActivated('cat')} />
       </group>
 
       <mesh geometry={roomNodes.screen.geometry}>
@@ -95,14 +103,14 @@ function RoomMesh() {
           scale={[2, 2.5, 1.5]}
           position={[0, -1.25, 0]}
           userData={{ focusTarget: 'pc' }}
-          onClick={() => setCamera('pc')}
+          onClick={() => onHotspotActivated('pc')}
           onPointerEnter={() => (document.body.style.cursor = 'pointer')}
           onPointerLeave={() => (document.body.style.cursor = 'default')}
         >
           <boxGeometry args={[1, 1]} />
           <meshBasicMaterial color="red" wireframe />
         </mesh>
-        <SakuraStar loc="pc" />
+        <SakuraStar loc="pc" onActivate={() => onHotspotActivated('pc')} />
       </group>
 
       <mesh geometry={roomNodes.board.geometry}>
@@ -115,14 +123,17 @@ function RoomMesh() {
           scale={[1, 4, 4]}
           position={[0, -1.8, 0]}
           userData={{ focusTarget: 'board' }}
-          onClick={() => setCamera('board')}
+          onClick={() => onHotspotActivated('board')}
           onPointerEnter={() => (document.body.style.cursor = 'pointer')}
           onPointerLeave={() => (document.body.style.cursor = 'default')}
         >
           <boxGeometry args={[1, 1]} />
           <meshBasicMaterial color="red" wireframe />
         </mesh>
-        <SakuraStar loc="board" />
+        <SakuraStar
+          loc="board"
+          onActivate={() => onHotspotActivated('board')}
+        />
       </group>
 
       <group position={draw}>
@@ -131,21 +142,23 @@ function RoomMesh() {
           scale={[1, 1, 4]}
           position={[-0.4, 0, 0]}
           userData={{ focusTarget: 'draw' }}
-          onClick={() => setCamera('draw')}
+          onClick={() => onHotspotActivated('draw')}
           onPointerEnter={() => (document.body.style.cursor = 'pointer')}
           onPointerLeave={() => (document.body.style.cursor = 'default')}
         >
           <boxGeometry args={[1, 1]} />
           <meshBasicMaterial color="red" wireframe />
         </mesh>
-        <SakuraStar loc="draw" />
+        <SakuraStar loc="draw" onActivate={() => onHotspotActivated('draw')} />
       </group>
     </group>
   )
 }
 
 function Room({ show }: { show: boolean }) {
-  const { connected, setCursorPosition } = useStore()
+  const connected = useStore((state) => state.connected)
+  const setCursorPosition = useStore((state) => state.setCursorPosition)
+  const { activateHotspot } = useSceneController()
   const castRay = (castX: number, castY: number) => {
     if (!connected)
       setCursorPosition({
@@ -177,7 +190,7 @@ function Room({ show }: { show: boolean }) {
 
         <color attach="background" args={['#996754']} />
         <directionalLight position={[10, 10, 5]} intensity={15} />
-        <RoomMesh />
+        <RoomMesh onHotspotActivated={activateHotspot} />
       </Canvas>
     </div>
   )

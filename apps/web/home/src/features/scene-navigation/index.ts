@@ -17,6 +17,14 @@ export type { CatAnimation } from './cat-transition'
 export { CameraToDefault } from './components/CameraToDefault'
 export { InteractionManager } from './components/InteractionManager'
 export { Transition } from './components/Transition'
+export { SceneController, useSceneController } from './scene-controller'
+export { resolveSceneControllerIntent } from './scene-controller-model'
+export type {
+  RoomHotspot,
+  SceneControllerCommand,
+  SceneControllerIntent,
+  SceneControllerState,
+} from './scene-controller-model'
 export {
   createNavigationStore,
   initialNavigationState,

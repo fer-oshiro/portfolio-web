@@ -1,15 +1,14 @@
 import { Html } from '@react-three/drei'
 import { useRef } from 'react'
 import * as Tone from 'tone'
-import { useStore } from 'zustand'
 
-import { navigationStore } from '../../scene-navigation/navigation-store'
+import { useSceneController } from '../../scene-navigation'
 import glass from '../assets/glass.mp3'
 import pawn from '../assets/pawn_the-grey-room_golden-palms.mp3'
 import wood from '../assets/wood.mp3'
 
 export const Game = () => {
-  const navigate = useStore(navigationStore, (state) => state.navigate)
+  const { navigateTo } = useSceneController()
   const musicRef = useRef<Tone.Player>(null)
   const woodRef = useRef(new Audio(wood))
   const glassRef = useRef(new Audio(glass))
@@ -51,7 +50,7 @@ export const Game = () => {
         <button onClick={() => soundEffect('wood')}>Play Wood</button>
         <button onClick={start}>Play Song</button>
         <button onClick={stop}>Stop Song</button>
-        <button onClick={() => navigate('room', 'cat')}>Voltar</button>
+        <button onClick={() => navigateTo('room')}>Voltar</button>
       </div>
     </Html>
   )

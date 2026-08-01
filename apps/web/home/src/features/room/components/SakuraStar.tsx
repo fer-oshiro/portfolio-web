@@ -3,7 +3,7 @@ import { useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { useControls } from 'leva'
 import { useStore } from '../../../store'
-import { CameraCoords } from '../../scene-navigation'
+import type { CameraCoords } from '../../scene-navigation'
 import { Billboard } from '@react-three/drei'
 
 function SakuraStar({
@@ -11,14 +11,17 @@ function SakuraStar({
   color = '#FFB7C5',
   size = 0.15,
   loc,
+  onActivate,
 }: {
   position?: [number, number, number]
   color?: string
   size?: number
   loc: CameraCoords
+  onActivate: () => void
 }) {
   const progress = useRef(0)
-  const { setCamera, focus, hover } = useStore()
+  const focus = useStore((state) => state.focus)
+  const hover = useStore((state) => state.hover)
   const { torus } = useControls('Stars', {
     torus: {
       value: [0.2, 0.03, 16],
@@ -80,7 +83,7 @@ function SakuraStar({
       )
 
       if (progress.current === 1) {
-        setCamera(loc)
+        onActivate()
       }
     }
   })

@@ -1,9 +1,11 @@
 import { AnimatePresence, motion } from 'motion/react'
 import { useStore } from '../../../store'
+import { useSceneController } from '../scene-controller'
 
 export const CameraToDefault = () => {
-  const { focus, setCamera } = useStore()
-  console.log(focus)
+  const focus = useStore((state) => state.focus)
+  const { resetCamera } = useSceneController()
+
   return (
     <AnimatePresence mode="wait">
       {['pc', 'board'].includes(focus) && (
@@ -37,7 +39,7 @@ export const CameraToDefault = () => {
               background: 'none',
               cursor: 'pointer',
             }}
-            onClick={() => setCamera('default')}
+            onClick={resetCamera}
           >
             Voltar
           </button>

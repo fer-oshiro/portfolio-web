@@ -48,19 +48,14 @@ const BrushPath = ({ variant, animation, ...props }: BrushPathProps) => {
 const BrushTransition = () => {
   const effect = useNavigationStore(navigationStore, (state) => state.effect)
   const phase = useNavigationStore(navigationStore, (state) => state.phase)
-  const setLocation = useStore((state) => state.setLocation)
   const animation = getBrushAnimation({ effect, phase })
 
   const completeAnimation = () => {
     const state = navigationStore.getState()
     const { completionEvent } = getBrushAnimation(state)
 
-    if (completionEvent === 'coverFinished' && state.targetScene) {
-      const targetScene = state.targetScene
-
+    if (completionEvent === 'coverFinished') {
       state.coverFinished()
-      // Location remains the render source until the SceneController migration.
-      void setLocation(targetScene, 0)
     }
 
     if (completionEvent === 'revealFinished') {
@@ -128,19 +123,14 @@ export const Transition = () => {
 const CatTransition = () => {
   const effect = useNavigationStore(navigationStore, (state) => state.effect)
   const phase = useNavigationStore(navigationStore, (state) => state.phase)
-  const setLocation = useStore((state) => state.setLocation)
   const animation = getCatAnimation({ effect, phase })
 
   const completeAnimation = () => {
     const state = navigationStore.getState()
     const { completionEvent } = getCatAnimation(state)
 
-    if (completionEvent === 'coverFinished' && state.targetScene) {
-      const targetScene = state.targetScene
-
+    if (completionEvent === 'coverFinished') {
       state.coverFinished()
-      // Location remains the render source until the SceneController migration.
-      void setLocation(targetScene, 0)
     }
 
     if (completionEvent === 'revealFinished') {

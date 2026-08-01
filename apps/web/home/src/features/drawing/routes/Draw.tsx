@@ -1,10 +1,8 @@
-import { useStore } from 'zustand'
-
-import { navigationStore } from '../../scene-navigation/navigation-store'
+import { useSceneController } from '../../scene-navigation'
 import { Canvas } from '../components/Canvas'
 
 function Draw({ show }: { show: boolean }) {
-  const navigate = useStore(navigationStore, (state) => state.navigate)
+  const { navigateTo } = useSceneController()
 
   return (
     <div
@@ -35,7 +33,7 @@ function Draw({ show }: { show: boolean }) {
           pointerEvents: 'auto',
           zIndex: 9999,
         }}
-        onClick={() => navigate('room', 'brush')}
+        onClick={() => navigateTo('room')}
       >
         Voltar
       </button>
