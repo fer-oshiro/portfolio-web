@@ -22,20 +22,18 @@ export const WebSocket = () => {
     remoteControlStore,
     (state) => state.setCursorPosition,
   )
-  const { roomId, gyro, connected, iceServers, readyState } = useDesktopRTC()
   const [isOpen, setIsOpen] = useState<boolean>(true)
-  const { x, y } = useGyro(gyro)
+  const { handleGyro, resetCalibration } = useGyro(setCursorPosition)
+  const { roomId, connected, iceServers, readyState } =
+    useDesktopRTC(handleGyro)
 
   useEffect(() => {
     if (connected === 'connected') {
+      resetCalibration()
       setIsOpen(false)
       setConnected(true)
     }
-  }, [connected])
-
-  useEffect(() => {
-    setCursorPosition({ x, y })
-  }, [x, y])
+  }, [connected, resetCalibration, setConnected])
 
   return (
     <div

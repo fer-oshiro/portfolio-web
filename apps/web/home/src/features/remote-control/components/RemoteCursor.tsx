@@ -1,6 +1,5 @@
 import { motion, useMotionValue, useSpring } from 'framer-motion'
 import { useEffect } from 'react'
-import { useStore } from 'zustand'
 
 import { remoteControlStore } from '../remote-control-store'
 
@@ -14,24 +13,23 @@ const sparkles = [
 ]
 
 export const Cursor = () => {
-  const cursorPosition = useStore(
-    remoteControlStore,
-    (state) => state.cursorPosition,
-  )
-  const { x, y } = cursorPosition
-
-  console.log('cursor', x, y)
-
-  const motionX = useMotionValue(x)
-  const motionY = useMotionValue(y)
+  const initialPosition = remoteControlStore.getState().cursorPosition
+  const motionX = useMotionValue(initialPosition.x)
+  const motionY = useMotionValue(initialPosition.y)
 
   const springX = useSpring(motionX, { stiffness: 200, damping: 25 })
   const springY = useSpring(motionY, { stiffness: 200, damping: 25 })
 
-  useEffect(() => {
-    motionX.set(x)
-    motionY.set(y)
-  }, [x, y])
+  useEffect(
+    () =>
+      remoteControlStore.subscribe((state, previousState) => {
+        if (state.cursorPosition === previousState.cursorPosition) return
+
+        motionX.set(state.cursorPosition.x)
+        motionY.set(state.cursorPosition.y)
+      }),
+    [motionX, motionY],
+  )
 
   return (
     <motion.svg

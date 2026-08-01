@@ -15,8 +15,8 @@
   "devDependencies": {
     "@fer-oshiro/typescript-config": "*",
     "@swc/core": "^1.4.0",
-    "@types/simple-peer": "^9.11.9",
     "@tailwindcss/postcss": "^4.3.3",
+    "@types/simple-peer": "^9.11.9",
     "address": "^2.0.3",
     "autoprefixer": "^10.4.21",
     "css-loader": "^7.1.2",
@@ -41,14 +41,15 @@
     "motion": "^12.6.3",
     "perfect-freehand": "^1.2.3",
     "postprocessing": "^6.38.3",
+    "process": "^0.11.10",
     "qrcode.react": "^4.2.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-router": "^8.3.0",
     "react-use-websocket": "^4.13.0",
     "react-youtube": "^10.1.0",
-    "three": "^0.185.1",
     "simple-peer": "^9.11.1",
+    "three": "^0.185.1",
     "tone": "^15.1.22",
     "zustand": "^5.0.12"
   }

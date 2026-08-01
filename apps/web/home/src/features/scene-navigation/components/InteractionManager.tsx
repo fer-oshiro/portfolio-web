@@ -14,38 +14,39 @@ export function InteractionManager({
   onFocus: (object: THREE.Object3D) => void
 }) {
   const setHover = useStore(cameraStore, (state) => state.setHover)
-  const cursorPosition = useStore(
-    remoteControlStore,
-    (state) => state.cursorPosition,
-  )
   const { camera, raycaster, size, scene } = useThree()
 
-  const { x, y } = cursorPosition
+  useEffect(() => {
+    const pointer = new THREE.Vector2()
+    const castRay = (pixelX: number, pixelY: number) => {
+      pointer.set(
+        (pixelX / size.width) * 2 - 1,
+        -(pixelY / size.height) * 2 + 1,
+      )
 
-  const castRay = (pixelX: number, pixelY: number) => {
-    const x = (pixelX / size.width) * 2 - 1
-    const y = -(pixelY / size.height) * 2 + 1
+      raycaster.setFromCamera(pointer, camera)
+      const firstHit = raycaster.intersectObjects(scene.children, true)[0]
 
-    raycaster.setFromCamera(new THREE.Vector2(x, y), camera)
-    const hits = raycaster.intersectObjects(scene.children, true)
-    const firstHit = hits[0]
+      if (firstHit) {
+        onFocus(firstHit.object)
 
-    if (firstHit) {
-      onFocus(firstHit.object)
-
-      if (firstHit.object.userData.focusTarget) {
-        setHover(firstHit.object.userData.focusTarget)
-      } else {
-        setHover('default')
+        if (firstHit.object.userData.focusTarget) {
+          setHover(firstHit.object.userData.focusTarget)
+        } else {
+          setHover('default')
+        }
       }
     }
-  }
 
-  useEffect(() => {
-    if (x !== undefined && y !== undefined) {
-      castRay(x, y)
-    }
-  }, [x, y])
+    const currentPosition = remoteControlStore.getState().cursorPosition
+    castRay(currentPosition.x, currentPosition.y)
+
+    return remoteControlStore.subscribe((state, previousState) => {
+      if (state.cursorPosition === previousState.cursorPosition) return
+
+      castRay(state.cursorPosition.x, state.cursorPosition.y)
+    })
+  }, [camera, onFocus, raycaster, scene, setHover, size.height, size.width])
 
   return null
 }

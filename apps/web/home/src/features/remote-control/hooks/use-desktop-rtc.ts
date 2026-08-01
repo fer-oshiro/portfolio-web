@@ -1,3 +1,4 @@
+import type { GyroscopeData } from '@fer-oshiro/realtime-contract'
 import { useState } from 'react'
 import { useStore } from 'zustand'
 
@@ -13,17 +14,20 @@ const createRoomId = () => {
     .join('-')
 }
 
-export const useDesktopRTC = () => {
+const ignoreGyro = () => {}
+
+export const useDesktopRTC = (
+  onGyro: (gyro: GyroscopeData) => void = ignoreGyro,
+) => {
   const setStatus = useStore(remoteControlStore, (state) => state.setStatus)
-  const [gyro, setGyro] = useState({ alpha: 0, beta: 0, gamma: 0 })
   const [roomId] = useState(createRoomId)
   const { connected, iceServers, readyState } = usePeerSession({
     role: 'desktop',
     roomId,
-    onData: setGyro,
+    onData: onGyro,
     onLog: console.log,
     onSocketError: () => setStatus('server_error'),
   })
 
-  return { connected, readyState, gyro, roomId, iceServers }
+  return { connected, readyState, roomId, iceServers }
 }

@@ -1,10 +1,82 @@
-import { useEffect, useRef, useState } from 'react'
+import type { GyroscopeData } from '@fer-oshiro/realtime-contract'
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
 import { useSearchParams } from 'react-router'
 
 import { useMobileRTC } from '../hooks/use-mobile-rtc'
 
 type DeviceOrientationConstructor = typeof DeviceOrientationEvent & {
   requestPermission?: () => Promise<'denied' | 'granted'>
+}
+
+type GyroControlsProps = {
+  getGyroSnapshot: () => GyroscopeData
+  handleSendGyro: (input: {
+    alpha: number | null
+    beta: number | null
+    gamma: number | null
+  }) => void
+  subscribeGyro: (listener: () => void) => () => void
+}
+
+const GyroControls = ({
+  getGyroSnapshot,
+  handleSendGyro,
+  subscribeGyro,
+}: GyroControlsProps) => {
+  const gyro = useSyncExternalStore(
+    subscribeGyro,
+    getGyroSnapshot,
+    getGyroSnapshot,
+  )
+
+  const handleFakeInput = (input: Partial<GyroscopeData>) => {
+    handleSendGyro({ ...gyro, ...input })
+  }
+
+  return (
+    <>
+      <p style={{ padding: '30px' }}>{JSON.stringify(gyro)}</p>
+
+      <div>
+        <input
+          type="range"
+          id="alpha"
+          name="alpha"
+          min="0"
+          max="60"
+          value={gyro.alpha}
+          onChange={(e) => handleFakeInput({ alpha: Number(e.target.value) })}
+        />
+        <label htmlFor="alpha">alpha</label>
+      </div>
+
+      <div>
+        <input
+          type="range"
+          id="beta"
+          name="beta"
+          min="-30"
+          max="30"
+          value={gyro.beta}
+          onChange={(e) => handleFakeInput({ beta: Number(e.target.value) })}
+        />
+        <label htmlFor="beta">beta</label>
+      </div>
+
+      <div>
+        <input
+          type="range"
+          id="gamma"
+          name="gamma"
+          min="-90"
+          max="90"
+          value={gyro.gamma}
+          onChange={(e) => handleFakeInput({ gamma: Number(e.target.value) })}
+        />
+        <label htmlFor="gamma">gamma</label>
+      </div>
+    </>
+  )
 }
 
 export const Mobile = () => {
@@ -15,7 +87,13 @@ export const Mobile = () => {
   const orientationListener = useRef<
     ((event: DeviceOrientationEvent) => void) | null
   >(null)
-  const { connected, gyro, handleSendGyro, readyState } = useMobileRTC(
+  const {
+    connected,
+    getGyroSnapshot,
+    handleSendGyro,
+    readyState,
+    subscribeGyro,
+  } = useMobileRTC(
     (log) => setMsg((prev) => [...prev, log]),
     searchParams.get('roomId') ?? 'error',
   )
@@ -103,15 +181,6 @@ export const Mobile = () => {
     }
   }, [])
 
-  const handleFakeInput = (input: {
-    alpha?: number
-    beta?: number
-    gamma?: number
-  }) => {
-    const payload = { ...gyro, ...input }
-    handleSendGyro(payload)
-  }
-
   return (
     <div
       style={{
@@ -133,7 +202,6 @@ export const Mobile = () => {
       </button>
 
       <p style={{ paddingTop: '20px' }}>{gyroStatus}</p>
-      <p style={{ padding: '30px' }}>{JSON.stringify(gyro)}</p>
       <p>
         DeviceOrientationEvent: {JSON.stringify(window.DeviceOrientationEvent)}
       </p>
@@ -141,44 +209,11 @@ export const Mobile = () => {
         {JSON.stringify(msg1)}
       </p>
 
-      <div>
-        <input
-          type="range"
-          id="alpha"
-          name="alpha"
-          min="0"
-          max="60"
-          value={gyro.alpha}
-          onChange={(e) => handleFakeInput({ alpha: Number(e.target.value) })}
-        />
-        <label htmlFor="alpha">alpha</label>
-      </div>
-
-      <div>
-        <input
-          type="range"
-          id="beta"
-          name="beta"
-          min="-30"
-          max="30"
-          value={gyro.beta}
-          onChange={(e) => handleFakeInput({ beta: Number(e.target.value) })}
-        />
-        <label htmlFor="beta">beta</label>
-      </div>
-
-      <div>
-        <input
-          type="range"
-          id="gamma"
-          name="gamma"
-          min="-90"
-          max="90"
-          value={gyro.gamma}
-          onChange={(e) => handleFakeInput({ gamma: Number(e.target.value) })}
-        />
-        <label htmlFor="gamma">gamma</label>
-      </div>
+      <GyroControls
+        getGyroSnapshot={getGyroSnapshot}
+        handleSendGyro={handleSendGyro}
+        subscribeGyro={subscribeGyro}
+      />
     </div>
   )
 }

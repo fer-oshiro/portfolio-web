@@ -1,5 +1,6 @@
 const HtmlWebPackPlugin = require('html-webpack-plugin')
 const ModuleFederationPlugin = require('webpack/lib/container/ModuleFederationPlugin')
+const ProvidePlugin = require('webpack/lib/ProvidePlugin')
 const Dotenv = require('dotenv-webpack')
 const path = require('path')
 const deps = require('./package.json').dependencies
@@ -99,6 +100,9 @@ module.exports = (_, argv) => {
     },
 
     plugins: [
+      new ProvidePlugin({
+        process: 'process/browser',
+      }),
       new ModuleFederationPlugin({
         name: 'home',
         filename: 'remoteEntry.js',

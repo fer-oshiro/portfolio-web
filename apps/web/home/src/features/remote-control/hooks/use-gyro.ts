@@ -1,54 +1,76 @@
-import { useEffect, useState } from 'react'
+import type { GyroscopeData } from '@fer-oshiro/realtime-contract'
+import { useCallback, useRef } from 'react'
+
+import type { CursorPosition } from '../remote-control-store'
 
 const BASE_WIDTH = 1920
 const BASE_HEIGHT = 1080
 const BASE_RANGE_X = 40
 const BASE_RANGE_Y = 20
 
-export const useGyro = (gyro: { alpha?: number; beta?: number }) => {
-  const [offset, setOffset] = useState({ alpha: 180, beta: 15 })
-  const [position, setPosition] = useState({
-    x: window.innerWidth / 2,
-    y: window.innerHeight / 2,
-  })
+type Viewport = {
+  width: number
+  height: number
+}
 
-  const calibrate = (currentAlpha: number, currentBeta: number) => {
-    setOffset({ alpha: currentAlpha, beta: currentBeta })
+type GyroOffset = {
+  alpha: number
+  beta: number
+}
+
+const clamp = (value: number, min: number, max: number) =>
+  Math.max(min, Math.min(max, value))
+
+export const mapGyroToScreen = (
+  gyro: Pick<GyroscopeData, 'alpha' | 'beta'>,
+  viewport: Viewport,
+  offset: GyroOffset = { alpha: 0, beta: 15 },
+): CursorPosition => {
+  const rangeX = BASE_RANGE_X * (viewport.width / BASE_WIDTH)
+  const rangeY = BASE_RANGE_Y * (viewport.height / BASE_HEIGHT)
+  let normalizedAlpha = gyro.alpha - offset.alpha
+  if (normalizedAlpha > 180) normalizedAlpha -= 360
+  if (normalizedAlpha < -180) normalizedAlpha += 360
+  const finalAlpha = -normalizedAlpha
+  const diffBeta = gyro.beta - offset.beta
+
+  return {
+    x:
+      ((clamp(finalAlpha, -rangeX, rangeX) + rangeX) / (2 * rangeX)) *
+      viewport.width,
+    y:
+      ((clamp(-diffBeta, -rangeY, rangeY) + rangeY) / (2 * rangeY)) *
+      viewport.height,
   }
+}
 
-  const mapGyroToScreen = (alpha?: number, beta?: number) => {
-    if (!alpha || !beta) return position
+export const useGyro = (onPosition: (position: CursorPosition) => void) => {
+  const offset = useRef<GyroOffset | null>(null)
 
-    const W = window.innerWidth
-    const H = window.innerHeight
+  const calibrate = useCallback((currentAlpha: number, currentBeta: number) => {
+    offset.current = { alpha: currentAlpha, beta: currentBeta }
+  }, [])
 
-    const RANGE_X = BASE_RANGE_X * (W / BASE_WIDTH)
-    const RANGE_Y = BASE_RANGE_Y * (H / BASE_HEIGHT)
+  const resetCalibration = useCallback(() => {
+    offset.current = null
+  }, [])
 
-    const clamp = (v: number, min: number, max: number) =>
-      Math.max(min, Math.min(max, v))
+  const handleGyro = useCallback(
+    (gyro: GyroscopeData) => {
+      if (!offset.current) {
+        offset.current = { alpha: gyro.alpha, beta: gyro.beta }
+      }
 
-    let diffAlpha = alpha > 180 ? alpha - 360 : alpha
-    const finalAlpha = -diffAlpha
+      onPosition(
+        mapGyroToScreen(
+          gyro,
+          { width: window.innerWidth, height: window.innerHeight },
+          offset.current,
+        ),
+      )
+    },
+    [onPosition],
+  )
 
-    const diffBeta = beta - offset.beta
-
-    const x =
-      ((clamp(finalAlpha, -RANGE_X, RANGE_X) + RANGE_X) / (2 * RANGE_X)) * W
-
-    const y =
-      ((clamp(-diffBeta, -RANGE_Y, RANGE_Y) + RANGE_Y) / (2 * RANGE_Y)) * H
-
-    setPosition({ x, y })
-  }
-
-  useEffect(() => {
-    mapGyroToScreen(gyro.alpha, gyro.beta)
-  }, [gyro])
-
-  console.log({
-    gyro,
-    position,
-  })
-  return { ...position, calibrate }
+  return { calibrate, handleGyro, resetCalibration }
 }
