@@ -18,7 +18,7 @@ resource "aws_s3_bucket_policy" "drawings_policy" {
           Service = "cloudfront.amazonaws.com"
         }
         Action   = "s3:GetObject"
-        Resource = "arn:aws:s3:::fer-oshiro-portfolio-drawings/gallery/*"
+        Resource = "${aws_s3_bucket.portfolio_bucket.arn}/gallery/*"
         Condition = {
           StringEquals = {
             "AWS:SourceArn" = aws_cloudfront_distribution.portfolio.arn

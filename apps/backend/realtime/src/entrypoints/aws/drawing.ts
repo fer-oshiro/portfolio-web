@@ -4,14 +4,19 @@ import type { APIGatewayProxyWebsocketHandlerV2 } from 'aws-lambda'
 
 import { ApiGatewayMessagePublisher } from '../../adapters/aws/api-gateway-publisher'
 import { S3DrawingStorage } from '../../adapters/aws/s3-drawings'
+import { loadDrawingEnvironment } from '../../config/env'
 import { DrawingService } from '../../features/drawing'
 
 // ---- Main Handler ----
 
-const storage = new S3DrawingStorage(new S3Client({ region: 'us-east-1' }), {
-  bucket: process.env.BUCKET!,
-  publicBaseUrl: 'https://fer-oshiro.com',
-})
+const environment = loadDrawingEnvironment()
+const storage = new S3DrawingStorage(
+  new S3Client({ region: environment.awsRegion }),
+  {
+    bucket: environment.drawingsBucket,
+    publicBaseUrl: environment.drawingsPublicBaseUrl,
+  },
+)
 
 export const handler: APIGatewayProxyWebsocketHandlerV2 = async (event) => {
   const { routeKey, connectionId, domainName, stage } = event.requestContext

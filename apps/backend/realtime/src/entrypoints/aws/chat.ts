@@ -4,13 +4,15 @@ import OpenAI from 'openai'
 
 import { ApiGatewayMessagePublisher } from '../../adapters/aws/api-gateway-publisher'
 import { GroqChatProvider } from '../../adapters/aws/groq-chat'
+import { loadChatEnvironment } from '../../config/env'
 import { ChatService } from '../../features/chat'
 import type { MessagePublisher } from '../../ports/message-publisher'
 
 // ---- Clients ----
 
+const environment = loadChatEnvironment()
 const groqClient = new OpenAI({
-  apiKey: process.env.GROQ_API_KEY!,
+  apiKey: environment.groqApiKey,
   baseURL: 'https://api.groq.com/openai/v1',
 })
 const chatProvider = new GroqChatProvider(groqClient)

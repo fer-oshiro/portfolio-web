@@ -6,29 +6,30 @@ import twilio from 'twilio'
 import { ApiGatewayMessagePublisher } from '../../adapters/aws/api-gateway-publisher'
 import { DynamoDbConnectionRepository } from '../../adapters/aws/dynamodb-connections'
 import { TwilioTurnProvider } from '../../adapters/aws/twilio-turn'
+import { loadSignalingEnvironment } from '../../config/env'
 import { SignalingService } from '../../features/signaling'
 
-const config =
-  process.env.NODE_ENV === 'development'
-    ? {
-        region: process.env.AWS_REGION,
-        endpoint: 'http://localhost:8000',
-        tls: false,
-        credentials: {
-          accessKeyId: 'local',
-          secretAccessKey: 'local',
-        },
-      }
-    : {
-        region: process.env.AWS_REGION,
-      }
+const environment = loadSignalingEnvironment()
+const dynamoConfig = environment.development
+  ? {
+      region: environment.awsRegion,
+      endpoint: 'http://localhost:8000',
+      tls: false,
+      credentials: {
+        accessKeyId: 'local',
+        secretAccessKey: 'local',
+      },
+    }
+  : {
+      region: environment.awsRegion,
+    }
 
 const connections = new DynamoDbConnectionRepository(
-  process.env.TABLE_NAME!,
-  new DynamoDBClient(config),
+  environment.tableName,
+  new DynamoDBClient(dynamoConfig),
 )
 const turn = new TwilioTurnProvider(
-  twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN),
+  twilio(environment.twilioAccountSid, environment.twilioAuthToken),
 )
 
 export const handler: APIGatewayProxyWebsocketHandlerV2 = async (event) => {

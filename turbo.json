@@ -1,7 +1,12 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "ui": "tui",
-  "globalEnv": ["BUCKET"],
+  "globalEnv": [
+    "AWS_REGION",
+    "DRAWINGS_BUCKET",
+    "DRAWINGS_PUBLIC_BASE_URL",
+    "TABLE_NAME"
+  ],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],

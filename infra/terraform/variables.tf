@@ -22,6 +22,11 @@ variable "s3_bucket_name" {
   default     = "fer-oshiro-portfolio-drawings"
 }
 
+variable "drawings_public_base_url" {
+  type        = string
+  description = "URL pública base usada para expor desenhos aprovados"
+}
+
 variable "groq_api_key" {
   description = "A chave secreta da API do Groq"
   type        = string

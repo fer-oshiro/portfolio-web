@@ -1,3 +1,9 @@
+locals {
+  signaling_zip_path = "${path.module}/../../apps/backend/realtime/dist/aws/signaling.zip"
+  chat_zip_path      = "${path.module}/../../apps/backend/realtime/dist/aws/chat.zip"
+  drawing_zip_path   = "${path.module}/../../apps/backend/realtime/dist/aws/drawing.zip"
+}
+
 resource "aws_iam_role" "lambda_role" {
   name = "${var.project_name}-lambda-role"
 
@@ -63,8 +69,8 @@ resource "aws_lambda_function" "ws_handler" {
   role             = aws_iam_role.lambda_role.arn
   handler          = "index.handler"
   runtime          = "nodejs20.x"
-  filename         = "../../apps/backend/realtime/dist/aws/signaling.zip"
-  source_code_hash = fileexists("../../apps/backend/realtime/dist/aws/signaling.zip") ? filebase64sha256("../../apps/backend/realtime/dist/aws/signaling.zip") : null
+  filename         = local.signaling_zip_path
+  source_code_hash = fileexists(local.signaling_zip_path) ? filebase64sha256(local.signaling_zip_path) : null
 
   timeout = 30
 
@@ -87,13 +93,12 @@ resource "aws_lambda_function" "chat_handler" {
   role             = aws_iam_role.lambda_role.arn
   handler          = "index.handler"
   runtime          = "nodejs20.x"
-  filename         = "../../apps/backend/realtime/dist/aws/chat.zip"
-  source_code_hash = fileexists("../../apps/backend/realtime/dist/aws/chat.zip") ? filebase64sha256("../../apps/backend/realtime/dist/aws/chat.zip") : null
+  filename         = local.chat_zip_path
+  source_code_hash = fileexists(local.chat_zip_path) ? filebase64sha256(local.chat_zip_path) : null
   timeout          = 30
 
   environment {
     variables = {
-      TABLE_NAME   = aws_dynamodb_table.connections.name
       GROQ_API_KEY = var.groq_api_key
     }
   }
@@ -109,12 +114,13 @@ resource "aws_lambda_function" "draw_handler" {
   role             = aws_iam_role.lambda_role.arn
   handler          = "index.handler"
   runtime          = "nodejs20.x"
-  filename         = "../../apps/backend/realtime/dist/aws/drawing.zip"
-  source_code_hash = fileexists("../../apps/backend/realtime/dist/aws/drawing.zip") ? filebase64sha256("../../apps/backend/realtime/dist/aws/drawing.zip") : null
+  filename         = local.drawing_zip_path
+  source_code_hash = fileexists(local.drawing_zip_path) ? filebase64sha256(local.drawing_zip_path) : null
 
   environment {
     variables = {
-      BUCKET = var.s3_bucket_name
+      DRAWINGS_BUCKET          = var.s3_bucket_name
+      DRAWINGS_PUBLIC_BASE_URL = var.drawings_public_base_url
     }
   }
 }

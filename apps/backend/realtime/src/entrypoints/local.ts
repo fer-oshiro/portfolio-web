@@ -17,6 +17,7 @@ import {
 import { LocalTurnProvider } from '../adapters/local/local-turn'
 import { LocalWebSocketMessagePublisher } from '../adapters/local/local-websocket-publisher'
 import { MemoryConnectionRepository } from '../adapters/local/memory-connections'
+import { loadLocalEnvironment } from '../config/env'
 import { ChatService, type ChatProvider } from '../features/chat'
 import { DrawingService } from '../features/drawing'
 import { SignalingService } from '../features/signaling'
@@ -188,11 +189,11 @@ const isMainModule =
   resolve(process.argv[1]) === fileURLToPath(import.meta.url)
 
 if (isMainModule) {
-  const port = Number.parseInt(process.env.PORT ?? '8080', 10)
+  const environment = loadLocalEnvironment()
   const application = createLocalApplication({
-    groqApiKey: process.env.GROQ_API_KEY,
-    host: process.env.REALTIME_HOST ?? '0.0.0.0',
-    port: Number.isNaN(port) ? 8080 : port,
+    groqApiKey: environment.groqApiKey,
+    host: environment.host,
+    port: environment.port,
   })
 
   void application
@@ -200,7 +201,7 @@ if (isMainModule) {
     .then(() => {
       const address = application.httpServer.address()
       const listeningPort =
-        address && typeof address === 'object' ? address.port : port
+        address && typeof address === 'object' ? address.port : environment.port
       console.log(
         `Servidor local disponível em http://localhost:${listeningPort}`,
       )
