@@ -4,13 +4,12 @@ import { useCallback, useState } from 'react'
 import { ReadyState } from 'react-use-websocket'
 import { useStore } from 'zustand'
 
-import github from '../../../assets/github.png'
-import linkedin from '../../../assets/linkedin.png'
 import { useDesktopRTC } from '../hooks/use-desktop-rtc'
 import { useGyro } from '../hooks/use-gyro'
 import { remoteControlStore } from '../remote-control-store'
 import { Cursor } from './RemoteCursor'
 import { QRCode } from './RoomQRCode'
+import { SocialLinks } from './SocialLinks'
 
 import './ConnectionPanel.css'
 
@@ -95,32 +94,7 @@ export const WebSocket = () => {
                   Caso queira saber mais sobre mim de uma forma rápida, acesse
                   as minhas redes sociais.
                 </p>
-                <ul className="connection-panel__social-list">
-                  <li>
-                    <a
-                      href="https://www.linkedin.com/in/fernanda-oshiro/"
-                      target="_blank"
-                      className="connection-panel__social-link"
-                    >
-                      <img
-                        src={linkedin}
-                        className="connection-panel__social-icon"
-                      />
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="https://github.com/fer-oshiro/"
-                      target="_blank"
-                      className="connection-panel__social-link"
-                    >
-                      <img
-                        src={github}
-                        className="connection-panel__social-icon"
-                      />
-                    </a>
-                  </li>
-                </ul>
+                <SocialLinks />
               </div>
             )}
             {status === 'server_error' && (
@@ -135,28 +109,7 @@ export const WebSocket = () => {
                   rápido possível
                 </p>
                 <p>Enquanto isso, que tal me acompanhar nas redes sociais?</p>
-                <div>
-                  <a
-                    href="https://www.linkedin.com/in/fernanda-oshiro/"
-                    target="_blank"
-                    className="connection-panel__social-link"
-                  >
-                    <img
-                      src={linkedin}
-                      className="connection-panel__social-icon"
-                    />
-                  </a>
-                  <a
-                    href="https://github.com/fer-oshiro/"
-                    target="_blank"
-                    className="connection-panel__social-link"
-                  >
-                    <img
-                      src={github}
-                      className="connection-panel__social-icon"
-                    />
-                  </a>
-                </div>
+                <SocialLinks layout="inline" />
               </div>
             )}
           </motion.div>
