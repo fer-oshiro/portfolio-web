@@ -1,1 +1,1 @@
-export { WS_URL } from '../features/remote-control'
+export { WS_URL, webUrls } from '../config/urls'

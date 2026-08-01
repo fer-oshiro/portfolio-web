@@ -9,3 +9,9 @@ O frontend Home possui dois modos de entrada:
 
 O contrato público se limita ao componente raiz. Rotas, providers de realtime,
 estado, componentes e assets permanecem internos a este remote.
+
+## Configuração de URL
+
+O WebSocket é definido no build pela variável `WEBSOCKET_URL`. Sem essa
+variável, o build de desenvolvimento usa `ws://localhost:8080` e o build de
+produção preserva o endpoint atualmente publicado.

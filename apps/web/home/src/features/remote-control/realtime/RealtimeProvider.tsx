@@ -1,7 +1,7 @@
 import { PropsWithChildren, useEffect, useState } from 'react'
 import useWebSocket from 'react-use-websocket'
 
-import { WS_URL } from './constants'
+import { webUrls } from '../../../config/urls'
 import { RealtimeContextProvider } from './realtime-context'
 import { RealtimeClient } from './realtime-client'
 
@@ -10,7 +10,7 @@ export { useRealtimeMessage } from './use-realtime-message'
 
 export const RealtimeProvider = ({ children }: PropsWithChildren) => {
   const [realtimeClient] = useState(() => new RealtimeClient())
-  const { sendJsonMessage, readyState } = useWebSocket(WS_URL, {
+  const { sendJsonMessage, readyState } = useWebSocket(webUrls.websocket, {
     reconnectAttempts: 10,
     reconnectInterval: 3000,
     retryOnError: true,

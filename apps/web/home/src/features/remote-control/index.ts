@@ -10,7 +10,7 @@ export {
   useRealtime,
   useRealtimeMessage,
 } from './realtime/RealtimeProvider'
-export { WS_URL } from './realtime/constants'
+export { WS_URL } from '../../config/urls'
 export { Mobile } from './routes/MobileControllerPage'
 export {
   createRemoteControlStore,

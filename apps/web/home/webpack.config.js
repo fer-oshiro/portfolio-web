@@ -1,11 +1,22 @@
 const HtmlWebPackPlugin = require('html-webpack-plugin')
 const ModuleFederationPlugin = require('webpack/lib/container/ModuleFederationPlugin')
+const DefinePlugin = require('webpack/lib/DefinePlugin')
 const ProvidePlugin = require('webpack/lib/ProvidePlugin')
 const Dotenv = require('dotenv-webpack')
 const deps = require('./package.json').dependencies
 
+const PRODUCTION_WEBSOCKET_URL =
+  'wss://6ga2gesq46.execute-api.us-east-1.amazonaws.com/prod'
+
+function getWebSocketUrl({ isProduction, environment = process.env }) {
+  if (environment.WEBSOCKET_URL) return environment.WEBSOCKET_URL
+
+  return isProduction ? PRODUCTION_WEBSOCKET_URL : 'ws://localhost:8080'
+}
+
 module.exports = (_, argv) => {
   const isProd = argv.mode === 'production'
+  const websocketUrl = getWebSocketUrl({ isProduction: isProd })
 
   return {
     output: {
@@ -92,6 +103,9 @@ module.exports = (_, argv) => {
     plugins: [
       new ProvidePlugin({
         process: 'process/browser',
+      }),
+      new DefinePlugin({
+        __WEBSOCKET_URL__: JSON.stringify(websocketUrl),
       }),
       new ModuleFederationPlugin({
         name: 'home',

@@ -13,6 +13,12 @@
         "storybook-static/**"
       ]
     },
+    "@fer-oshiro/home#build": {
+      "dependsOn": ["^build"],
+      "env": ["WEBSOCKET_URL"],
+      "inputs": ["$TURBO_DEFAULT$", ".env*"],
+      "outputs": ["dist/**"]
+    },
     "lint": {
       "dependsOn": ["^lint"]
     },
@@ -30,6 +36,7 @@
     "@fer-oshiro/home#dev": {
       "cache": false,
       "dependsOn": ["@fer-oshiro/ui#build"],
+      "env": ["WEBSOCKET_URL"],
       "persistent": true,
       "with": ["@fer-oshiro/ui#dev:js", "@fer-oshiro/ui#css:watch"]
     },

@@ -3,7 +3,9 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import { ReadyState } from 'react-use-websocket'
 import { describe, expect, it, vi } from 'vitest'
 
-vi.mock('./constants', () => ({ WS_URL: 'ws://localhost' }))
+vi.mock('../../../config/urls', () => ({
+  webUrls: { websocket: 'ws://localhost' },
+}))
 
 import { RealtimeProvider, useRealtime } from './RealtimeProvider'
 import { RealtimeContextProvider, useRealtimeClient } from './realtime-context'
