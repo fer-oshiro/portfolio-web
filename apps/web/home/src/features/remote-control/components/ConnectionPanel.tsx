@@ -1,6 +1,6 @@
 import { Button } from '@fer-oshiro/ui'
 import { motion } from 'motion/react'
-import { useEffect, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { ReadyState } from 'react-use-websocket'
 import { useStore } from 'zustand'
 
@@ -24,16 +24,24 @@ export const WebSocket = () => {
   )
   const [isOpen, setIsOpen] = useState<boolean>(true)
   const { handleGyro, resetCalibration } = useGyro(setCursorPosition)
-  const { roomId, connected, iceServers, readyState } =
-    useDesktopRTC(handleGyro)
+  const handleConnectionStateChange = useCallback(
+    (connectionState: RTCPeerConnectionState) => {
+      const isConnected = connectionState === 'connected'
 
-  useEffect(() => {
-    if (connected === 'connected') {
-      resetCalibration()
-      setIsOpen(false)
-      setConnected(true)
-    }
-  }, [connected, resetCalibration, setConnected])
+      if (remoteControlStore.getState().connected !== isConnected) {
+        setConnected(isConnected)
+      }
+      if (isConnected) {
+        resetCalibration()
+        setIsOpen(false)
+      }
+    },
+    [resetCalibration, setConnected],
+  )
+  const { roomId, connected, iceServers, readyState } = useDesktopRTC(
+    handleGyro,
+    handleConnectionStateChange,
+  )
 
   return (
     <div

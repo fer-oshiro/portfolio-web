@@ -18,6 +18,7 @@ const ignoreGyro = () => {}
 
 export const useDesktopRTC = (
   onGyro: (gyro: GyroscopeData) => void = ignoreGyro,
+  onConnectionStateChange?: (state: RTCPeerConnectionState) => void,
 ) => {
   const setStatus = useStore(remoteControlStore, (state) => state.setStatus)
   const [roomId] = useState(createRoomId)
@@ -25,6 +26,7 @@ export const useDesktopRTC = (
     role: 'desktop',
     roomId,
     onData: onGyro,
+    onConnectionStateChange,
     onLog: console.log,
     onSocketError: () => setStatus('server_error'),
   })

@@ -15,6 +15,7 @@ import { useRealtime, useRealtimeMessage } from '../realtime'
 
 type UsePeerSessionOptions = {
   onData: (data: GyroscopeData) => void
+  onConnectionStateChange?: (state: RTCPeerConnectionState) => void
   onLog: (message: string) => void
   onSocketError?: () => void
   role: DeviceRole
@@ -34,6 +35,7 @@ const decodePeerData = (data: unknown) => {
 
 export const usePeerSession = ({
   onData,
+  onConnectionStateChange,
   onLog,
   onSocketError,
   role,
@@ -47,12 +49,19 @@ export const usePeerSession = ({
   const peerRef = useRef<Peer.Instance | null>(null)
   const targetConnectionIdRef = useRef<string | null>(null)
   const onDataRef = useRef(onData)
+  const onConnectionStateChangeRef = useRef(onConnectionStateChange)
   const onLogRef = useRef(onLog)
 
   useEffect(() => {
     onDataRef.current = onData
+    onConnectionStateChangeRef.current = onConnectionStateChange
     onLogRef.current = onLog
-  }, [onData, onLog])
+  }, [onConnectionStateChange, onData, onLog])
+
+  const updateConnectionState = useCallback((state: RTCPeerConnectionState) => {
+    setConnected(state)
+    onConnectionStateChangeRef.current?.(state)
+  }, [])
 
   const disposePeer = useCallback(() => {
     peerRef.current?.destroy()
@@ -62,8 +71,8 @@ export const usePeerSession = ({
 
   const destroyPeer = useCallback(() => {
     disposePeer()
-    setConnected('disconnected')
-  }, [disposePeer])
+    updateConnectionState('disconnected')
+  }, [disposePeer, updateConnectionState])
 
   const createPeer = useCallback(
     (targetConnectionId: string) => {
@@ -103,7 +112,7 @@ export const usePeerSession = ({
         })
       })
       peer.on('connect', () => {
-        setConnected('connected')
+        updateConnectionState('connected')
         onLogRef.current('DataChannel aberto')
       })
       peer.on('data', (rawData: unknown) => {
@@ -118,15 +127,15 @@ export const usePeerSession = ({
           onLogRef.current('Erro ao processar dados do giroscópio')
         }
       })
-      peer.on('close', () => setConnected('disconnected'))
+      peer.on('close', () => updateConnectionState('disconnected'))
       peer.on('error', (error) => {
-        setConnected('failed')
+        updateConnectionState('failed')
         onLogRef.current(`WebRTC: ${error.message}`)
       })
 
       return peer
     },
-    [destroyPeer, role, send],
+    [destroyPeer, role, send, updateConnectionState],
   )
 
   const connectToPeers = useCallback(
