@@ -1,7 +1,7 @@
 import { useControls } from 'leva'
 import { useEffect, useRef, useState } from 'react'
 
-import { useRealtime, useRealtimeMessage } from '../../remote-control'
+import { useRealtime, useRealtimeMessage } from '../../remote-control/realtime'
 import { useStore } from '../../../store'
 import { TypingDots } from './TypingDots'
 

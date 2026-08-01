@@ -2,7 +2,7 @@ import { PointerEvent, useEffect, useRef, useState } from 'react'
 import getStroke, { Vec2 } from 'perfect-freehand'
 import { ReadyState } from 'react-use-websocket'
 
-import { useRealtime, useRealtimeMessage } from '../../remote-control'
+import { useRealtime, useRealtimeMessage } from '../../remote-control/realtime'
 
 const COLORS = ['#000000', '#ef4444', '#3b82f6', '#22c55e', '#f59e0b']
 
