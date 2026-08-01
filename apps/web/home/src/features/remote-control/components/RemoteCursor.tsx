@@ -1,7 +1,8 @@
 import { motion, useMotionValue, useSpring } from 'framer-motion'
 import { useEffect } from 'react'
+import { useStore } from 'zustand'
 
-import { useStore } from '../../../store'
+import { remoteControlStore } from '../remote-control-store'
 
 import './RemoteCursor.css'
 
@@ -13,7 +14,10 @@ const sparkles = [
 ]
 
 export const Cursor = () => {
-  const { cursorPosition } = useStore()
+  const cursorPosition = useStore(
+    remoteControlStore,
+    (state) => state.cursorPosition,
+  )
   const { x, y } = cursorPosition
 
   console.log('cursor', x, y)

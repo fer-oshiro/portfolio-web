@@ -34,18 +34,18 @@ vi.mock('leva', () => ({
 
 import { RealtimeContextProvider } from '../../../remote-control/realtime/realtime-context'
 import { RealtimeClient } from '../../../remote-control/realtime/realtime-client'
-import { useStore } from '../../../../store'
+import { cameraStore } from '../../../scene-navigation/camera/camera-store'
 import { Computer } from './Computer'
 
 afterEach(() => {
-  useStore.getState().setCamera('default')
+  cameraStore.getState().setCamera('default')
   htmlRoot.children = undefined
 })
 
 describe('Computer', () => {
   it('repassa realtime para a raiz React criada pelo Html', () => {
     const realtimeClient = new RealtimeClient()
-    useStore.getState().setCamera('pc')
+    cameraStore.getState().setCamera('pc')
 
     renderToStaticMarkup(
       <RealtimeContextProvider client={realtimeClient}>

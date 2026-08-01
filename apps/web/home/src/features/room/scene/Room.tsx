@@ -1,7 +1,9 @@
 import { useGLTF, useTexture } from '@react-three/drei'
 import { Canvas } from '@react-three/fiber'
 import { useControls } from 'leva'
+import { useCallback, useState } from 'react'
 import * as THREE from 'three'
+import { useStore } from 'zustand'
 
 import {
   CameraController,
@@ -10,7 +12,7 @@ import {
   useSceneController,
 } from '../../scene-navigation'
 import { Tricked } from '../../../components/Tricked'
-import { useStore } from '../../../store'
+import { remoteControlStore } from '../../remote-control'
 import { Board } from '../components/Board/Board'
 import { Computer } from '../components/Computer/Computer'
 import SakuraStar from '../components/SakuraStar'
@@ -20,8 +22,10 @@ import roomBaked from '../assets/models/room.png'
 
 function RoomMesh({
   onHotspotActivated,
+  onVideoRequested,
 }: {
   onHotspotActivated: (hotspot: RoomHotspot) => void
+  onVideoRequested: () => void
 }) {
   const { nodes } = useGLTF(roomUrl)
   const roomNodes = nodes as Record<
@@ -115,7 +119,7 @@ function RoomMesh({
 
       <mesh geometry={roomNodes.board.geometry}>
         <meshBasicMaterial map={bakedTexture} />
-        <Board />
+        <Board onVideoRequested={onVideoRequested} />
       </mesh>
       <group position={board}>
         <mesh
@@ -156,9 +160,15 @@ function RoomMesh({
 }
 
 function Room({ show }: { show: boolean }) {
-  const connected = useStore((state) => state.connected)
-  const setCursorPosition = useStore((state) => state.setCursorPosition)
+  const [videoOpen, setVideoOpen] = useState(false)
+  const connected = useStore(remoteControlStore, (state) => state.connected)
+  const setCursorPosition = useStore(
+    remoteControlStore,
+    (state) => state.setCursorPosition,
+  )
   const { activateHotspot } = useSceneController()
+  const openVideo = useCallback(() => setVideoOpen(true), [])
+  const closeVideo = useCallback(() => setVideoOpen(false), [])
   const castRay = (castX: number, castY: number) => {
     if (!connected)
       setCursorPosition({
@@ -175,7 +185,7 @@ function Room({ show }: { show: boolean }) {
         display: show ? 'block' : 'none',
       }}
     >
-      <Tricked />
+      <Tricked open={videoOpen} onClose={closeVideo} />
 
       <Canvas
         dpr={[1, 1.5]}
@@ -190,7 +200,10 @@ function Room({ show }: { show: boolean }) {
 
         <color attach="background" args={['#996754']} />
         <directionalLight position={[10, 10, 5]} intensity={15} />
-        <RoomMesh onHotspotActivated={activateHotspot} />
+        <RoomMesh
+          onHotspotActivated={activateHotspot}
+          onVideoRequested={openVideo}
+        />
       </Canvas>
     </div>
   )

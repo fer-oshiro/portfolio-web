@@ -7,10 +7,11 @@ import {
   RealtimeContextProvider,
   useRealtimeClient,
 } from '../../../remote-control/realtime'
-import { useStore } from '../../../../store'
+import { cameraStore } from '../../../scene-navigation/camera/camera-store'
+import { useStore } from 'zustand'
 
 export const Computer = () => {
-  const { focus } = useStore()
+  const focus = useStore(cameraStore, (state) => state.focus)
   const realtimeClient = useRealtimeClient()
   const { distanceFactor, position } = useControls('PC', {
     distanceFactor: 1.2,

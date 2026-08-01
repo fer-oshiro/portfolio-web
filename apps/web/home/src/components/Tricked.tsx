@@ -1,9 +1,16 @@
 import YouTube from 'react-youtube'
-import { useStore } from '../store'
 
-export const Tricked = () => {
-  const { tricked, opts, setTricked } = useStore()
-  if (!tricked) return <></>
+const opts = {
+  height: '390',
+  width: '640',
+  playerVars: {
+    autoplay: 1,
+    controls: 1,
+  },
+}
+
+export const Tricked = ({ open, onClose }: TrickedProps) => {
+  if (!open) return null
   return (
     <div
       style={{
@@ -30,7 +37,7 @@ export const Tricked = () => {
           position: 'fixed',
           zIndex: 999,
         }}
-        onClick={() => setTricked(false)}
+        onClick={onClose}
       />
       <div
         style={{
@@ -39,7 +46,7 @@ export const Tricked = () => {
           zIndex: 9999,
           position: 'relative',
         }}
-        onClick={() => setTricked(false)}
+        onClick={onClose}
       >
         <button
           style={{
@@ -58,4 +65,9 @@ export const Tricked = () => {
       </div>
     </div>
   )
+}
+
+interface TrickedProps {
+  open: boolean
+  onClose: () => void
 }

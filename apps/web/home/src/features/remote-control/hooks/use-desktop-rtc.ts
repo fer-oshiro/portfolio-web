@@ -1,6 +1,7 @@
 import { useState } from 'react'
+import { useStore } from 'zustand'
 
-import { useStore } from '../../../store'
+import { remoteControlStore } from '../remote-control-store'
 import { usePeerSession } from './use-peer-session'
 
 const createRoomId = () => {
@@ -13,7 +14,7 @@ const createRoomId = () => {
 }
 
 export const useDesktopRTC = () => {
-  const { setStatus } = useStore()
+  const setStatus = useStore(remoteControlStore, (state) => state.setStatus)
   const [gyro, setGyro] = useState({ alpha: 0, beta: 0, gamma: 0 })
   const [roomId] = useState(createRoomId)
   const { connected, iceServers, readyState } = usePeerSession({

@@ -11,7 +11,6 @@ import * as THREE from 'three'
 
 import github from '../../../../assets/github.png'
 import linkedin from '../../../../assets/linkedin.png'
-import { useStore } from '../../../../store'
 import SP42 from '../../assets/42SP.png'
 import confia from '../../assets/confia.png'
 import eu from '../../assets/eu.png'
@@ -40,8 +39,7 @@ function useSpaceGradient() {
   }, [])
 }
 
-export function Info() {
-  const { setTricked } = useStore()
+export function Info({ onVideoRequested }: InfoProps) {
   const gradientTexture = useSpaceGradient()
   const foto = useTexture(eu)
   const ytTexture = useTexture(yt)
@@ -86,15 +84,6 @@ export function Info() {
       value: [0.12, -0.4, 0],
     },
   })
-
-  const opts = {
-    height: '390',
-    width: '640',
-    playerVars: {
-      autoplay: 1,
-      controls: 1,
-    },
-  }
 
   return (
     <mesh position={position} rotation={rotation}>
@@ -180,7 +169,7 @@ export function Info() {
           position={ytP}
           onPointerOver={() => (document.body.style.cursor = 'pointer')}
           onPointerOut={() => (document.body.style.cursor = 'auto')}
-          onClick={() => setTricked(true)}
+          onClick={onVideoRequested}
         >
           <circleGeometry args={[0.05, 32]} />
           <meshStandardMaterial map={ytTexture} />
@@ -188,4 +177,8 @@ export function Info() {
       </MeshPortalMaterial>
     </mesh>
   )
+}
+
+interface InfoProps {
+  onVideoRequested: () => void
 }

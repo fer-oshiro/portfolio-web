@@ -1,8 +1,10 @@
 import { useThree } from '@react-three/fiber'
 import { useEffect } from 'react'
 import * as THREE from 'three'
+import { useStore } from 'zustand'
 
-import { useStore } from '../../../store'
+import { remoteControlStore } from '../../remote-control'
+import { cameraStore } from '../camera/camera-store'
 
 export function InteractionManager({
   onFocus,
@@ -11,7 +13,11 @@ export function InteractionManager({
   customY?: number
   onFocus: (object: THREE.Object3D) => void
 }) {
-  const { setHover, cursorPosition } = useStore()
+  const setHover = useStore(cameraStore, (state) => state.setHover)
+  const cursorPosition = useStore(
+    remoteControlStore,
+    (state) => state.cursorPosition,
+  )
   const { camera, raycaster, size, scene } = useThree()
 
   const { x, y } = cursorPosition

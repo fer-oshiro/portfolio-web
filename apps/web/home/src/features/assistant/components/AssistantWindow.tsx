@@ -2,7 +2,6 @@ import { useControls } from 'leva'
 import { useEffect, useRef, useState } from 'react'
 
 import { useRealtime, useRealtimeMessage } from '../../remote-control/realtime'
-import { useStore } from '../../../store'
 import { TypingDots } from './TypingDots'
 
 import './AssistantWindow.css'
@@ -46,13 +45,9 @@ export const AssistantWindow = () => {
   const [text, setText] = useState('')
   const [waiting, setWaiting] = useState(false)
   const inputRef = useRef<HTMLTextAreaElement>(null)
-  const { focus } = useStore()
-
   useEffect(() => {
-    if (focus === 'pc') {
-      inputRef.current?.focus()
-    }
-  }, [focus])
+    inputRef.current?.focus()
+  }, [])
 
   const handleAddBotMessage = async (mess: string, lastMess?: string) => {
     setMess((prev) => [

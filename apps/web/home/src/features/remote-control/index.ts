@@ -12,3 +12,12 @@ export {
 } from './realtime/RealtimeProvider'
 export { WS_URL } from './realtime/constants'
 export { Mobile } from './routes/MobileControllerPage'
+export {
+  createRemoteControlStore,
+  remoteControlStore,
+} from './remote-control-store'
+export type {
+  CursorPosition,
+  RemoteControlStatus,
+  RemoteControlStore,
+} from './remote-control-store'

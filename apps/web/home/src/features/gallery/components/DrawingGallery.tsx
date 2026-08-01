@@ -2,9 +2,10 @@ import type { Drawing } from '@fer-oshiro/realtime-contract'
 import { Image, RoundedBox, Text } from '@react-three/drei'
 import { useControls } from 'leva'
 import { useEffect, useMemo, useState } from 'react'
+import { useStore } from 'zustand'
 
 import { useRealtime, useRealtimeMessage } from '../../remote-control/realtime'
-import { useStore } from '../../../store'
+import { galleryStore } from '../gallery-store'
 
 const SKIP_POSITIONS = [0, 1, 7, 8, 19, 20, 26, 27]
 
@@ -61,7 +62,10 @@ export function DrawingGallery() {
       step: 1,
     },
   })
-  const { setStatus } = useStore()
+  const setDrawingsReady = useStore(
+    galleryStore,
+    (state) => state.setDrawingsReady,
+  )
   const [imgs, setImgs] = useState<Drawing[]>([])
   const { send } = useRealtime()
 
@@ -75,7 +79,7 @@ export function DrawingGallery() {
 
   useRealtimeMessage('drawings', ({ drawings }) => {
     setImgs(drawings)
-    setStatus('ready')
+    setDrawingsReady(true)
   })
 
   return imgs?.map((img, index) => {

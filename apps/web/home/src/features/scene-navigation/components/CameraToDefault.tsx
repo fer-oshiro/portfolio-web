@@ -1,9 +1,10 @@
 import { AnimatePresence, motion } from 'motion/react'
-import { useStore } from '../../../store'
+import { useStore } from 'zustand'
+import { cameraStore } from '../camera/camera-store'
 import { useSceneController } from '../scene-controller'
 
 export const CameraToDefault = () => {
-  const focus = useStore((state) => state.focus)
+  const focus = useStore(cameraStore, (state) => state.focus)
   const { resetCamera } = useSceneController()
 
   return (

@@ -1,26 +1,23 @@
 import { Suspense, useEffect } from 'react'
-import { useStore as useNavigationStore } from 'zustand'
+import { useStore } from 'zustand'
 import { CatMiniGame } from '../../features/cat-game'
 import { Draw } from '../../features/drawing'
 import { WebSocket } from '../../features/remote-control'
 import { Room } from '../../features/room'
 import {
   CameraToDefault,
+  cameraStore,
   navigationStore,
   Transition,
 } from '../../features/scene-navigation'
-import { useStore } from '../../store'
 import { Leva } from 'leva'
 import { useLocation } from 'react-router'
 
 export const Home = () => {
   const loc = useLocation()
-  const currentScene = useNavigationStore(
-    navigationStore,
-    (state) => state.currentScene,
-  )
-  const setViewport = useStore((state) => state.setViewport)
-  const viewport = useStore((state) => state.viewport)
+  const currentScene = useStore(navigationStore, (state) => state.currentScene)
+  const setViewport = useStore(cameraStore, (state) => state.setViewport)
+  const viewport = useStore(cameraStore, (state) => state.viewport)
 
   useEffect(() => {
     if (window.innerWidth > 700) setViewport('desktop')

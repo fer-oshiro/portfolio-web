@@ -4,8 +4,9 @@ import { useControls } from 'leva'
 import { useEffect, useMemo, useRef } from 'react'
 import * as THREE from 'three'
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib'
+import { useStore } from 'zustand'
 
-import { useStore } from '../../../store'
+import { cameraStore } from './camera-store'
 import {
   hasCameraArrived,
   initialCameraState,
@@ -25,8 +26,8 @@ function readCurrentPose(
 
 export const CameraController = () => {
   const orbitRef = useRef<OrbitControlsImpl | null>(null)
-  const focus = useStore((state) => state.focus)
-  const viewport = useStore((state) => state.viewport)
+  const focus = useStore(cameraStore, (state) => state.focus)
+  const viewport = useStore(cameraStore, (state) => state.viewport)
   const destination = selectCameraPose({ focus, viewport })
   const intro = selectCameraPose(initialCameraState)
   const moving = useRef(true)

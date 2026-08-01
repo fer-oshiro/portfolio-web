@@ -1,9 +1,10 @@
 import { animate, motion, useMotionValue } from 'motion/react'
 import { ComponentProps, useEffect } from 'react'
-import { useStore as useNavigationStore } from 'zustand'
+import { useStore } from 'zustand'
 
-import { useStore } from '../../../store'
+import { galleryStore } from '../../gallery'
 import { getBrushAnimation } from '../brush-transition'
+import { cameraStore } from '../camera/camera-store'
 import { getCatAnimation } from '../cat-transition'
 import { navigationStore } from '../navigation-store'
 import './Transition.css'
@@ -46,8 +47,8 @@ const BrushPath = ({ variant, animation, ...props }: BrushPathProps) => {
 }
 
 const BrushTransition = () => {
-  const effect = useNavigationStore(navigationStore, (state) => state.effect)
-  const phase = useNavigationStore(navigationStore, (state) => state.phase)
+  const effect = useStore(navigationStore, (state) => state.effect)
+  const phase = useStore(navigationStore, (state) => state.phase)
   const animation = getBrushAnimation({ effect, phase })
 
   const completeAnimation = () => {
@@ -84,12 +85,13 @@ const BrushTransition = () => {
 }
 
 export const Transition = () => {
-  const { status, setCamera } = useStore()
+  const drawingsReady = useStore(galleryStore, (state) => state.drawingsReady)
+  const setCamera = useStore(cameraStore, (state) => state.setCamera)
   const { progress } = useProgress()
   const opacity = useMotionValue(1)
 
   useEffect(() => {
-    if (progress === 100 && status === 'ready') {
+    if (progress === 100 && drawingsReady) {
       let cameraReset = false
       const intro = animate(opacity, [1, 1, 0], {
         duration: 6,
@@ -104,7 +106,7 @@ export const Transition = () => {
 
       return () => intro.stop()
     }
-  }, [opacity, progress, setCamera, status])
+  }, [drawingsReady, opacity, progress, setCamera])
 
   return (
     <>
@@ -128,8 +130,8 @@ export const Transition = () => {
 }
 
 const CatTransition = () => {
-  const effect = useNavigationStore(navigationStore, (state) => state.effect)
-  const phase = useNavigationStore(navigationStore, (state) => state.phase)
+  const effect = useStore(navigationStore, (state) => state.effect)
+  const phase = useStore(navigationStore, (state) => state.phase)
   const animation = getCatAnimation({ effect, phase })
 
   const completeAnimation = () => {

@@ -6,7 +6,7 @@ import {
   type PropsWithChildren,
 } from 'react'
 
-import { useStore } from '../../store'
+import { cameraStore } from './camera/camera-store'
 import { navigationStore } from './navigation-store'
 import {
   resolveSceneControllerIntent,
@@ -26,7 +26,7 @@ const SceneControllerContext = createContext<SceneControllerValue | null>(null)
 export function SceneController({ children }: PropsWithChildren) {
   const dispatch = useCallback((intent: SceneControllerIntent) => {
     const navigation = navigationStore.getState()
-    const camera = useStore.getState()
+    const camera = cameraStore.getState()
     const commands = resolveSceneControllerIntent(
       {
         currentScene: navigation.currentScene,
@@ -38,7 +38,7 @@ export function SceneController({ children }: PropsWithChildren) {
 
     for (const command of commands) {
       if (command.type === 'focusCamera') {
-        useStore.getState().setCamera(command.focus)
+        cameraStore.getState().setCamera(command.focus)
       } else {
         navigationStore.getState().navigate(command.targetScene, command.effect)
       }

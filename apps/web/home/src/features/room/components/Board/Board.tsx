@@ -7,7 +7,7 @@ import awsPractioner from '../../assets/aws-practioner.png'
 import { DrawingGallery } from '../../../gallery'
 import { Info } from './Info'
 
-function AWS() {
+function AWS({ onVideoRequested }: BoardProps) {
   const {
     positionDeveloper,
     pinDeveloper,
@@ -72,16 +72,20 @@ function AWS() {
           )
         }
       />
-      <Info />
+      <Info onVideoRequested={onVideoRequested} />
     </>
   )
 }
 
-export const Board = () => {
+export const Board = ({ onVideoRequested }: BoardProps) => {
   return (
     <>
-      <AWS />
+      <AWS onVideoRequested={onVideoRequested} />
       <DrawingGallery />
     </>
   )
+}
+
+interface BoardProps {
+  onVideoRequested: () => void
 }

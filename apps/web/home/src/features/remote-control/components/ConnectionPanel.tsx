@@ -2,17 +2,26 @@ import { Button } from '@fer-oshiro/ui'
 import { motion } from 'motion/react'
 import { useEffect, useState } from 'react'
 import { ReadyState } from 'react-use-websocket'
+import { useStore } from 'zustand'
 
 import github from '../../../assets/github.png'
 import linkedin from '../../../assets/linkedin.png'
-import { useStore } from '../../../store'
 import { useDesktopRTC } from '../hooks/use-desktop-rtc'
 import { useGyro } from '../hooks/use-gyro'
+import { remoteControlStore } from '../remote-control-store'
 import { Cursor } from './RemoteCursor'
 import { QRCode } from './RoomQRCode'
 
 export const WebSocket = () => {
-  const { status, setConnected, setGyro, setCursorPosition } = useStore()
+  const status = useStore(remoteControlStore, (state) => state.status)
+  const setConnected = useStore(
+    remoteControlStore,
+    (state) => state.setConnected,
+  )
+  const setCursorPosition = useStore(
+    remoteControlStore,
+    (state) => state.setCursorPosition,
+  )
   const { roomId, gyro, connected, iceServers, readyState } = useDesktopRTC()
   const [isOpen, setIsOpen] = useState<boolean>(true)
   const { x, y } = useGyro(gyro)
@@ -25,7 +34,6 @@ export const WebSocket = () => {
   }, [connected])
 
   useEffect(() => {
-    setGyro(gyro)
     setCursorPosition({ x, y })
   }, [x, y])
 

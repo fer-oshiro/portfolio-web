@@ -2,9 +2,10 @@ import * as THREE from 'three'
 import { useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { useControls } from 'leva'
-import { useStore } from '../../../store'
-import type { CameraCoords } from '../../scene-navigation'
+import { cameraStore } from '../../scene-navigation/camera/camera-store'
+import type { CameraCoords } from '../../scene-navigation/camera/camera-types'
 import { Billboard } from '@react-three/drei'
+import { useStore } from 'zustand'
 
 function SakuraStar({
   position = [0, 0, 0],
@@ -20,8 +21,8 @@ function SakuraStar({
   onActivate: () => void
 }) {
   const progress = useRef(0)
-  const focus = useStore((state) => state.focus)
-  const hover = useStore((state) => state.hover)
+  const focus = useStore(cameraStore, (state) => state.focus)
+  const hover = useStore(cameraStore, (state) => state.hover)
   const { torus } = useControls('Stars', {
     torus: {
       value: [0.2, 0.03, 16],
