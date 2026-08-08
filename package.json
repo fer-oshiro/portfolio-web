@@ -3,6 +3,7 @@
   "private": true,
   "scripts": {
     "build": "turbo run build",
+    "deploy:web": "bash scripts/front.sh",
     "dev": "node --env-file-if-exists=.env node_modules/turbo/bin/turbo run dev --filter=@fer-oshiro/shell --filter=@fer-oshiro/home --filter=@fer-oshiro/blog --filter=@fer-oshiro/resume --filter=@fer-oshiro/realtime",
     "dev:web": "turbo run dev --filter=@fer-oshiro/shell --filter=@fer-oshiro/home --filter=@fer-oshiro/blog --filter=@fer-oshiro/resume",
     "dev:back": "node --env-file-if-exists=.env node_modules/turbo/bin/turbo run dev --filter=@fer-oshiro/realtime",
