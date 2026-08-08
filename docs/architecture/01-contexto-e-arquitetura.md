@@ -67,7 +67,9 @@ Procedimento padrão:
 6. testar manualmente o fluxo afetado;
 7. remover a compatibilidade antiga em outro commit, se possível.
 
-## Situação atual
+## Situação inicial (Fase 0)
+
+Esta era a estrutura registrada antes da execução do roadmap:
 
 ```text
 apps/
@@ -90,6 +92,32 @@ scripts/
 └── local-server.ts
 ```
 
+## Situação consolidada (Fase 12)
+
+```text
+apps/
+├── web/
+│   ├── shell/
+│   ├── home/
+│   ├── blog/
+│   └── resume/
+├── backend/
+│   └── realtime/
+└── tooling/
+    └── docs/
+
+packages/
+├── realtime-contract/
+├── ui/
+├── eslint-config/
+└── typescript-config/
+```
+
+Os workspaces backend antigos e os caminhos temporários de compatibilidade do
+`home` foram removidos na Fase 12 depois da busca por consumidores. As
+referências a eles nas seções de mapeamento abaixo registram a migração, não o
+estado atual.
+
 ### O que deve ser preservado
 
 - npm workspaces e Turbo;
@@ -101,7 +129,7 @@ scripts/
 - experiência local já existente;
 - design system e Storybook.
 
-### Problemas estruturais atuais
+### Problemas estruturais registrados na Fase 0
 
 - `apps/` mistura navegador, Lambda e tooling;
 - endereços e configurações de remotes estão espalhados;

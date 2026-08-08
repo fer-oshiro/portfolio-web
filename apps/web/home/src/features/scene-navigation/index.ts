@@ -1,4 +1,3 @@
-export { CameraManager } from './camera/CameraManager'
 export { CameraController } from './camera/camera-controller'
 export { cameraStore, createCameraStore } from './camera/camera-store'
 export type { CameraStore } from './camera/camera-store'

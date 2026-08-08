@@ -78,3 +78,17 @@ IA, não garantias de resultado.
 
 Se uma tarefa começar a misturar mais de uma responsabilidade, divida-a antes
 de aumentar o effort.
+
+## Status após a Fase 12
+
+| Fases | Status                   | Observação                                                                                                      |
+| ----- | ------------------------ | --------------------------------------------------------------------------------------------------------------- |
+| 0–1   | concluídas               | baseline registrada e workspaces agrupados por tipo                                                             |
+| 2     | parcial                  | contratos, modos standalone/remote e boundaries existem; compartilhamento explícito no shell permanece pendente |
+| 3–10  | concluídas               | backend consolidado, ambiente local, Home por domínio, estado/realtime e UI/configuração migrados               |
+| 11    | concluída no repositório | `apply` e smoke de produção permanecem ações operacionais dependentes de autorização                            |
+| 12    | concluída                | paths sem consumidores removidos, documentação alinhada e validação local executada                             |
+
+As pendências técnicas e operacionais continuam registradas em
+[Decisões em aberto e definição de pronto](./09-decisoes-e-pronto.md) e na
+[revisão da Fase 11](./06-ui-infraestrutura-deploy.md#revisao-da-sessao-6-da-fase-11).

@@ -1,5 +1,57 @@
 # Portfólio
 
+Monorepo do portfólio, organizado em quatro microfrontends, um backend realtime
+com entrypoints local e AWS, tooling e packages compartilhados.
+
+## Desenvolvimento local
+
+Requisitos:
+
+- Node.js e npm nas versões declaradas no `package.json`;
+- portas `3000`, `3001`, `3002`, `3003` e `8080` disponíveis.
+
+Instale as dependências e inicie shell, remotes e backend:
+
+```bash
+npm install
+npm run dev
+```
+
+O backend local usa memória para conexões e desenhos. Sem `GROQ_API_KEY`, o
+chat responde com um fallback local; quando a variável é fornecida, usa o
+adapter Groq. `WEBSOCKET_URL`, `PORT` e `REALTIME_HOST` são opcionais no
+desenvolvimento e possuem defaults locais.
+
+Comandos por área:
+
+```bash
+npm run dev:web
+npm run dev:back
+npm run dev:docs
+```
+
+## Estrutura
+
+```text
+apps/
+├── web/{shell,home,blog,resume}
+├── backend/realtime
+└── tooling/docs
+packages/
+├── realtime-contract
+├── ui
+├── eslint-config
+└── typescript-config
+infra/
+├── terraform
+├── scripts
+└── docker-compose.yml
+```
+
+O backend gera três artefatos independentes (`signaling`, `chat` e `drawing`)
+a partir do workspace `apps/backend/realtime`. A visão completa e o histórico
+do roadmap estão em [`docs/architecture`](./docs/architecture/README.md).
+
 ## Giroscópio
 
 O acesso ao giroscópio exige HTTPS. Para desenvolvimento:

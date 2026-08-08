@@ -139,7 +139,11 @@ Cada entrypoint:
 7. traduz erros para mensagem realtime;
 8. retorna status.
 
-## Mapeamento atual
+## Mapeamento da migração
+
+As origens desta tabela são históricas. Os três workspaces antigos foram
+removidos na Fase 12 depois que build, Terraform e buscas de referência
+confirmaram `apps/backend/realtime` como único consumidor ativo.
 
 | Origem                         | Destino                                  |
 | ------------------------------ | ---------------------------------------- |

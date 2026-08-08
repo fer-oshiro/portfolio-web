@@ -996,17 +996,17 @@ Uma sessão para busca/limpeza e outra para documentação, se necessário.
 
 ### Tarefas
 
-- [ ] buscar paths antigos;
-- [ ] buscar reexports temporários;
-- [ ] confirmar consumidores;
-- [ ] remover diretórios vazios;
-- [ ] remover scripts substituídos;
-- [ ] remover configs duplicadas;
-- [ ] atualizar README;
-- [ ] atualizar árvores;
-- [ ] marcar fases concluídas;
-- [ ] registrar decisões;
-- [ ] preservar pendências não bloqueantes.
+- [x] buscar paths antigos;
+- [x] buscar reexports temporários;
+- [x] confirmar consumidores;
+- [x] remover diretórios vazios;
+- [x] remover scripts substituídos;
+- [x] remover configs duplicadas;
+- [x] atualizar README;
+- [x] atualizar árvores;
+- [x] marcar fases concluídas;
+- [x] registrar decisões;
+- [x] preservar pendências não bloqueantes.
 
 ### Não incluir
 
@@ -1028,6 +1028,29 @@ Uma sessão para busca/limpeza e outra para documentação, se necessário.
 
 - código e documentação correspondem;
 - não há compatibilidade temporária sem justificativa.
+
+### Registro de conclusão
+
+Concluída em 2026-08-08. Foram removidos os três workspaces backend já
+substituídos por `apps/backend/realtime`, os reexports temporários sem
+consumidores do `home`, o alias temporário `CameraManager` e dois assets sem
+referências. O script de deploy web e os caminhos ainda consumidos foram
+preservados.
+
+Validações executadas:
+
+- `npm run format:check`;
+- `npm run check-types`;
+- `npm test` (92 testes);
+- `npm run lint` (sem erros; warnings preexistentes preservados);
+- `npm run build`;
+- integridade dos três ZIPs e presença dos artefatos web/Storybook;
+- `npm run deploy:web -- --help`;
+- `terraform fmt -check` nos arquivos versionados e `terraform validate`.
+
+O `terraform.tfvars` local e ignorado continua com a pendência de formatação já
+registrada na Fase 11. Nenhum `plan`, `apply`, deploy ou smoke de produção foi
+executado nesta fase.
 
 ### Prompt sugerido
 

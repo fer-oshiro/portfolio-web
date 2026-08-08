@@ -11,15 +11,16 @@
 - O `home` será organizado por domínio.
 - Navegação será dirigida pelo fim real das animações, não por timers no store.
 - Não será adicionada uma biblioteca de máquina de estados inicialmente.
+- O navigation store usa Zustand sobre uma função de transição pura.
+- Desenhos locais permanecem em memória durante a execução do processo.
+- O modo local usa Groq quando `GROQ_API_KEY` está disponível e um provider de
+  fallback quando não está.
 - Testes não terão meta de cobertura.
 - Documentação será evolutiva.
 
 ## Decisões em aberto
 
-- desenhos locais em memória ou diretório temporário;
-- adapter Groq real disponível no modo local;
 - geração automática de tipos do Module Federation;
-- navigation store como reducer puro ou Zustand;
 - profile/info como feature própria;
 - momento de transformar warnings críticos em erros;
 - CI remoto além dos hooks;
@@ -35,23 +36,23 @@ Ao fechar uma decisão:
 
 ## Definição geral de pronto
 
-- [ ] apps agrupados em `web`, `backend` e `tooling`;
+- [x] apps agrupados em `web`, `backend` e `tooling`;
 - [ ] cada remote funciona standalone e pelo shell;
-- [ ] não há imports internos entre aplicações;
+- [x] não há imports internos entre aplicações;
 - [ ] Module Federation compartilha dependências explícitas;
-- [ ] backend possui um workspace e quatro entrypoints;
-- [ ] local e AWS usam as mesmas features;
-- [ ] backend local não depende de emulador;
-- [ ] três ZIPs são gerados;
-- [ ] `home` está organizado por domínio;
-- [ ] realtime não depende de mutáveis globais;
-- [ ] transições não usam timers no store;
-- [ ] câmera e efeito têm responsabilidades separadas;
-- [ ] `packages/ui` é consumido pela API pública;
-- [ ] configuração não está hardcoded nas features;
-- [ ] smoke tests principais estão documentados;
-- [ ] README explica desenvolvimento e deploy;
-- [ ] documentação corresponde à estrutura real.
+- [x] backend possui um workspace e quatro entrypoints;
+- [x] local e AWS usam as mesmas features;
+- [x] backend local não depende de emulador;
+- [x] três ZIPs são gerados;
+- [x] `home` está organizado por domínio;
+- [x] realtime não depende de mutáveis globais;
+- [x] transições não usam timers no store;
+- [x] câmera e efeito têm responsabilidades separadas;
+- [x] `packages/ui` é consumido pela API pública;
+- [x] configuração não está hardcoded nas features;
+- [x] smoke tests principais estão documentados;
+- [x] README explica desenvolvimento e deploy;
+- [x] documentação corresponde à estrutura real.
 
 ## Resultado esperado
 

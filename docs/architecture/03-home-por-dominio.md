@@ -7,6 +7,10 @@ fique espalhada entre `components`, `hooks`, `pages`, `service` e `store`.
 
 A movimentação deve acontecer antes das refatorações comportamentais.
 
+Os paths listados como “origens prováveis” nas seções abaixo são históricos.
+Os reexports mantidos nesses locais durante a migração foram removidos na Fase
+12 após a confirmação de que não tinham consumidores.
+
 ## Árvore-alvo
 
 ```text
