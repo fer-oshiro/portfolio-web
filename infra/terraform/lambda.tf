@@ -2,6 +2,7 @@ locals {
   websocket_stage_name    = "prod"
   signaling_function_name = "${var.project_name}-ws-handler"
   chat_function_name      = "${var.project_name}-chat-handler"
+  drawing_function_name   = "${var.project_name}-draw-handler"
   signaling_zip_path      = "${path.module}/../../apps/backend/realtime/dist/aws/signaling.zip"
   chat_zip_path           = "${path.module}/../../apps/backend/realtime/dist/aws/chat.zip"
   drawing_zip_path        = "${path.module}/../../apps/backend/realtime/dist/aws/drawing.zip"
@@ -85,8 +86,8 @@ resource "aws_iam_role_policy" "chat_lambda_policy" {
   })
 }
 
-resource "aws_iam_role" "lambda_role" {
-  name = "${var.project_name}-lambda-role"
+resource "aws_iam_role" "drawing_lambda_role" {
+  name = "${var.project_name}-drawing-lambda-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -98,48 +99,41 @@ resource "aws_iam_role" "lambda_role" {
   })
 }
 
-resource "aws_iam_role_policy" "lambda_policy" {
-  name = "${var.project_name}-lambda-policy"
-  role = aws_iam_role.lambda_role.id
+resource "aws_iam_role_policy" "drawing_lambda_policy" {
+  name = "${var.project_name}-drawing-lambda-policy"
+  role = aws_iam_role.drawing_lambda_role.id
 
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
-        Action   = ["dynamodb:PutItem", "dynamodb:DeleteItem", "dynamodb:GetItem", "dynamodb:Scan", "dynamodb:Query", "dynamodb:UpdateItem"]
+        Sid      = "DrawingGallery"
+        Action   = "s3:ListBucket"
         Effect   = "Allow"
-        Resource = [aws_dynamodb_table.connections.arn]
+        Resource = aws_s3_bucket.portfolio_bucket.arn
+        Condition = {
+          StringLike = {
+            "s3:prefix" = "gallery/*"
+          }
+        }
       },
       {
-        Action   = ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"]
+        Sid      = "DrawingUploads"
+        Action   = "s3:PutObject"
         Effect   = "Allow"
-        Resource = "arn:aws:logs:*:*:*"
+        Resource = "${aws_s3_bucket.portfolio_bucket.arn}/submissions/*"
       },
       {
-        Action   = ["execute-api:ManageConnections"]
+        Sid      = "WebSocketConnections"
+        Action   = "execute-api:ManageConnections"
         Effect   = "Allow"
-        Resource = "arn:aws:execute-api:${var.aws_region}:${data.aws_caller_identity.current.account_id}:${aws_apigatewayv2_api.ws.id}/*"
+        Resource = "${aws_apigatewayv2_api.ws.execution_arn}/${local.websocket_stage_name}/POST/@connections/*"
       },
       {
-        Effect = "Allow"
-        Action = [
-          "s3:ListBucket"
-        ]
-        Resource = "arn:aws:s3:::${var.s3_bucket_name}"
-      },
-      {
-        Effect = "Allow"
-        Action = [
-          "s3:PutObject"
-        ]
-        Resource = "arn:aws:s3:::${var.s3_bucket_name}/submissions/*"
-      },
-      {
-        Effect = "Allow"
-        Action = [
-          "s3:GetObject"
-        ]
-        Resource = "arn:aws:s3:::${var.s3_bucket_name}/gallery/*"
+        Sid      = "FunctionLogs"
+        Action   = ["logs:CreateLogStream", "logs:PutLogEvents"]
+        Effect   = "Allow"
+        Resource = "arn:aws:logs:${var.aws_region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${local.drawing_function_name}:*"
       }
     ]
   })
@@ -201,8 +195,8 @@ resource "aws_cloudwatch_log_group" "chat_lambda_logs" {
 }
 
 resource "aws_lambda_function" "draw_handler" {
-  function_name    = "${var.project_name}-draw-handler"
-  role             = aws_iam_role.lambda_role.arn
+  function_name    = local.drawing_function_name
+  role             = aws_iam_role.drawing_lambda_role.arn
   handler          = "index.handler"
   runtime          = "nodejs20.x"
   filename         = local.drawing_zip_path
@@ -214,9 +208,14 @@ resource "aws_lambda_function" "draw_handler" {
       DRAWINGS_PUBLIC_BASE_URL = var.drawings_public_base_url
     }
   }
+
+  depends_on = [
+    aws_cloudwatch_log_group.draw_lambda_logs,
+    aws_iam_role_policy.drawing_lambda_policy,
+  ]
 }
 
 resource "aws_cloudwatch_log_group" "draw_lambda_logs" {
-  name              = "/aws/lambda/${aws_lambda_function.draw_handler.function_name}"
+  name              = "/aws/lambda/${local.drawing_function_name}"
   retention_in_days = 90
 }
