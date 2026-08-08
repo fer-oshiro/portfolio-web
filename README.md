@@ -10,6 +10,38 @@ ngrok config add-authtoken ...
 ngrok http 3000
 ```
 
+## Terraform
+
+O Terraform exige versão 1.5 ou superior, credenciais AWS capazes de ler o
+backend S3 e os recursos gerenciados e os seguintes valores locais:
+
+- `drawings_public_base_url`;
+- `groq_api_key`;
+- `twilio_account_sid`;
+- `twilio_auth_token`.
+
+Não registre secrets no Git. `terraform.tfvars` é ignorado pelo repositório,
+mas continua sendo um arquivo de texto local; prefira um mecanismo seguro para
+fornecer os valores e evite comandos que imprimam seu conteúdo.
+
+Para validar e revisar mudanças sem aplicá-las:
+
+```bash
+terraform -chdir=infra/terraform init -input=false
+terraform -chdir=infra/terraform fmt -check
+terraform -chdir=infra/terraform validate
+terraform -chdir=infra/terraform plan \
+  -input=false \
+  -lock=false \
+  -detailed-exitcode
+```
+
+Com `-detailed-exitcode`, código 0 significa nenhuma mudança, 2 significa que
+há mudanças para revisar e 1 indica erro. `terraform apply` não faz parte do
+build ou do deploy web e só deve ser executado após revisão do plan e
+autorização explícita. O registro da última revisão está em
+[`docs/architecture/06-ui-infraestrutura-deploy.md`](./docs/architecture/06-ui-infraestrutura-deploy.md#revisao-da-sessao-6-da-fase-11).
+
 ## Deploy web
 
 O deploy web exige Node.js e npm nas versões declaradas no `package.json`, AWS

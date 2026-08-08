@@ -942,9 +942,9 @@ Sessão 6:
 - [ ] atualizar script web;
 - [ ] remover `cd` implícito;
 - [ ] parametrizar profile/distribution;
-- [ ] documentar pré-requisitos;
-- [ ] executar plan;
-- [ ] revisar plan;
+- [x] documentar pré-requisitos;
+- [x] executar plan;
+- [x] revisar plan;
 - [ ] aplicar apenas com autorização explícita;
 - [ ] executar smoke em produção.
 

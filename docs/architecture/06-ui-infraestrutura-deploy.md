@@ -142,6 +142,94 @@ terraform -chdir=infra/terraform apply
 
 `apply` permanece explícito e nunca faz parte do build.
 
+### Pré-requisitos do Terraform
+
+- Terraform 1.5 ou superior;
+- credenciais AWS válidas para ler o backend S3 e os recursos gerenciados;
+- `drawings_public_base_url`, `groq_api_key`, `twilio_account_sid` e
+  `twilio_auth_token` fornecidos localmente;
+- os três ZIPs em `apps/backend/realtime/dist/aws/`;
+- revisão humana do plan antes de qualquer `apply`.
+
+Arquivos `*.tfvars` são ignorados pelo Git, mas armazenam texto puro. Não
+registrar valores na documentação, não usar `terraform fmt -diff` sobre um
+arquivo com secrets e preferir um mecanismo seguro de injeção. Os valores
+sensitive também podem existir no state; o backend deve permanecer criptografado
+e com acesso restrito.
+
+Para uma auditoria sem mutação remota:
+
+```bash
+terraform -chdir=infra/terraform init -input=false
+terraform -chdir=infra/terraform fmt -check
+terraform -chdir=infra/terraform validate
+terraform -chdir=infra/terraform plan \
+  -input=false \
+  -lock=false \
+  -detailed-exitcode
+```
+
+O `plan` com `-lock=false` não cria lock remoto. O código de saída é 0 quando
+não há mudanças, 2 quando há mudanças a revisar e 1 quando ocorre erro. Um
+futuro `apply` exige autorização explícita e um novo plan imediatamente antes
+da execução.
+
+### Revisão da sessão 6 da Fase 11
+
+Revisão realizada em 2026-08-08 sobre o commit
+`d3bf97ab57b8ca73c75f04b4e7f9c2453f220f01`.
+
+| Verificação                 | Resultado                                                              |
+| --------------------------- | ---------------------------------------------------------------------- |
+| ZIPs das três Lambdas       | presentes nos paths esperados                                          |
+| `terraform fmt -check`      | arquivos `.tf` formatados; `terraform.tfvars` local requer alinhamento |
+| `terraform validate`        | configuração válida                                                    |
+| `terraform plan`            | código 0, `No changes`                                                 |
+| Criações/alterações         | nenhuma                                                                |
+| Substituições/destruições   | nenhuma                                                                |
+| `terraform apply`           | não executado                                                          |
+| Deploy ou smoke de produção | não executados; são ações fora da sessão 6 e dependem de autorização   |
+
+O provider AWS foi inicializado em diretório temporário para não alterar o
+cache local. O plan foi executado com `-input=false`, `-lock=false`, sem
+arquivo de saída e apenas com refresh de leitura do estado e dos recursos AWS.
+
+#### Revisão manual
+
+- signaling: `GetItem`, `Scan`, `PutItem` e `DeleteItem` limitados à tabela de
+  conexões, além de `ManageConnections` e escrita no log da função;
+- chat: somente `ManageConnections` e escrita no log da função, sem S3 ou
+  DynamoDB;
+- drawing: `ListBucket` limitado ao prefixo `gallery/`, `PutObject` limitado a
+  `submissions/`, além de `ManageConnections` e escrita no log da função;
+- logs: os três grupos são criados previamente e mantêm retenção de 90 dias;
+- S3 de desenhos: acesso público direto bloqueado; leitura de `gallery/`
+  permitida ao CloudFront somente quando a origem é a distribuição declarada;
+- artefatos Lambda, rotas WebSocket, stage, buckets, tabela e distribuição não
+  apresentam drift em relação ao código.
+
+#### Pendências identificadas
+
+O resultado `No changes` significa que código, state e recursos gerenciados
+estão alinhados; não significa que a configuração seja portátil ou que recursos
+fora do state tenham sido auditados.
+
+- backend, bucket do site e CloudFront ainda contêm nomes, IDs, domínios e ARNs
+  específicos da conta; `state_bucket` está declarado, mas não configura o
+  backend;
+- `.terraform.lock.hcl` está ignorado, portanto a seleção exata do provider não
+  é reproduzida por um clone novo;
+- o CORS do bucket de desenhos aceita qualquer origem e mais métodos que o
+  fluxo atual de upload exige;
+- as permissões de invocação do API Gateway usam `/*/*`, abrangendo todos os
+  stages e routes da API;
+- secrets locais precisam ser rotacionados se forem exibidos por ferramentas e
+  nunca devem ser incluídos em logs ou documentação.
+
+Essas pendências não geraram mudanças no plan e não foram corrigidas nesta
+sessão, pois pertencem às sessões de configuração/IAM/S3 anteriores ou exigem
+uma decisão operacional separada.
+
 ## Deploy web
 
 Atualizar os paths:
@@ -203,12 +291,12 @@ Para mudança incompatível de contrato:
 - [ ] alinhar envs;
 - [ ] validar retenção de logs;
 - [ ] revisar permissões S3;
-- [ ] executar Terraform plan.
+- [x] executar Terraform plan.
 
 ### Deploy
 
 - [ ] atualizar paths web;
 - [ ] remover dependência de diretório atual;
-- [ ] documentar pré-requisitos;
-- [ ] manter plan antes de apply;
+- [x] documentar pré-requisitos;
+- [x] manter plan antes de apply;
 - [ ] executar smoke em produção.
