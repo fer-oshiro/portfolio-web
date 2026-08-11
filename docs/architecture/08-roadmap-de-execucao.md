@@ -96,22 +96,22 @@ Uma única sessão somente de inspeção e documentação. Não corrigir problem
 
 ### Tarefas
 
-- [ ] executar `git status --short`;
-- [ ] registrar mudanças existentes que não pertencem à migração;
-- [ ] executar `npm run format:check`;
-- [ ] executar `npm run check-types`;
-- [ ] executar `npm test`;
-- [ ] executar `npm run lint`;
-- [ ] registrar warnings conhecidos sem corrigi-los;
-- [ ] executar `npm run build`;
-- [ ] iniciar frontend;
-- [ ] iniciar backend local atual;
-- [ ] registrar portas;
-- [ ] registrar variáveis por nome, nunca valor;
-- [ ] confirmar artefatos Lambda;
-- [ ] confirmar paths usados pelo Terraform;
-- [ ] executar smoke dos fluxos disponíveis;
-- [ ] registrar o que não pode ser testado e por quê.
+- [x] executar `git status --short`;
+- [x] registrar mudanças existentes que não pertencem à migração;
+- [x] executar `npm run format:check`;
+- [x] executar `npm run check-types`;
+- [x] executar `npm test`;
+- [x] executar `npm run lint`;
+- [x] registrar warnings conhecidos sem corrigi-los;
+- [x] executar `npm run build`;
+- [x] iniciar frontend;
+- [x] iniciar backend local atual;
+- [x] registrar portas;
+- [x] registrar variáveis por nome, nunca valor;
+- [x] confirmar artefatos Lambda;
+- [x] confirmar paths usados pelo Terraform;
+- [x] executar smoke dos fluxos disponíveis;
+- [x] registrar o que não pode ser testado e por quê.
 
 ### Não incluir
 
@@ -164,28 +164,28 @@ se o diff ficar grande.
 
 ### Tarefas
 
-- [ ] criar `apps/web`;
-- [ ] mover shell;
-- [ ] mover home;
-- [ ] mover blog;
-- [ ] mover resume;
-- [ ] criar `apps/tooling`;
-- [ ] mover docs/Storybook;
-- [ ] criar `apps/backend`;
-- [ ] mover ws-api;
-- [ ] mover chat-api;
-- [ ] mover draw-api;
-- [ ] atualizar workspaces;
-- [ ] regenerar lockfile com npm;
-- [ ] corrigir aliases Webpack;
-- [ ] corrigir paths Terraform;
-- [ ] corrigir deploy web;
-- [ ] corrigir imports do servidor local;
-- [ ] buscar todos os paths antigos;
-- [ ] preservar nomes npm;
-- [ ] preservar módulos federados;
-- [ ] preservar portas;
-- [ ] preservar outputs.
+- [x] criar `apps/web`;
+- [x] mover shell;
+- [x] mover home;
+- [x] mover blog;
+- [x] mover resume;
+- [x] criar `apps/tooling`;
+- [x] mover docs/Storybook;
+- [x] criar `apps/backend`;
+- [x] mover ws-api;
+- [x] mover chat-api;
+- [x] mover draw-api;
+- [x] atualizar workspaces;
+- [x] regenerar lockfile com npm;
+- [x] corrigir aliases Webpack;
+- [x] corrigir paths Terraform;
+- [x] corrigir deploy web;
+- [x] corrigir imports do servidor local;
+- [x] buscar todos os paths antigos;
+- [x] preservar nomes npm;
+- [x] preservar módulos federados;
+- [x] preservar portas;
+- [x] preservar outputs.
 
 ### Não incluir
 
@@ -255,20 +255,20 @@ Sessão 3:
 
 ### Tarefas
 
-- [ ] criar `app/` em cada frontend;
-- [ ] separar raiz remota e standalone;
-- [ ] manter router superior no shell;
-- [ ] manter rotas internas em cada remote;
-- [ ] mover providers próprios;
-- [ ] centralizar declarações dos módulos;
-- [ ] centralizar configuração dos remotes;
-- [ ] substituir `...deps` por lista explícita;
-- [ ] compartilhar React, React DOM e React Router quando necessário;
-- [ ] adicionar loading boundary;
-- [ ] adicionar error boundary;
-- [ ] preservar módulos expostos;
-- [ ] validar estilos isolados;
-- [ ] documentar contrato público.
+- [x] criar `app/` em cada frontend;
+- [x] separar raiz remota e standalone;
+- [x] manter router superior no shell;
+- [x] manter rotas internas em cada remote;
+- [x] mover providers próprios;
+- [x] centralizar declarações dos módulos;
+- [x] centralizar configuração dos remotes;
+- [x] substituir `...deps` por lista explícita;
+- [x] compartilhar React, React DOM e React Router quando necessário;
+- [x] adicionar loading boundary;
+- [x] adicionar error boundary;
+- [x] preservar módulos expostos;
+- [x] validar estilos isolados;
+- [x] documentar contrato público.
 
 ### Não incluir
 
@@ -327,20 +327,20 @@ Sessão 3:
 
 ### Tarefas
 
-- [ ] criar `apps/backend`;
-- [ ] unificar dependências;
-- [ ] declarar `ws` e `dotenv`;
-- [ ] criar signaling entrypoint;
-- [ ] criar chat entrypoint;
-- [ ] criar drawing entrypoint;
-- [ ] preservar export `handler`;
-- [ ] criar build por entrypoint;
-- [ ] gerar três ZIPs;
-- [ ] atualizar Turbo;
-- [ ] atualizar Terraform;
-- [ ] confirmar hash dos artefatos;
-- [ ] procurar imports dos workspaces antigos;
-- [ ] remover workspaces antigos somente após validação.
+- [x] criar `apps/backend/realtime`;
+- [x] unificar dependências;
+- [x] declarar `ws` e `dotenv`;
+- [x] criar signaling entrypoint;
+- [x] criar chat entrypoint;
+- [x] criar drawing entrypoint;
+- [x] preservar export `handler`;
+- [x] criar build por entrypoint;
+- [x] gerar três ZIPs;
+- [x] atualizar Turbo;
+- [x] atualizar Terraform;
+- [x] confirmar hash dos artefatos;
+- [x] procurar imports dos workspaces antigos;
+- [x] remover workspaces antigos somente após validação.
 
 ### Não incluir
 
@@ -399,44 +399,44 @@ Sessões:
 
 ### Tarefas — transporte
 
-- [ ] definir `MessagePublisher`;
-- [ ] implementar API Gateway publisher;
-- [ ] remover providers duplicados;
-- [ ] manter validação de saída;
-- [ ] preservar comportamento de conexão stale.
+- [x] definir `MessagePublisher`;
+- [x] implementar API Gateway publisher;
+- [x] remover providers duplicados;
+- [x] manter validação de saída;
+- [x] preservar comportamento de conexão stale.
 
 ### Tarefas — signaling
 
-- [ ] definir `ConnectionRepository`;
-- [ ] definir `TurnProvider`;
-- [ ] definir tipos internos;
-- [ ] mover join para service;
-- [ ] mover signal para service;
-- [ ] mover disconnect para service;
-- [ ] implementar DynamoDB repository;
-- [ ] implementar Twilio provider;
-- [ ] impedir service de importar AWS;
-- [ ] preservar validação de mesma sala.
+- [x] definir `ConnectionRepository`;
+- [x] definir `TurnProvider`;
+- [x] definir tipos internos;
+- [x] mover join para service;
+- [x] mover signal para service;
+- [x] mover disconnect para service;
+- [x] implementar DynamoDB repository;
+- [x] implementar Twilio provider;
+- [x] impedir service de importar AWS;
+- [x] preservar validação de mesma sala.
 
 ### Tarefas — chat
 
-- [ ] definir `ChatProvider`;
-- [ ] mover prompt;
-- [ ] mover chunking;
-- [ ] implementar Groq provider;
-- [ ] preservar limite e schema da mensagem;
-- [ ] preservar `chat_done`;
-- [ ] preservar erro com source `chat`.
+- [x] definir `ChatProvider`;
+- [x] mover prompt;
+- [x] mover chunking;
+- [x] implementar Groq provider;
+- [x] preservar limite e schema da mensagem;
+- [x] preservar `chat_done`;
+- [x] preservar erro com source `chat`.
 
 ### Tarefas — drawing
 
-- [ ] definir `DrawingStorage`;
-- [ ] mover listagem;
-- [ ] mover criação de upload;
-- [ ] implementar S3 storage;
-- [ ] remover bucket hardcoded;
-- [ ] preservar formato de `drawings`;
-- [ ] preservar erro com source `draw`.
+- [x] definir `DrawingStorage`;
+- [x] mover listagem;
+- [x] mover criação de upload;
+- [x] implementar S3 storage;
+- [x] remover bucket hardcoded;
+- [x] preservar formato de `drawings`;
+- [x] preservar erro com source `draw`.
 
 ### Não incluir
 
@@ -502,25 +502,25 @@ Sessão 4:
 
 ### Tarefas
 
-- [ ] criar entrypoint local;
-- [ ] criar HTTP server;
-- [ ] anexar WebSocket server;
-- [ ] implementar dispatcher;
-- [ ] implementar memory connection repository;
-- [ ] implementar local publisher;
-- [ ] criar fallback STUN;
-- [ ] criar chat previsível sem secret;
-- [ ] permitir Groq opcional;
-- [ ] criar upload SVG local;
-- [ ] servir SVG local;
-- [ ] manter schemas;
-- [ ] criar script `dev`;
-- [ ] criar `dev:web`;
-- [ ] criar `dev:back`;
-- [ ] criar `dev:docs`;
-- [ ] fazer `dev` iniciar portfólio completo;
-- [ ] excluir Storybook do comando principal;
-- [ ] remover servidor antigo depois do smoke.
+- [x] criar entrypoint local;
+- [x] criar HTTP server;
+- [x] anexar WebSocket server;
+- [x] implementar dispatcher;
+- [x] implementar memory connection repository;
+- [x] implementar local publisher;
+- [x] criar fallback STUN;
+- [x] criar chat previsível sem secret;
+- [x] permitir Groq opcional;
+- [x] criar upload SVG local;
+- [x] servir SVG local;
+- [x] manter schemas;
+- [x] criar script `dev`;
+- [x] criar `dev:web`;
+- [x] criar `dev:back`;
+- [x] criar `dev:docs`;
+- [x] fazer `dev` iniciar portfólio completo;
+- [x] excluir Storybook do comando principal;
+- [x] remover servidor antigo depois do smoke.
 
 ### Não incluir
 
@@ -578,16 +578,19 @@ Ordem:
 
 ### Procedimento por sessão
 
-- [ ] ler o mapa da feature;
-- [ ] listar consumidores;
-- [ ] mover arquivos;
-- [ ] mover assets exclusivos;
-- [ ] criar API pública;
-- [ ] atualizar imports;
-- [ ] preservar reexports necessários;
-- [ ] buscar paths antigos;
-- [ ] executar validações;
+- [x] ler o mapa da feature;
+- [x] listar consumidores;
+- [x] mover arquivos;
+- [x] mover assets exclusivos;
+- [x] criar API pública;
+- [x] atualizar imports;
+- [x] preservar reexports necessários;
+- [x] buscar paths antigos;
+- [x] executar validações;
 - [ ] fazer smoke da feature.
+
+Pendência confirmada na Fase 12: o smoke visual individual das sete features
+não possui registro completo.
 
 ### Não incluir
 
@@ -648,18 +651,18 @@ Sessão 4:
 
 ### Tarefas
 
-- [ ] criar cliente;
-- [ ] mover fila;
-- [ ] mover listeners;
-- [ ] mover ready state;
-- [ ] criar Context;
-- [ ] conectar ao montar;
-- [ ] limpar ao desmontar;
-- [ ] preservar hooks existentes;
-- [ ] migrar consumidores;
-- [ ] validar reconexão;
-- [ ] validar standalone;
-- [ ] remover mutáveis globais.
+- [x] criar cliente;
+- [x] mover fila;
+- [x] mover listeners;
+- [x] mover ready state;
+- [x] criar Context;
+- [x] conectar ao montar;
+- [x] limpar ao desmontar;
+- [x] preservar hooks existentes;
+- [x] migrar consumidores;
+- [x] validar reconexão;
+- [x] validar standalone;
+- [x] remover mutáveis globais.
 
 ### Não incluir
 
@@ -729,23 +732,23 @@ Sessão 6:
 
 ### Tarefas
 
-- [ ] criar tipos;
-- [ ] criar estado inicial;
-- [ ] implementar `navigate`;
-- [ ] implementar `coverFinished`;
-- [ ] implementar `revealFinished`;
-- [ ] implementar cancelamento simples;
-- [ ] testar transições puras;
-- [ ] adaptar callbacks das animações;
-- [ ] trocar cena quando coberta;
-- [ ] mover configuração de câmera;
-- [ ] criar camera controller;
-- [ ] criar SceneController;
-- [ ] migrar hotspots;
-- [ ] bloquear navegação concorrente;
-- [ ] remover timers;
-- [ ] remover chamadas entre slices;
-- [ ] remover estado antigo somente após busca.
+- [x] criar tipos;
+- [x] criar estado inicial;
+- [x] implementar `navigate`;
+- [x] implementar `coverFinished`;
+- [x] implementar `revealFinished`;
+- [x] implementar cancelamento simples;
+- [x] testar transições puras;
+- [x] adaptar callbacks das animações;
+- [x] trocar cena quando coberta;
+- [x] mover configuração de câmera;
+- [x] criar camera controller;
+- [x] criar SceneController;
+- [x] migrar hotspots;
+- [x] bloquear navegação concorrente;
+- [x] remover timers;
+- [x] remover chamadas entre slices;
+- [x] remover estado antigo somente após busca.
 
 ### Não incluir
 
@@ -801,15 +804,19 @@ não introduzir regressões visuais.
 
 ### Tarefas
 
-- [ ] separar stores;
-- [ ] usar estado local;
-- [ ] adicionar seletores;
-- [ ] revisar cursor;
-- [ ] revisar giroscópio;
-- [ ] usar refs ou motion values;
-- [ ] remover estado derivado;
-- [ ] revisar effects;
+- [x] separar stores;
+- [x] usar estado local;
+- [x] adicionar seletores;
+- [x] revisar cursor;
+- [x] revisar giroscópio;
+- [x] usar refs ou motion values;
+- [x] remover estado derivado;
+- [x] revisar effects;
 - [ ] comparar renders/performance.
+
+Pendência confirmada na Fase 12: existem testes de isolamento dos stores, mas
+não há comparação documentada de renders ou medição de performance antes e
+depois.
 
 ### Não incluir
 
@@ -856,16 +863,16 @@ e substituição gradual de componentes repetidos.
 
 ### Tarefas
 
-- [ ] remover imports do source de UI;
-- [ ] estabilizar exports;
-- [ ] configurar watch;
-- [ ] remover alias;
-- [ ] centralizar remotes;
-- [ ] centralizar WebSocket URL;
-- [ ] remover URLs concretas das features;
-- [ ] extrair padrões repetidos;
-- [ ] validar CSS isolado;
-- [ ] validar Storybook.
+- [x] remover imports do source de UI;
+- [x] estabilizar exports;
+- [x] configurar watch;
+- [x] remover alias;
+- [x] centralizar remotes;
+- [x] centralizar WebSocket URL;
+- [x] remover URLs concretas das features;
+- [x] extrair padrões repetidos;
+- [x] validar CSS isolado;
+- [x] validar Storybook.
 
 ### Não incluir
 
@@ -931,22 +938,26 @@ Sessão 6:
 
 ### Tarefas
 
-- [ ] atualizar paths dos ZIPs;
-- [ ] alinhar nomes de env;
+- [x] atualizar paths dos ZIPs;
+- [x] alinhar nomes de env;
 - [ ] remover hardcodes;
-- [ ] criar role/policy signaling;
-- [ ] criar role/policy chat;
-- [ ] criar role/policy drawing;
-- [ ] manter logs;
-- [ ] revisar S3;
-- [ ] atualizar script web;
-- [ ] remover `cd` implícito;
-- [ ] parametrizar profile/distribution;
+- [x] criar role/policy signaling;
+- [x] criar role/policy chat;
+- [x] criar role/policy drawing;
+- [x] manter logs;
+- [x] revisar S3;
+- [x] atualizar script web;
+- [x] remover `cd` implícito;
+- [x] parametrizar profile/distribution;
 - [x] documentar pré-requisitos;
 - [x] executar plan;
 - [x] revisar plan;
 - [ ] aplicar apenas com autorização explícita;
 - [ ] executar smoke em produção.
+
+Pendências confirmadas na Fase 12: ainda existem nomes, IDs, domínios e ARNs
+específicos da conta; nenhum `apply` autorizado nem smoke de produção foi
+registrado.
 
 ### Não incluir
 

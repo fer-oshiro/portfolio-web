@@ -188,7 +188,7 @@ Um remote está suficientemente isolado quando:
 - [ ] manter rotas internas no remote;
 - [ ] centralizar declarações de módulos no shell;
 - [ ] criar configuração única de URLs;
-- [ ] remover `...deps` de `shared`;
+- [x] remover `...deps` de `shared`;
 - [ ] adicionar boundary por remote;
 - [ ] validar execução standalone;
 - [ ] validar execução pelo shell;

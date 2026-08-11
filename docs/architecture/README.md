@@ -81,13 +81,17 @@ de aumentar o effort.
 
 ## Status após a Fase 12
 
-| Fases | Status                   | Observação                                                                                                      |
-| ----- | ------------------------ | --------------------------------------------------------------------------------------------------------------- |
-| 0–1   | concluídas               | baseline registrada e workspaces agrupados por tipo                                                             |
-| 2     | parcial                  | contratos, modos standalone/remote e boundaries existem; compartilhamento explícito no shell permanece pendente |
-| 3–10  | concluídas               | backend consolidado, ambiente local, Home por domínio, estado/realtime e UI/configuração migrados               |
-| 11    | concluída no repositório | `apply` e smoke de produção permanecem ações operacionais dependentes de autorização                            |
-| 12    | concluída                | paths sem consumidores removidos, documentação alinhada e validação local executada                             |
+| Fases | Status     | Observação                                                                                    |
+| ----- | ---------- | --------------------------------------------------------------------------------------------- |
+| 0–1   | concluídas | baseline registrada e workspaces agrupados por tipo                                           |
+| 2     | concluída  | contratos, modos standalone/remote, boundaries e compartilhamento explícito estão definidos   |
+| 3–5   | concluídas | backend consolidado, features/adapters extraídos e ambiente local definitivo                  |
+| 6     | parcial    | organização por domínio concluída; smoke visual individual das features sem registro completo |
+| 7–8   | concluídas | cliente realtime isolado e navegação/transições desacopladas                                  |
+| 9     | parcial    | limites de estado revisados; comparação formal de renders/performance pendente                |
+| 10    | concluída  | UI pública, watch, CSS, Storybook e configuração web validados                                |
+| 11    | parcial    | hardcodes, `apply` autorizado e smoke de produção permanecem pendentes                        |
+| 12    | concluída  | paths sem consumidores removidos, documentação alinhada e validação local executada           |
 
 As pendências técnicas e operacionais continuam registradas em
 [Decisões em aberto e definição de pronto](./09-decisoes-e-pronto.md) e na
