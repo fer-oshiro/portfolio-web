@@ -1,7 +1,7 @@
 # Portfólio
 
 Monorepo do portfólio, organizado em quatro microfrontends, um backend realtime
-com entrypoints local e AWS, tooling e packages compartilhados.
+com entrypoints local e AWS, Storybook e packages compartilhados.
 
 ## Desenvolvimento local
 
@@ -36,7 +36,7 @@ npm run dev:docs
 apps/
 ├── web/{shell,home,blog,resume}
 ├── backend
-└── tooling/docs
+└── storybook
 packages/
 ├── realtime-contract
 ├── ui

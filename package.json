@@ -51,7 +51,7 @@
   "workspaces": [
     "apps/web/*",
     "apps/backend",
-    "apps/tooling/*",
+    "apps/storybook",
     "packages/*"
   ]
 }

@@ -8,7 +8,7 @@ Objetivos:
 
 - manter Module Federation como parte intencional do estudo;
 - isolar `shell`, `home`, `blog` e `resume`;
-- separar aplicações web, backend e tooling;
+- separar aplicações web, backend e Storybook;
 - ter um backend organizado por domínio, com entrypoints AWS e local;
 - rodar localmente sem emulador de Lambda;
 - continuar publicando três Lambdas independentes;
@@ -102,9 +102,7 @@ apps/
 │   ├── blog/
 │   └── resume/
 ├── backend/
-│   └── realtime/
-└── tooling/
-    └── docs/
+└── storybook/
 
 packages/
 ├── realtime-contract/
@@ -155,9 +153,7 @@ apps/
 │   ├── blog/
 │   └── resume/
 ├── backend/
-│   └── realtime/
-└── tooling/
-    └── docs/
+└── storybook/
 
 packages/
 ├── realtime-contract/
@@ -210,7 +206,7 @@ Configuração desejada:
 
 ```json
 {
-  "workspaces": ["apps/web/*", "apps/backend/*", "apps/tooling/*", "packages/*"]
+  "workspaces": ["apps/web/*", "apps/backend", "apps/storybook", "packages/*"]
 }
 ```
 
@@ -224,7 +220,7 @@ Os nomes npm devem ser preservados na primeira movimentação.
 | `apps/home`     | `apps/web/home`         |
 | `apps/blog`     | `apps/web/blog`         |
 | `apps/resume`   | `apps/web/resume`       |
-| `apps/docs`     | `apps/tooling/docs`     |
+| `apps/docs`     | `apps/storybook`        |
 | `apps/ws-api`   | `apps/backend/ws-api`   |
 | `apps/chat-api` | `apps/backend/chat-api` |
 | `apps/draw-api` | `apps/backend/draw-api` |

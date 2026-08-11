@@ -169,8 +169,7 @@ se o diff ficar grande.
 - [x] mover home;
 - [x] mover blog;
 - [x] mover resume;
-- [x] criar `apps/tooling`;
-- [x] mover docs/Storybook;
+- [x] mover docs/Storybook para `apps/storybook`;
 - [x] criar `apps/backend`;
 - [x] mover ws-api;
 - [x] mover chat-api;

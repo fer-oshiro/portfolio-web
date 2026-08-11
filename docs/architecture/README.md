@@ -25,9 +25,7 @@ apps/
 │   ├── blog/
 │   └── resume/
 ├── backend/
-│   └── realtime/
-└── tooling/
-    └── docs/
+└── storybook/
 
 packages/
 ├── realtime-contract/

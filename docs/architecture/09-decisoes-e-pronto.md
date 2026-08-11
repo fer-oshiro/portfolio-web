@@ -36,7 +36,7 @@ Ao fechar uma decisão:
 
 ## Definição geral de pronto
 
-- [x] apps agrupados em `web`, `backend` e `tooling`;
+- [x] apps web agrupados e workspaces de backend e Storybook explicitados;
 - [ ] cada remote funciona standalone e pelo shell;
 - [x] não há imports internos entre aplicações;
 - [ ] Module Federation compartilha dependências explícitas;
