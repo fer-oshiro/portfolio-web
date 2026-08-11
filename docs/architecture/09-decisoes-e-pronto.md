@@ -4,7 +4,7 @@
 
 - Module Federation será mantido como objetivo de estudo.
 - Os microfrontends ficarão em `apps/web/*`.
-- Backends serão consolidados em `apps/backend/realtime`.
+- Backends serão consolidados em `apps/backend`.
 - O backend terá três entrypoints AWS e um local.
 - Três Lambdas continuarão existindo.
 - Desenvolvimento local não usará emulador de Lambda.

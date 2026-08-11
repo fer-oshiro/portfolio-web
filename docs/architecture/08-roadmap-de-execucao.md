@@ -327,7 +327,7 @@ Sessão 3:
 
 ### Tarefas
 
-- [ ] criar `apps/backend/realtime`;
+- [ ] criar `apps/backend`;
 - [ ] unificar dependências;
 - [ ] declarar `ws` e `dotenv`;
 - [ ] criar signaling entrypoint;
@@ -1032,7 +1032,7 @@ Uma sessão para busca/limpeza e outra para documentação, se necessário.
 ### Registro de conclusão
 
 Concluída em 2026-08-08. Foram removidos os três workspaces backend já
-substituídos por `apps/backend/realtime`, os reexports temporários sem
+substituídos por `apps/backend`, os reexports temporários sem
 consumidores do `home`, o alias temporário `CameraManager` e dois assets sem
 referências. O script de deploy web e os caminhos ainda consumidos foram
 preservados.

@@ -1,5 +1,5 @@
 {
-  "name": "@fer-oshiro/realtime",
+  "name": "@fer-oshiro/backend",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -15,7 +15,7 @@
     "zip:chat": "zip -q -FS -j dist/aws/chat.zip dist/aws/chat/index.js",
     "zip:drawing": "zip -q -FS -j dist/aws/drawing.zip dist/aws/drawing/index.js",
     "clean": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\"",
-    "lint": "eslint . --config ../../../eslint.config.mjs",
+    "lint": "eslint . --config ../../eslint.config.mjs",
     "test": "node --import tsx --test \"src/**/*.test.ts\"",
     "check-types": "tsc --noEmit"
   },

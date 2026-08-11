@@ -35,7 +35,7 @@ npm run dev:docs
 ```text
 apps/
 ├── web/{shell,home,blog,resume}
-├── backend/realtime
+├── backend
 └── tooling/docs
 packages/
 ├── realtime-contract
@@ -49,7 +49,7 @@ infra/
 ```
 
 O backend gera três artefatos independentes (`signaling`, `chat` e `drawing`)
-a partir do workspace `apps/backend/realtime`. A visão completa e o histórico
+a partir do workspace `apps/backend`. A visão completa e o histórico
 do roadmap estão em [`docs/architecture`](./docs/architecture/README.md).
 
 ## Giroscópio

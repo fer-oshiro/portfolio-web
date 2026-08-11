@@ -3,9 +3,9 @@ locals {
   signaling_function_name = "${var.project_name}-ws-handler"
   chat_function_name      = "${var.project_name}-chat-handler"
   drawing_function_name   = "${var.project_name}-draw-handler"
-  signaling_zip_path      = "${path.module}/../../apps/backend/realtime/dist/aws/signaling.zip"
-  chat_zip_path           = "${path.module}/../../apps/backend/realtime/dist/aws/chat.zip"
-  drawing_zip_path        = "${path.module}/../../apps/backend/realtime/dist/aws/drawing.zip"
+  signaling_zip_path      = "${path.module}/../../apps/backend/dist/aws/signaling.zip"
+  chat_zip_path           = "${path.module}/../../apps/backend/dist/aws/chat.zip"
+  drawing_zip_path        = "${path.module}/../../apps/backend/dist/aws/drawing.zip"
 }
 
 resource "aws_iam_role" "signaling_lambda_role" {

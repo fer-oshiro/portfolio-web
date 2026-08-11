@@ -83,9 +83,9 @@ drawing Lambda
 Terraform passa a consumir:
 
 ```text
-../../apps/backend/realtime/dist/aws/signaling.zip
-../../apps/backend/realtime/dist/aws/chat.zip
-../../apps/backend/realtime/dist/aws/drawing.zip
+../../apps/backend/dist/aws/signaling.zip
+../../apps/backend/dist/aws/chat.zip
+../../apps/backend/dist/aws/drawing.zip
 ```
 
 Os paths devem ser verificados a partir de `infra/terraform`.
@@ -148,7 +148,7 @@ terraform -chdir=infra/terraform apply
 - credenciais AWS válidas para ler o backend S3 e os recursos gerenciados;
 - `drawings_public_base_url`, `groq_api_key`, `twilio_account_sid` e
   `twilio_auth_token` fornecidos localmente;
-- os três ZIPs em `apps/backend/realtime/dist/aws/`;
+- os três ZIPs em `apps/backend/dist/aws/`;
 - revisão humana do plan antes de qualquer `apply`.
 
 Arquivos `*.tfvars` são ignorados pelo Git, mas armazenam texto puro. Não

@@ -230,7 +230,7 @@ Os nomes npm devem ser preservados na primeira movimentação.
 | `apps/draw-api` | `apps/backend/draw-api` |
 
 Os três backends permanecem separados logo após esse movimento. A união em
-`apps/backend/realtime` acontece somente depois que a nova taxonomia estiver
+`apps/backend` acontece somente depois que a nova taxonomia estiver
 validada.
 
 ### Referências afetadas

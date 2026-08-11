@@ -14,7 +14,7 @@ Uma aplicação backend continuará produzindo três Lambdas.
 ## Estrutura-alvo
 
 ```text
-apps/backend/realtime/
+apps/backend/
 ├── package.json
 ├── tsconfig.json
 ├── scripts/
@@ -143,7 +143,7 @@ Cada entrypoint:
 
 As origens desta tabela são históricas. Os três workspaces antigos foram
 removidos na Fase 12 depois que build, Terraform e buscas de referência
-confirmaram `apps/backend/realtime` como único consumidor ativo.
+confirmaram `apps/backend` como único consumidor ativo.
 
 | Origem                         | Destino                                  |
 | ------------------------------ | ---------------------------------------- |
@@ -160,7 +160,7 @@ confirmaram `apps/backend/realtime` como único consumidor ativo.
 Saída:
 
 ```text
-apps/backend/realtime/dist/aws/
+apps/backend/dist/aws/
 ├── signaling/
 │   └── index.js
 ├── chat/

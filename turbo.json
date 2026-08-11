@@ -53,7 +53,7 @@
       "cache": false,
       "persistent": true
     },
-    "@fer-oshiro/realtime#dev": {
+    "@fer-oshiro/backend#dev": {
       "cache": false,
       "persistent": true,
       "env": ["PORT", "REALTIME_HOST"],
