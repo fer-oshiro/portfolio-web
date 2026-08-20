@@ -2,7 +2,8 @@ export type Scene = 'room' | 'draw' | 'cat'
 
 export type TransitionEffect = 'none' | 'brush' | 'cat'
 export type ActiveTransitionEffect = Exclude<TransitionEffect, 'none'>
-export type TransitionPhase = 'idle' | 'covering' | 'revealing'
+export type TransitionPhase = 'idle' | 'covering' | 'covered' | 'revealing'
+export type TargetStatus = 'loading' | 'ready' | 'failed'
 
 type IdleNavigationState = {
   currentScene: Scene
@@ -11,11 +12,20 @@ type IdleNavigationState = {
   effect: 'none'
 }
 
-type CoveringNavigationState = {
+type LoadingNavigationState = {
+  currentScene: Scene
+  targetScene: Scene
+  phase: 'covering' | 'covered'
+  effect: ActiveTransitionEffect
+  targetStatus: 'loading'
+}
+
+type SettledNavigationState = {
   currentScene: Scene
   targetScene: Scene
   phase: 'covering'
   effect: ActiveTransitionEffect
+  targetStatus: Exclude<TargetStatus, 'loading'>
 }
 
 type RevealingNavigationState = {
@@ -26,7 +36,10 @@ type RevealingNavigationState = {
 }
 
 export type NavigationState =
-  IdleNavigationState | CoveringNavigationState | RevealingNavigationState
+  | IdleNavigationState
+  | LoadingNavigationState
+  | SettledNavigationState
+  | RevealingNavigationState
 
 export type NavigationEvent =
   | {
@@ -34,12 +47,16 @@ export type NavigationEvent =
       targetScene: Scene
       effect: ActiveTransitionEffect
     }
+  | { type: 'sceneReady'; scene: Scene }
+  | { type: 'sceneFailed'; scene: Scene; reason: string }
   | { type: 'coverFinished' }
   | { type: 'revealFinished' }
   | { type: 'cancelNavigation' }
 
 export type NavigationActions = {
   navigate: (targetScene: Scene, effect: ActiveTransitionEffect) => void
+  sceneReady: (scene: Scene) => void
+  sceneFailed: (scene: Scene, reason: string) => void
   coverFinished: () => void
   revealFinished: () => void
   cancelNavigation: () => void

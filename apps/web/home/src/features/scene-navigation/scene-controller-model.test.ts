@@ -88,7 +88,7 @@ describe('scene controller model', () => {
     ).toEqual([])
   })
 
-  it.each(['covering', 'revealing'] as const)(
+  it.each(['covering', 'covered', 'revealing'] as const)(
     'bloqueia novas intenções durante %s',
     (phase) => {
       expect(

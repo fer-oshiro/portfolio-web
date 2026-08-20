@@ -31,11 +31,25 @@ export function getBrushAnimation(state: BrushTransitionState): BrushAnimation {
     }
   }
 
-  return {
-    pathLength: 0,
-    strokeWidth: 0,
-    duration: 2,
-    delay: 2,
-    completionEvent: 'revealFinished',
+  if (state.phase === 'covered') {
+    return {
+      pathLength: 1,
+      strokeWidth: 120,
+      duration: 0,
+      delay: 0,
+      completionEvent: null,
+    }
   }
+
+  if (state.phase === 'revealing') {
+    return {
+      pathLength: 0,
+      strokeWidth: 0,
+      duration: 2,
+      delay: 2,
+      completionEvent: 'revealFinished',
+    }
+  }
+
+  return hiddenBrush
 }

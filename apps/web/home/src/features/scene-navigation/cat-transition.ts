@@ -30,10 +30,23 @@ export function getCatAnimation(state: CatTransitionState): CatAnimation {
     }
   }
 
-  return {
-    scale: 0,
-    duration: segmentDuration,
-    delay: segmentDuration,
-    completionEvent: 'revealFinished',
+  if (state.phase === 'covered') {
+    return {
+      scale: 2,
+      duration: 0,
+      delay: 0,
+      completionEvent: null,
+    }
   }
+
+  if (state.phase === 'revealing') {
+    return {
+      scale: 0,
+      duration: segmentDuration,
+      delay: segmentDuration,
+      completionEvent: 'revealFinished',
+    }
+  }
+
+  return hiddenCat
 }

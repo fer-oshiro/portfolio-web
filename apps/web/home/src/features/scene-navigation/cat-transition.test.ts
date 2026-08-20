@@ -45,7 +45,11 @@ describe('getCatAnimation', () => {
       targetScene: 'cat',
       effect: 'cat',
     })
-    const revealing = transitionNavigation(covering, {
+    const ready = transitionNavigation(covering, {
+      type: 'sceneReady',
+      scene: 'cat',
+    })
+    const revealing = transitionNavigation(ready, {
       type: 'coverFinished',
     })
 
@@ -54,6 +58,24 @@ describe('getCatAnimation', () => {
       duration: 4 / 3,
       delay: 4 / 3,
       completionEvent: 'revealFinished',
+    })
+  })
+
+  it('permanece completamente coberto sem emitir conclusão em covered', () => {
+    const covering = transitionNavigation(initialNavigationState, {
+      type: 'navigate',
+      targetScene: 'cat',
+      effect: 'cat',
+    })
+    const covered = transitionNavigation(covering, {
+      type: 'coverFinished',
+    })
+
+    expect(getCatAnimation(covered)).toEqual({
+      scale: 2,
+      duration: 0,
+      delay: 0,
+      completionEvent: null,
     })
   })
 })

@@ -47,7 +47,11 @@ describe('getBrushAnimation', () => {
       targetScene: 'draw',
       effect: 'brush',
     })
-    const revealing = transitionNavigation(covering, {
+    const ready = transitionNavigation(covering, {
+      type: 'sceneReady',
+      scene: 'draw',
+    })
+    const revealing = transitionNavigation(ready, {
       type: 'coverFinished',
     })
 
@@ -57,6 +61,25 @@ describe('getBrushAnimation', () => {
       duration: 2,
       delay: 2,
       completionEvent: 'revealFinished',
+    })
+  })
+
+  it('permanece completamente coberto sem emitir conclusão em covered', () => {
+    const covering = transitionNavigation(initialNavigationState, {
+      type: 'navigate',
+      targetScene: 'draw',
+      effect: 'brush',
+    })
+    const covered = transitionNavigation(covering, {
+      type: 'coverFinished',
+    })
+
+    expect(getBrushAnimation(covered)).toEqual({
+      pathLength: 1,
+      strokeWidth: 120,
+      duration: 0,
+      delay: 0,
+      completionEvent: null,
     })
   })
 })

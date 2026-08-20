@@ -21,7 +21,11 @@ function completeNavigation(
     targetScene,
     effect,
   })
-  const revealing = transitionNavigation(covering, {
+  const ready = transitionNavigation(covering, {
+    type: 'sceneReady',
+    scene: targetScene,
+  })
+  const revealing = transitionNavigation(ready, {
     type: 'coverFinished',
   })
 
@@ -64,13 +68,17 @@ describe('transitionNavigation', () => {
     expect(room).toEqual(initialNavigationState)
   })
 
-  it('troca a cena apenas depois que o overlay cobre a anterior', () => {
+  it('troca a cena depois que o destino fica pronto e o overlay cobre a anterior', () => {
     const covering = transitionNavigation(initialNavigationState, {
       type: 'navigate',
       targetScene: 'draw',
       effect: 'brush',
     })
-    const revealing = transitionNavigation(covering, {
+    const ready = transitionNavigation(covering, {
+      type: 'sceneReady',
+      scene: 'draw',
+    })
+    const revealing = transitionNavigation(ready, {
       type: 'coverFinished',
     })
 
@@ -79,6 +87,14 @@ describe('transitionNavigation', () => {
       targetScene: 'draw',
       phase: 'covering',
       effect: 'brush',
+      targetStatus: 'loading',
+    })
+    expect(ready).toEqual({
+      currentScene: 'room',
+      targetScene: 'draw',
+      phase: 'covering',
+      effect: 'brush',
+      targetStatus: 'ready',
     })
     expect(revealing).toEqual({
       currentScene: 'draw',
@@ -86,6 +102,151 @@ describe('transitionNavigation', () => {
       phase: 'revealing',
       effect: 'brush',
     })
+  })
+
+  it('permanece coberto até o destino ficar pronto', () => {
+    const covering = transitionNavigation(initialNavigationState, {
+      type: 'navigate',
+      targetScene: 'cat',
+      effect: 'cat',
+    })
+    const covered = transitionNavigation(covering, {
+      type: 'coverFinished',
+    })
+    const revealing = transitionNavigation(covered, {
+      type: 'sceneReady',
+      scene: 'cat',
+    })
+
+    expect(covered).toEqual({
+      currentScene: 'room',
+      targetScene: 'cat',
+      phase: 'covered',
+      effect: 'cat',
+      targetStatus: 'loading',
+    })
+    expect(revealing).toEqual({
+      currentScene: 'cat',
+      targetScene: null,
+      phase: 'revealing',
+      effect: 'cat',
+    })
+  })
+
+  it('revela a origem quando o destino falha antes da cobertura terminar', () => {
+    const covering = transitionNavigation(initialNavigationState, {
+      type: 'navigate',
+      targetScene: 'cat',
+      effect: 'cat',
+    })
+    const failed = transitionNavigation(covering, {
+      type: 'sceneFailed',
+      scene: 'cat',
+      reason: 'cat-scene-load-failed',
+    })
+    const revealing = transitionNavigation(failed, {
+      type: 'coverFinished',
+    })
+
+    expect(failed).toEqual({
+      currentScene: 'room',
+      targetScene: 'cat',
+      phase: 'covering',
+      effect: 'cat',
+      targetStatus: 'failed',
+    })
+    expect(revealing).toEqual({
+      currentScene: 'room',
+      targetScene: null,
+      phase: 'revealing',
+      effect: 'cat',
+    })
+  })
+
+  it('revela a origem quando o destino falha depois da cobertura terminar', () => {
+    const covering = transitionNavigation(initialNavigationState, {
+      type: 'navigate',
+      targetScene: 'cat',
+      effect: 'cat',
+    })
+    const covered = transitionNavigation(covering, {
+      type: 'coverFinished',
+    })
+    const revealing = transitionNavigation(covered, {
+      type: 'sceneFailed',
+      scene: 'cat',
+      reason: 'cat-scene-load-failed',
+    })
+
+    expect(revealing).toEqual({
+      currentScene: 'room',
+      targetScene: null,
+      phase: 'revealing',
+      effect: 'cat',
+    })
+  })
+
+  it('ignora readiness de outra cena e eventos terminais duplicados', () => {
+    const covering = transitionNavigation(initialNavigationState, {
+      type: 'navigate',
+      targetScene: 'cat',
+      effect: 'cat',
+    })
+    const wrongScene = transitionNavigation(covering, {
+      type: 'sceneReady',
+      scene: 'draw',
+    })
+    const ready = transitionNavigation(covering, {
+      type: 'sceneReady',
+      scene: 'cat',
+    })
+    const duplicateReady = transitionNavigation(ready, {
+      type: 'sceneReady',
+      scene: 'cat',
+    })
+    const lateFailure = transitionNavigation(ready, {
+      type: 'sceneFailed',
+      scene: 'cat',
+      reason: 'late-failure',
+    })
+    const failed = transitionNavigation(covering, {
+      type: 'sceneFailed',
+      scene: 'cat',
+      reason: 'cat-scene-load-failed',
+    })
+    const duplicateFailure = transitionNavigation(failed, {
+      type: 'sceneFailed',
+      scene: 'cat',
+      reason: 'duplicate-failure',
+    })
+    const lateReadiness = transitionNavigation(failed, {
+      type: 'sceneReady',
+      scene: 'cat',
+    })
+
+    expect(wrongScene).toBe(covering)
+    expect(duplicateReady).toBe(ready)
+    expect(lateFailure).toBe(ready)
+    expect(duplicateFailure).toBe(failed)
+    expect(lateReadiness).toBe(failed)
+  })
+
+  it('ignora readiness atrasada depois de cancelar a navegação', () => {
+    const covering = transitionNavigation(initialNavigationState, {
+      type: 'navigate',
+      targetScene: 'cat',
+      effect: 'cat',
+    })
+    const cancelled = transitionNavigation(covering, {
+      type: 'cancelNavigation',
+    })
+
+    expect(
+      transitionNavigation(cancelled, {
+        type: 'sceneReady',
+        scene: 'cat',
+      }),
+    ).toBe(cancelled)
   })
 
   it('ignora navegação repetida ou concorrente', () => {
@@ -104,7 +265,11 @@ describe('transitionNavigation', () => {
       targetScene: 'cat',
       effect: 'cat',
     })
-    const revealing = transitionNavigation(covering, {
+    const ready = transitionNavigation(covering, {
+      type: 'sceneReady',
+      scene: 'draw',
+    })
+    const revealing = transitionNavigation(ready, {
       type: 'coverFinished',
     })
     const concurrentWhileRevealing = transitionNavigation(revealing, {
@@ -152,13 +317,32 @@ describe('transitionNavigation', () => {
     ).toEqual(initialNavigationState)
   })
 
+  it('cancela covered e limpa a tentativa ativa sem trocar a cena', () => {
+    const covering = transitionNavigation(initialNavigationState, {
+      type: 'navigate',
+      targetScene: 'cat',
+      effect: 'cat',
+    })
+    const covered = transitionNavigation(covering, {
+      type: 'coverFinished',
+    })
+
+    expect(transitionNavigation(covered, { type: 'cancelNavigation' })).toEqual(
+      initialNavigationState,
+    )
+  })
+
   it('cancela revealing preservando a cena que já foi trocada', () => {
     const covering = transitionNavigation(initialNavigationState, {
       type: 'navigate',
       targetScene: 'cat',
       effect: 'cat',
     })
-    const revealing = transitionNavigation(covering, {
+    const ready = transitionNavigation(covering, {
+      type: 'sceneReady',
+      scene: 'cat',
+    })
+    const revealing = transitionNavigation(ready, {
       type: 'coverFinished',
     })
 
@@ -191,6 +375,7 @@ describe('createNavigationStore', () => {
     const store = createNavigationStore()
 
     store.getState().navigate('draw', 'brush')
+    store.getState().sceneReady('draw')
     store.getState().coverFinished()
     store.getState().revealFinished()
 

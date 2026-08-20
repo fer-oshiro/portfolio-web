@@ -38,6 +38,7 @@ export type {
   NavigationState,
   NavigationStore,
   Scene,
+  TargetStatus,
   TransitionEffect,
   TransitionPhase,
 } from './navigation-types'

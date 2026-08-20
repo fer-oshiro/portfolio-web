@@ -1,0 +1,63 @@
+import { renderToStaticMarkup } from 'react-dom/server'
+import { beforeEach, describe, expect, it } from 'vitest'
+
+import { initialCameraState } from './camera/camera-model'
+import { cameraStore } from './camera/camera-store'
+import { initialNavigationState, navigationStore } from './navigation-store'
+import { SceneController, useSceneController } from './scene-controller'
+import type { ActiveTransitionEffect, Scene } from './navigation-types'
+
+describe('SceneController', () => {
+  let controller: ReturnType<typeof useSceneController> | undefined
+
+  beforeEach(() => {
+    navigationStore.setState(initialNavigationState)
+    cameraStore.setState(initialCameraState)
+
+    const Probe = () => {
+      controller = useSceneController()
+      return null
+    }
+
+    renderToStaticMarkup(
+      <SceneController>
+        <Probe />
+      </SceneController>,
+    )
+  })
+
+  it.each([
+    ['draw', 'brush'],
+    ['cat', 'cat'],
+  ] as const)(
+    'mantém room → %s → room executável com a ponte eager',
+    (targetScene: Scene, effect: ActiveTransitionEffect) => {
+      controller?.navigateTo(targetScene)
+
+      expect(navigationStore.getState()).toMatchObject({
+        currentScene: 'room',
+        targetScene,
+        phase: 'covering',
+        effect,
+        targetStatus: 'ready',
+      })
+
+      navigationStore.getState().coverFinished()
+      navigationStore.getState().revealFinished()
+      controller?.navigateTo('room')
+
+      expect(navigationStore.getState()).toMatchObject({
+        currentScene: targetScene,
+        targetScene: 'room',
+        phase: 'covering',
+        effect,
+        targetStatus: 'ready',
+      })
+
+      navigationStore.getState().coverFinished()
+      navigationStore.getState().revealFinished()
+
+      expect(navigationStore.getState()).toMatchObject(initialNavigationState)
+    },
+  )
+})
