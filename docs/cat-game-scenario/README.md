@@ -587,6 +587,132 @@ e registrar que a falha já existia.
 **Commit sugerido:** nenhum, exceto se o baseline for registrado em um arquivo
 próprio dentro desta pasta.
 
+#### Registro da execução — 20 de agosto de 2026
+
+**Resultado do gate:** aprovado para iniciar a Fase 1. Testes, typecheck, lint
+e build terminaram com código 0. Os warnings e problemas abaixo já existiam
+antes de qualquer alteração de comportamento e passam a fazer parte do
+baseline.
+
+Ambiente usado:
+
+| Campo                 | Valor                                                     |
+| --------------------- | --------------------------------------------------------- |
+| Commit                | `0746a19236693aa2b698deee364de980b73d767d`                |
+| Estado inicial        | `main` limpa, dois commits à frente de `origin/main`      |
+| Navegador             | Chrome `151.0.7922.170`, headless                         |
+| Sistema               | macOS `15.7.4`, arm64                                     |
+| Dispositivo           | Mac mini, Apple M2 com 8 núcleos e 16 GB                  |
+| Node.js / npm         | `24.13.1` / `11.8.0`                                      |
+| Viewport / DPR        | `1440 × 900` / `1`                                        |
+| CPU throttling        | nenhum                                                    |
+| Rede                  | loopback local, sem throttling e com cache desabilitado   |
+| Runtime               | webpack dev server do Home e backend local em memória     |
+| Renderização headless | SwiftShader; números de GPU e FPS não são representativos |
+
+Validações automatizadas:
+
+| Validação | Resultado                                             |
+| --------- | ----------------------------------------------------- |
+| Testes    | 10 arquivos e 55 testes passaram em 643 ms            |
+| Typecheck | passou sem diagnóstico                                |
+| Lint      | passou com 13 warnings preexistentes e nenhum erro    |
+| Build     | passou em 8,686 s com um warning de tamanho de assets |
+
+Os warnings de lint estão concentrados em `DrawingGallery.tsx`,
+`SakuraStar.tsx`, `Room.tsx` e `webpack.config.js`. O build sinaliza
+`362.js`, a música do gato e `room.png` acima do limite recomendado pelo
+webpack.
+
+Tamanhos do build de produção em `apps/web/home/dist`:
+
+| Grupo ou arquivo           | Tamanho em disco | Gzip, quando aplicável |
+| -------------------------- | ---------------: | ---------------------: |
+| Total de `dist`            |        20,93 MiB |                      — |
+| JavaScript total           |         2,39 MiB |             702,58 KiB |
+| Imagens PNG                |        11,35 MiB |                      — |
+| Áudio MP3                  |         7,17 MiB |                      — |
+| `e8fb13274cacd7fc908b.png` |        11,02 MiB |                      — |
+| `5e32c30003496a69b147.mp3` |         7,08 MiB |                      — |
+| `362.js`                   |         2,08 MiB |             602,97 KiB |
+
+O PNG de 11,02 MiB é a textura atual `room.png`. A música de 7,08 MiB está no
+build, mas não entrou no carregamento inicial; ela foi baixada somente após o
+clique em `Play Song`.
+
+Medição do boot, sempre relativa a `navigationStart`:
+
+| Métrica                                      | Resultado |
+| -------------------------------------------- | --------: |
+| `DOMContentLoaded`                           |     73 ms |
+| `load`                                       |    552 ms |
+| First Contentful Paint                       |    604 ms |
+| Sala começou a aparecer, opacidade `< 0,999` |  2.462 ms |
+| Câmera chegou ao destino, tolerância `0,05`  |  5.814 ms |
+| Sala ficou totalmente revelada               |  7.094 ms |
+| Maior long task                              |    328 ms |
+| Elementos `canvas` montados                  |         2 |
+| Elementos `canvas` visíveis                  |         1 |
+
+A carga inicial fez 13,42 MiB de transferência observada, incluindo headers,
+decoders Draco e fontes externos. O corpo das respostas somou 13,41 MiB. A
+Performance API registrou 23,20 MiB depois da descompressão. Os maiores
+recursos do caminho inicial foram:
+
+| Recurso                                 | Corpo transferido |
+| --------------------------------------- | ----------------: |
+| `room.png`                              |         11,02 MiB |
+| bundle principal de vendors do modo dev |          1,64 MiB |
+| outra imagem da sala                    |        198,06 KiB |
+| bundle de React Router do modo dev      |        125,95 KiB |
+| `draco_decoder.wasm`, externo           |         86,95 KiB |
+
+O teste `room → cat → room` foi repetido cinco vezes. Foi executado garbage
+collection antes de cada amostra para reduzir ruído do heap:
+
+| Amostra           | Heap JS usado | Canvas montados/visíveis | Nós DOM | Listeners |
+| ----------------- | ------------: | -----------------------: | ------: | --------: |
+| Antes dos ciclos  |     36,40 MiB |                      2/1 |     151 |       383 |
+| Depois do ciclo 1 |     38,21 MiB |                      2/1 |     139 |       537 |
+| Depois do ciclo 2 |     38,24 MiB |                      2/1 |     139 |       537 |
+| Depois do ciclo 3 |     38,73 MiB |                      2/1 |     139 |       537 |
+| Depois do ciclo 4 |     38,86 MiB |                      2/1 |     139 |       537 |
+| Depois do ciclo 5 |     38,53 MiB |                      2/1 |     139 |       537 |
+
+O heap terminou 2,13 MiB acima da primeira amostra, mas estabilizou após o
+primeiro ciclo; nós e listeners também ficaram estáveis nos quatro ciclos
+seguintes. Essa coleta cobre somente heap JS, não memória de texturas, buffers
+ou processo de GPU.
+
+Para observar o áudio, `Play Song` foi acionado uma vez no primeiro ciclo. O
+`AudioBufferSourceNode` da música tinha duração de 185,45 s. Depois de voltar
+para `room`, ele continuava sem evento `ended` e sem chamada a `stop`. Portanto,
+o vazamento de áudio ao sair do gato é um problema preexistente confirmado, e
+a Fase 6 deve tratá-lo como regressão protegida por teste.
+
+Problemas e limitações confirmados no baseline:
+
+- o Home monta dois contextos WebGL desde o boot, embora somente um fique
+  visível;
+- sem o backend local, `drawingsReady` não é confirmado e o overlay inicial
+  permanece opaco;
+- o import eager de Tone inicializa áudio antes do gesto e pode produzir
+  warnings de autoplay no console;
+- a música não para automaticamente ao sair do gato;
+- a textura de 11,02 MiB responde por cerca de 82% do corpo transferido no
+  boot local;
+- o boot depende de Draco e fontes hospedados externamente;
+- o console de desenvolvimento também registra `stroke-linecap` inválido,
+  favicon ausente e depreciação de `THREE.Clock`;
+- com `#leva`, a atualização de `Camera.position` e `Camera.target` gera
+  warnings do painel de debug;
+- os tempos são uma única amostra em localhost, sem throttling e em Chrome
+  headless; devem ser comparados apenas repetindo exatamente esse ambiente.
+
+Com esse registro, os budgets provisórios permanecem inalterados. A textura da
+sala excede o budget sugerido para uma textura individual, mas sua otimização
+continua separada da criação do cenário do gato e exige comparação visual.
+
 ### Fase 1 — Prontidão no modelo de navegação
 
 **Effort recomendado:** `high`.
