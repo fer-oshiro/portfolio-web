@@ -1,14 +1,15 @@
+import { useProgress } from '@react-three/drei'
 import { animate, motion, useMotionValue } from 'motion/react'
-import { ComponentProps, useEffect } from 'react'
+import { ComponentProps, useEffect, useReducer } from 'react'
 import { useStore } from 'zustand'
 
 import { galleryStore } from '../../gallery'
 import { getBrushAnimation } from '../brush-transition'
 import { cameraStore } from '../camera/camera-store'
 import { getCatAnimation } from '../cat-transition'
+import { initialBootPhase, transitionInitialBoot } from '../initial-boot'
 import { navigationStore } from '../navigation-store'
 import './Transition.css'
-import { useProgress } from '@react-three/drei'
 
 const d1 =
   'M53.7183 30.0664C22.2812 55.0475 7.52971 68.9601 18.7183 92.5664C53.7183 108.456 75.0002 80.8146 123 49.4564C173.047 16.7613 201 1.45634 232.5 30.0664C250.5 76.4563 180.93 123.461 132 136.066C10.8044 182.088 20.6423 185.967 18.7183 219.566C62.3911 259.673 109.01 220.809 192.218 173.066C240.218 145.526 273.125 109.456 297.218 136.066C321.311 162.677 286 196.859 207 230.456C102.553 274.876 89.908 308.015 94.7183 339.066C119.372 357.748 134.854 341.36 207 297.956C257.954 258.152 300.021 246.801 342.218 266.066C358.476 287.091 372.5 297.956 330.718 315.566L253 339.066'
@@ -89,24 +90,37 @@ export const Transition = () => {
   const setCamera = useStore(cameraStore, (state) => state.setCamera)
   const { progress } = useProgress()
   const opacity = useMotionValue(1)
+  const initialRoomReady = progress === 100 && drawingsReady
+  const [bootPhase, dispatchBoot] = useReducer(
+    transitionInitialBoot,
+    initialBootPhase,
+  )
 
   useEffect(() => {
-    if (progress === 100 && drawingsReady) {
-      let cameraReset = false
-      const intro = animate(opacity, [1, 1, 0], {
-        duration: 6,
-        times: [0, 1 / 6, 1],
-        onUpdate: (latest) => {
-          if (cameraReset || latest === 1) return
+    dispatchBoot({
+      type: 'readinessChanged',
+      ready: initialRoomReady,
+    })
+  }, [initialRoomReady])
 
-          cameraReset = true
-          setCamera('default')
-        },
-      })
+  useEffect(() => {
+    if (bootPhase !== 'running') return
 
-      return () => intro.stop()
-    }
-  }, [drawingsReady, opacity, progress, setCamera])
+    let cameraReset = false
+    const intro = animate(opacity, [1, 1, 0], {
+      duration: 6,
+      times: [0, 1 / 6, 1],
+      onUpdate: (latest) => {
+        if (cameraReset || latest === 1) return
+
+        cameraReset = true
+        setCamera('default')
+      },
+      onComplete: () => dispatchBoot({ type: 'introFinished' }),
+    })
+
+    return () => intro.stop()
+  }, [bootPhase, opacity, setCamera])
 
   return (
     <>
