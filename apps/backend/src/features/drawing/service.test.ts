@@ -18,9 +18,15 @@ class FakeDrawingStorage implements DrawingStorage {
     return this.drawings
   }
 
-  async createUpload(name: string): Promise<{ url: string }> {
+  async createUpload(name: string) {
     this.uploadNames.push(name)
-    return { url: this.uploadUrl }
+    return {
+      url: this.uploadUrl,
+      method: 'POST' as const,
+      fields: { key: 'submissions/test.svg' },
+      expiresAt: '2026-08-11T12:00:00.000Z',
+      maxBytes: 1_000_000,
+    }
   }
 }
 
@@ -76,8 +82,12 @@ test('creates an upload and publishes its URL', async () => {
     {
       connectionId: 'connection-1',
       message: {
-        type: 'upload_url',
+        type: 'upload_grant',
         url: 'https://uploads.example.com/drawing',
+        method: 'POST',
+        fields: { key: 'submissions/test.svg' },
+        expiresAt: '2026-08-11T12:00:00.000Z',
+        maxBytes: 1_000_000,
       },
     },
   ])

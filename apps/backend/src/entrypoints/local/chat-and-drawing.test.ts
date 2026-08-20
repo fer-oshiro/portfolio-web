@@ -83,8 +83,8 @@ describe('local chat and drawing', () => {
     socket.send(
       JSON.stringify({ action: 'save_drawing', name: 'local-test.svg' }),
     )
-    const uploadMessage = await takeMessage(messages, 'upload_url')
-    assert.equal(uploadMessage.type, 'upload_url')
+    const uploadMessage = await takeMessage(messages, 'upload_grant')
+    assert.equal(uploadMessage.type, 'upload_grant')
 
     const upload = await fetch(uploadMessage.url, {
       method: 'PUT',

@@ -82,11 +82,17 @@ export class LocalDrawingStorage implements DrawingStorage {
     this.maxSvgSize = options.maxSvgSize ?? DEFAULT_MAX_SVG_SIZE
   }
 
-  async createUpload(name: string): Promise<{ url: string }> {
+  async createUpload(name: string) {
     const uploadId = randomUUID()
     this.pending.set(uploadId, { id: drawingName(name) })
 
-    return { url: this.urlFor(uploadId) }
+    return {
+      url: this.urlFor(uploadId),
+      method: 'PUT' as const,
+      fields: {},
+      expiresAt: new Date(Date.now() + 300_000).toISOString(),
+      maxBytes: this.maxSvgSize,
+    }
   }
 
   async list(): Promise<Drawing[]> {

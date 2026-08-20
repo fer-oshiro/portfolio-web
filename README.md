@@ -48,9 +48,10 @@ infra/
 └── docker-compose.yml
 ```
 
-O backend gera três artefatos independentes (`signaling`, `chat` e `drawing`)
-a partir do workspace `apps/backend`. A visão completa e o histórico
-do roadmap estão em [`docs/architecture`](./docs/architecture/README.md).
+O backend gera cinco artefatos independentes (`authorizer`, `signaling`,
+`chat`, `drawing` e `cost-guard`) a partir do workspace `apps/backend`. A visão
+completa e o histórico do roadmap estão em
+[`docs/architecture`](./docs/architecture/README.md).
 
 ## Giroscópio
 
@@ -70,7 +71,11 @@ backend S3 e os recursos gerenciados e os seguintes valores locais:
 - `drawings_public_base_url`;
 - `groq_api_key`;
 - `twilio_account_sid`;
-- `twilio_auth_token`.
+- `twilio_auth_token`;
+- `twilio_parent_account_sid`;
+- `twilio_parent_auth_token`;
+- `turnstile_secret_key`;
+- `security_alert_email`.
 
 Não registre secrets no Git. `terraform.tfvars` é ignorado pelo repositório,
 mas continua sendo um arquivo de texto local; prefira um mecanismo seguro para
@@ -93,6 +98,10 @@ há mudanças para revisar e 1 indica erro. `terraform apply` não faz parte do
 build ou do deploy web e só deve ser executado após revisão do plan e
 autorização explícita. O registro da última revisão está em
 [`docs/architecture/06-ui-infraestrutura-deploy.md`](./docs/architecture/06-ui-infraestrutura-deploy.md#revisao-da-sessao-6-da-fase-11).
+
+A ativação completa de Turnstile, limites Groq, subconta/Usage Triggers Twilio,
+SNS e cost allocation tags está no
+[`runbook de proteção de custo`](./docs/operations/public-api-cost-protection.md).
 
 ## Deploy web
 

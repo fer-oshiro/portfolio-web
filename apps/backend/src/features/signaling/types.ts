@@ -13,6 +13,7 @@ export interface Connection {
 }
 
 export interface JoinInput extends Omit<ClientMessageOf<'join'>, 'action'> {
+  beforeTurn?: () => Promise<void>
   connectionId: string
 }
 

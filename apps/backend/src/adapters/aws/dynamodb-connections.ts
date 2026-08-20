@@ -3,7 +3,7 @@ import {
   DynamoDBClient,
   GetItemCommand,
   PutItemCommand,
-  ScanCommand,
+  QueryCommand,
 } from '@aws-sdk/client-dynamodb'
 import type { AttributeValue } from '@aws-sdk/client-dynamodb'
 import {
@@ -48,6 +48,7 @@ export class DynamoDbConnectionRepository implements ConnectionRepository {
   constructor(
     private readonly tableName: string,
     private readonly client: DynamoDBClient,
+    private readonly roomIndexName = 'roomId-index',
   ) {}
 
   async findById(connectionId: string): Promise<Connection | null> {
@@ -63,9 +64,10 @@ export class DynamoDbConnectionRepository implements ConnectionRepository {
 
   async findByRoom(roomId: string): Promise<Connection[]> {
     const result = await this.client.send(
-      new ScanCommand({
+      new QueryCommand({
         TableName: this.tableName,
-        FilterExpression: 'roomId = :roomId',
+        IndexName: this.roomIndexName,
+        KeyConditionExpression: 'roomId = :roomId',
         ExpressionAttributeValues: {
           ':roomId': { S: roomId },
         },
@@ -96,6 +98,7 @@ export class DynamoDbConnectionRepository implements ConnectionRepository {
           deviceType: { S: connection.role },
           roomId: { S: connection.roomId },
           iceServers: { S: JSON.stringify(connection.iceServers) },
+          expiresAt: { N: (Math.floor(Date.now() / 1_000) + 7_200).toString() },
         },
       }),
     )

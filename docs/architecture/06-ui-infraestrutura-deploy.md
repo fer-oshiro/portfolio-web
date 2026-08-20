@@ -72,20 +72,24 @@ Não manter a URL concreta do API Gateway dentro de uma feature.
 
 ## Lambdas
 
-Continuar com:
+O backend produz cinco funções com responsabilidades isoladas:
 
 ```text
+authorizer Lambda
 signaling Lambda
 chat Lambda
 drawing Lambda
+cost-guard Lambda
 ```
 
 Terraform passa a consumir:
 
 ```text
+../../apps/backend/dist/aws/authorizer.zip
 ../../apps/backend/dist/aws/signaling.zip
 ../../apps/backend/dist/aws/chat.zip
 ../../apps/backend/dist/aws/drawing.zip
+../../apps/backend/dist/aws/cost-guard.zip
 ```
 
 Os paths devem ser verificados a partir de `infra/terraform`.
@@ -96,22 +100,37 @@ Substituir a role compartilhada por permissões proporcionais.
 
 ### Signaling
 
-- DynamoDB da tabela de conexões;
+- DynamoDB da tabela/índice de conexões e vínculo de sessão;
+- consumo atômico das quotas de `join`, `signal` e `turn`;
 - `execute-api:ManageConnections`;
 - CloudWatch Logs.
 
 ### Chat
 
 - `execute-api:ManageConnections`;
+- leitura da sessão e consumo atômico da quota de chat;
 - CloudWatch Logs;
-- sem S3 e DynamoDB, salvo necessidade real.
+- sem S3.
 
 ### Drawing
 
 - `execute-api:ManageConnections`;
 - `s3:ListBucket`;
 - `s3:PutObject`;
-- leitura necessária para gallery;
+- leitura da sessão e consumo atômico das quotas de drawing;
+- CloudWatch Logs.
+
+### Authorizer
+
+- criação da sessão no DynamoDB somente após validar Turnstile;
+- CloudWatch Logs;
+- sem acesso a Groq, S3 ou Twilio.
+
+### Cost guard
+
+- deduplicação do callback na tabela de segurança;
+- publicação no tópico SNS;
+- credenciais Twilio da conta principal somente para suspender a subconta;
 - CloudWatch Logs.
 
 ## Variáveis Terraform
@@ -146,10 +165,14 @@ terraform -chdir=infra/terraform apply
 
 - Terraform 1.5 ou superior;
 - credenciais AWS válidas para ler o backend S3 e os recursos gerenciados;
-- `drawings_public_base_url`, `groq_api_key`, `twilio_account_sid` e
-  `twilio_auth_token` fornecidos localmente;
-- os três ZIPs em `apps/backend/dist/aws/`;
+- `drawings_public_base_url`, `groq_api_key`, credenciais da subconta e da conta
+  principal Twilio, `turnstile_secret_key` e `security_alert_email` fornecidos
+  por mecanismo seguro;
+- os cinco ZIPs em `apps/backend/dist/aws/`;
 - revisão humana do plan antes de qualquer `apply`.
+
+O procedimento por plataforma e a ordem de rollout estão no
+[runbook de proteção de custo](../operations/public-api-cost-protection.md).
 
 Arquivos `*.tfvars` são ignorados pelo Git, mas armazenam texto puro. Não
 registrar valores na documentação, não usar `terraform fmt -diff` sobre um

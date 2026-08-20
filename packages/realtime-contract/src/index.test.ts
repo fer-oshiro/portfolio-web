@@ -51,6 +51,32 @@ describe('realtime contract', () => {
     ).toBe(false)
   })
 
+  it('bounds public inputs and validates upload grants', () => {
+    expect(
+      clientMessageSchema.safeParse({
+        action: 'join',
+        roomId: 'x'.repeat(65),
+        role: 'desktop',
+      }).success,
+    ).toBe(false)
+    expect(
+      clientMessageSchema.safeParse({
+        action: 'save_drawing',
+        name: '   ',
+      }).success,
+    ).toBe(false)
+    expect(
+      serverMessageSchema.safeParse({
+        type: 'upload_grant',
+        url: 'https://uploads.example.com',
+        method: 'POST',
+        fields: { key: 'submissions/id.svg' },
+        expiresAt: '2026-08-11T12:00:00.000Z',
+        maxBytes: 1_000_000,
+      }).success,
+    ).toBe(true)
+  })
+
   it('only accepts complete finite gyroscope data', () => {
     expect(
       gyroscopeDataSchema.safeParse({ alpha: 1, beta: 2, gamma: 3 }).success,

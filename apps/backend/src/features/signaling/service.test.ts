@@ -116,14 +116,19 @@ test('gets ICE from the provider when joining an empty room', async () => {
   const publisher = new RecordingPublisher()
   const turn = new FakeTurnProvider(generatedIceServers)
   const service = new SignalingService({ connections, publisher, turn })
+  let beforeTurnCalls = 0
 
   await service.join({
+    beforeTurn: async () => {
+      beforeTurnCalls += 1
+    },
     connectionId: 'desktop-1',
     role: 'desktop',
     roomId: 'room-1',
   })
 
   assert.equal(turn.calls, 1)
+  assert.equal(beforeTurnCalls, 1)
   assert.deepEqual(publisher.messages, [
     {
       connectionId: 'desktop-1',
@@ -134,6 +139,38 @@ test('gets ICE from the provider when joining an empty room', async () => {
       },
     },
   ])
+})
+
+test('rejects mobile-first and duplicate roles without issuing TURN', async () => {
+  const connections = new MemoryConnections()
+  const publisher = new RecordingPublisher()
+  const turn = new FakeTurnProvider(generatedIceServers)
+  const service = new SignalingService({ connections, publisher, turn })
+
+  await service.join({
+    connectionId: 'mobile-1',
+    role: 'mobile',
+    roomId: 'room-1',
+  })
+  connections.connections.set('desktop-1', {
+    connectionId: 'desktop-1',
+    iceServers: storedIceServers,
+    role: 'desktop',
+    roomId: 'room-2',
+  })
+  await service.join({
+    connectionId: 'desktop-2',
+    role: 'desktop',
+    roomId: 'room-2',
+  })
+
+  assert.equal(turn.calls, 0)
+  assert.deepEqual(
+    publisher.messages.map(({ message }) =>
+      message.type === 'error' ? message.code : message.type,
+    ),
+    ['ROOM_NOT_READY', 'ROOM_FULL'],
+  )
 })
 
 test('relays a signal only when source and target share a room', async () => {

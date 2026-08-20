@@ -12,13 +12,13 @@ export const iceServerSchema = z
 
 const sessionDescriptionSchema = z.object({
   type: z.enum(['answer', 'offer', 'pranswer', 'rollback']),
-  sdp: z.string(),
+  sdp: z.string().max(32_768),
 })
 
 const iceCandidateSchema = z.object({
   type: z.literal('candidate'),
   candidate: z.object({
-    candidate: z.string(),
+    candidate: z.string().max(2_048),
     sdpMLineIndex: z.number().nullable().optional(),
     sdpMid: z.string().nullable().optional(),
     usernameFragment: z.string().nullable().optional(),
@@ -31,19 +31,19 @@ export const signalDataSchema = z.union([
 ])
 
 export const peerSchema = z.object({
-  connectionId: z.string().min(1),
+  connectionId: z.string().min(1).max(128),
   role: deviceRoleSchema,
 })
 
 export const clientMessageSchema = z.discriminatedUnion('action', [
   z.object({
     action: z.literal('join'),
-    roomId: z.string().min(1),
+    roomId: z.string().min(1).max(64),
     role: deviceRoleSchema,
   }),
   z.object({
     action: z.literal('signal'),
-    targetConnectionId: z.string().min(1),
+    targetConnectionId: z.string().min(1).max(128),
     signal: signalDataSchema,
   }),
   z.object({
@@ -55,7 +55,7 @@ export const clientMessageSchema = z.discriminatedUnion('action', [
   }),
   z.object({
     action: z.literal('save_drawing'),
-    name: z.string().max(100),
+    name: z.string().trim().min(1).max(60),
   }),
 ])
 
@@ -91,19 +91,31 @@ export const serverMessageSchema = z.discriminatedUnion('type', [
     ),
   }),
   z.object({
+    type: z.literal('upload_grant'),
+    url: z.url(),
+    method: z.enum(['POST', 'PUT']),
+    fields: z.record(z.string(), z.string()),
+    expiresAt: z.iso.datetime(),
+    maxBytes: z.number().int().positive(),
+  }),
+  z.object({
     type: z.literal('upload_url'),
     url: z.url(),
   }),
   z.object({
     type: z.literal('error'),
-    source: z.enum(['chat', 'draw', 'signaling']),
+    source: z.enum(['chat', 'draw', 'security', 'signaling']),
     code: z.enum([
       'INTERNAL_ERROR',
       'INVALID_MESSAGE',
       'INVALID_TARGET',
+      'QUOTA_EXCEEDED',
+      'ROOM_FULL',
       'ROOM_NOT_READY',
+      'SESSION_EXPIRED',
     ]),
     message: z.string(),
+    retryAfterSeconds: z.number().int().nonnegative().optional(),
   }),
 ])
 

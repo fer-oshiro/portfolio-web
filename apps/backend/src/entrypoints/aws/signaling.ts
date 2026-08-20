@@ -5,9 +5,17 @@ import twilio from 'twilio'
 
 import { ApiGatewayMessagePublisher } from '../../adapters/aws/api-gateway-publisher'
 import { DynamoDbConnectionRepository } from '../../adapters/aws/dynamodb-connections'
+import { DynamoDbQuotaRepository } from '../../adapters/aws/dynamodb-quotas'
+import { DynamoDbSessionRepository } from '../../adapters/aws/dynamodb-sessions'
 import { TwilioTurnProvider } from '../../adapters/aws/twilio-turn'
 import { loadSignalingEnvironment } from '../../config/env'
 import { SignalingService } from '../../features/signaling'
+import { SecurityService } from '../../features/security'
+import {
+  getAuthorizerSessionContext,
+  resolveSessionContext,
+  respondToSecurityError,
+} from './security'
 
 const environment = loadSignalingEnvironment()
 const dynamoConfig = environment.development
@@ -28,8 +36,20 @@ const connections = new DynamoDbConnectionRepository(
   environment.tableName,
   new DynamoDBClient(dynamoConfig),
 )
+const sessions = new DynamoDbSessionRepository(
+  environment.quotasTableName,
+  new DynamoDBClient(dynamoConfig),
+)
 const turn = new TwilioTurnProvider(
   twilio(environment.twilioAccountSid, environment.twilioAuthToken),
+  environment.turnCredentialTtlSeconds,
+)
+const security = new SecurityService(
+  new DynamoDbQuotaRepository(
+    environment.quotasTableName,
+    new DynamoDBClient(dynamoConfig),
+  ),
+  environment.quotaLimits,
 )
 
 export const handler: APIGatewayProxyWebsocketHandlerV2 = async (event) => {
@@ -39,11 +59,18 @@ export const handler: APIGatewayProxyWebsocketHandlerV2 = async (event) => {
 
   try {
     if (routeKey === '$connect') {
+      await sessions.bindConnection(
+        connectionId,
+        getAuthorizerSessionContext(event),
+      )
       return { statusCode: 200, body: 'Connected' }
     }
 
     if (routeKey === '$disconnect') {
-      await signaling.disconnect(connectionId)
+      await Promise.all([
+        signaling.disconnect(connectionId),
+        sessions.removeConnection(connectionId),
+      ])
       return { statusCode: 200, body: 'Disconnected' }
     }
 
@@ -65,7 +92,19 @@ export const handler: APIGatewayProxyWebsocketHandlerV2 = async (event) => {
     }
 
     if (parsed.data.action === 'join') {
+      const session = await resolveSessionContext(event, sessions)
+      await security.consume({
+        action: 'join',
+        requestId: event.requestContext.requestId,
+        session,
+      })
       await signaling.join({
+        beforeTurn: () =>
+          security.consume({
+            action: 'turn',
+            requestId: event.requestContext.requestId,
+            session,
+          }),
         connectionId,
         role: parsed.data.role,
         roomId: parsed.data.roomId,
@@ -74,6 +113,11 @@ export const handler: APIGatewayProxyWebsocketHandlerV2 = async (event) => {
     }
 
     if (parsed.data.action === 'signal') {
+      await security.consume({
+        action: 'signal',
+        requestId: event.requestContext.requestId,
+        session: await resolveSessionContext(event, sessions),
+      })
       await signaling.signal({
         connectionId,
         signal: parsed.data.signal,
@@ -85,6 +129,14 @@ export const handler: APIGatewayProxyWebsocketHandlerV2 = async (event) => {
     return { statusCode: 400, body: 'Unknown route' }
   } catch (error) {
     console.error('WebSocket signaling error:', error)
+
+    const securityResponse = await respondToSecurityError(
+      error,
+      connectionId,
+      publisher,
+    )
+    if (securityResponse) return securityResponse
+
     await publisher.send(connectionId, {
       type: 'error',
       source: 'signaling',

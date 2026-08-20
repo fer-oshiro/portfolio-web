@@ -33,9 +33,9 @@ resource "aws_s3_bucket_cors_configuration" "portfolio_bucket" {
   bucket = aws_s3_bucket.portfolio_bucket.id
 
   cors_rule {
-    allowed_origins = ["*"]
-    allowed_methods = ["PUT", "POST", "GET", "HEAD"]
-    allowed_headers = ["*"]
+    allowed_origins = ["https://fer-oshiro.com"]
+    allowed_methods = ["POST"]
+    allowed_headers = ["content-type"]
     expose_headers  = ["ETag"]
     max_age_seconds = 3000
   }

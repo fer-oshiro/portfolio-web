@@ -17,6 +17,7 @@ function getWebSocketUrl({ isProduction, environment = process.env }) {
 module.exports = (_, argv) => {
   const isProd = argv.mode === 'production'
   const websocketUrl = getWebSocketUrl({ isProduction: isProd })
+  const turnstileSiteKey = process.env.TURNSTILE_SITE_KEY ?? ''
 
   return {
     output: {
@@ -106,6 +107,7 @@ module.exports = (_, argv) => {
       }),
       new DefinePlugin({
         __WEBSOCKET_URL__: JSON.stringify(websocketUrl),
+        __TURNSTILE_SITE_KEY__: JSON.stringify(turnstileSiteKey),
       }),
       new ModuleFederationPlugin({
         name: 'home',

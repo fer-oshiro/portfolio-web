@@ -1,11 +1,16 @@
 import { clientMessageSchema } from '@fer-oshiro/realtime-contract'
+import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 import { S3Client } from '@aws-sdk/client-s3'
 import type { APIGatewayProxyWebsocketHandlerV2 } from 'aws-lambda'
 
 import { ApiGatewayMessagePublisher } from '../../adapters/aws/api-gateway-publisher'
+import { DynamoDbQuotaRepository } from '../../adapters/aws/dynamodb-quotas'
+import { DynamoDbSessionRepository } from '../../adapters/aws/dynamodb-sessions'
 import { S3DrawingStorage } from '../../adapters/aws/s3-drawings'
 import { loadDrawingEnvironment } from '../../config/env'
 import { DrawingService } from '../../features/drawing'
+import { SecurityService } from '../../features/security'
+import { resolveSessionContext, respondToSecurityError } from './security'
 
 // ---- Main Handler ----
 
@@ -14,8 +19,21 @@ const storage = new S3DrawingStorage(
   new S3Client({ region: environment.awsRegion }),
   {
     bucket: environment.drawingsBucket,
+    maxUploadBytes: environment.maxUploadBytes,
     publicBaseUrl: environment.drawingsPublicBaseUrl,
+    uploadExpiresInSeconds: environment.uploadExpiresInSeconds,
   },
+)
+const security = new SecurityService(
+  new DynamoDbQuotaRepository(
+    environment.quotasTableName,
+    new DynamoDBClient({ region: environment.awsRegion }),
+  ),
+  environment.quotaLimits,
+)
+const sessions = new DynamoDbSessionRepository(
+  environment.quotasTableName,
+  new DynamoDBClient({ region: environment.awsRegion }),
 )
 
 export const handler: APIGatewayProxyWebsocketHandlerV2 = async (event) => {
@@ -26,6 +44,11 @@ export const handler: APIGatewayProxyWebsocketHandlerV2 = async (event) => {
   try {
     switch (routeKey) {
       case 'get_drawings':
+        await security.consume({
+          action: 'get_drawings',
+          requestId: event.requestContext.requestId,
+          session: await resolveSessionContext(event, sessions),
+        })
         await drawing.list(connectionId)
         break
       case 'save_drawing': {
@@ -35,6 +58,11 @@ export const handler: APIGatewayProxyWebsocketHandlerV2 = async (event) => {
           throw new Error('Invalid drawing message')
         }
 
+        await security.consume({
+          action: 'save_drawing',
+          requestId: event.requestContext.requestId,
+          session: await resolveSessionContext(event, sessions),
+        })
         await drawing.createUpload(connectionId, parsed.data.name)
         break
       }
@@ -46,6 +74,13 @@ export const handler: APIGatewayProxyWebsocketHandlerV2 = async (event) => {
     return { statusCode: 200 }
   } catch (err) {
     console.error(`[${routeKey}] error:`, err)
+
+    const securityResponse = await respondToSecurityError(
+      err,
+      connectionId,
+      publisher,
+    )
+    if (securityResponse) return securityResponse
 
     await publisher.send(connectionId, {
       type: 'error',

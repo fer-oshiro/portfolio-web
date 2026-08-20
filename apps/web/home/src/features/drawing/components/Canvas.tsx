@@ -1,4 +1,5 @@
 import { PointerEvent, useEffect, useRef, useState } from 'react'
+import type { ServerMessageOf } from '@fer-oshiro/realtime-contract'
 import getStroke, { Vec2 } from 'perfect-freehand'
 import { ReadyState } from 'react-use-websocket'
 
@@ -85,7 +86,7 @@ export function Canvas() {
   const handleSubmit = () => {
     if (readyState !== ReadyState.OPEN) return
     setStatus('loading')
-    send({ action: 'save_drawing', name: name.slice(0, 100) })
+    send({ action: 'save_drawing', name: name.slice(0, 60) })
   }
 
   const exportSVG = () => {
@@ -96,20 +97,33 @@ export function Canvas() {
     return svgStr
   }
 
-  const uploadToS3 = async (presignedUrl: string) => {
+  const uploadDrawing = async (grant: ServerMessageOf<'upload_grant'>) => {
     try {
       const svgStr = exportSVG()
-      if (!svgStr || !presignedUrl) return
+      if (!svgStr || !grant.url) return
 
       const blob = new Blob([svgStr], { type: 'image/svg+xml' })
+      if (blob.size > grant.maxBytes) {
+        throw new Error('O desenho excede o limite permitido.')
+      }
 
-      await fetch(presignedUrl, {
-        method: 'PUT',
-        body: blob,
-        headers: {
-          'Content-Type': 'image/svg+xml',
-        },
-      })
+      let response: Response
+      if (grant.method === 'POST') {
+        const form = new FormData()
+        for (const [field, value] of Object.entries(grant.fields)) {
+          form.append(field, value)
+        }
+        form.append('file', blob, 'drawing.svg')
+        response = await fetch(grant.url, { method: 'POST', body: form })
+      } else {
+        response = await fetch(grant.url, {
+          method: 'PUT',
+          body: blob,
+          headers: { 'Content-Type': 'image/svg+xml' },
+        })
+      }
+
+      if (!response.ok) throw new Error(`Upload falhou: ${response.status}`)
       setStatus('okay')
     } catch (e) {
       console.error(e)
@@ -135,7 +149,17 @@ export function Canvas() {
     return () => window.removeEventListener('resize', updateSize)
   }, [])
 
-  useRealtimeMessage('upload_url', ({ url }) => uploadToS3(url))
+  useRealtimeMessage('upload_grant', (grant) => uploadDrawing(grant))
+  useRealtimeMessage('upload_url', ({ url }) =>
+    uploadDrawing({
+      type: 'upload_grant',
+      url,
+      method: 'PUT',
+      fields: {},
+      expiresAt: new Date().toISOString(),
+      maxBytes: Number.MAX_SAFE_INTEGER,
+    }),
+  )
   useRealtimeMessage('error', ({ source }) => {
     if (source === 'draw') setStatus('error')
   })

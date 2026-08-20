@@ -20,6 +20,27 @@ export class SignalingService {
     const peers = (await connections.findByRoom(input.roomId)).filter(
       ({ connectionId }) => connectionId !== input.connectionId,
     )
+    if (peers.some(({ role }) => role === input.role) || peers.length >= 2) {
+      await publisher.send(input.connectionId, {
+        type: 'error',
+        source: 'signaling',
+        code: 'ROOM_FULL',
+        message: 'Esta sala já possui um dispositivo com o mesmo papel.',
+      })
+      return
+    }
+
+    if (peers.length === 0 && input.role === 'mobile') {
+      await publisher.send(input.connectionId, {
+        type: 'error',
+        source: 'signaling',
+        code: 'ROOM_NOT_READY',
+        message: 'A sala ainda não está disponível.',
+      })
+      return
+    }
+
+    if (peers.length === 0) await input.beforeTurn?.()
     const iceServers = peers.at(0)?.iceServers ?? (await turn.getIceServers())
 
     await connections.save({

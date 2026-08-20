@@ -14,6 +14,7 @@ Comece pela visão geral e use o roadmap de execução como checklist.
 7. [Estratégia leve de qualidade](./07-qualidade.md)
 8. [Roadmap de execução e effort recomendado](./08-roadmap-de-execucao.md)
 9. [Decisões em aberto e definição de pronto](./09-decisoes-e-pronto.md)
+10. [Runbook de proteção de custo das APIs públicas](../operations/public-api-cost-protection.md)
 
 ## Visão rápida
 

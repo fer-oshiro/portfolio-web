@@ -13,11 +13,11 @@ export class DrawingService {
   }
 
   async createUpload(connectionId: string, name: string): Promise<void> {
-    const { url } = await this.dependencies.storage.createUpload(name)
+    const grant = await this.dependencies.storage.createUpload(name)
 
     await this.dependencies.publisher.send(connectionId, {
-      type: 'upload_url',
-      url,
+      type: 'upload_grant',
+      ...grant,
     })
   }
 }

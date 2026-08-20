@@ -1,17 +1,20 @@
-import {
-  ListObjectsV2Command,
-  PutObjectCommand,
-  type S3Client,
-} from '@aws-sdk/client-s3'
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
+import { randomUUID } from 'node:crypto'
+
+import { ListObjectsV2Command, type S3Client } from '@aws-sdk/client-s3'
+import { createPresignedPost } from '@aws-sdk/s3-presigned-post'
 import type { Drawing } from '@fer-oshiro/realtime-contract'
 
 import type { DrawingStorage } from '../../features/drawing'
 
 interface S3DrawingStorageOptions {
   bucket: string
+  maxUploadBytes?: number
   publicBaseUrl: string
+  uploadExpiresInSeconds?: number
 }
+
+const DEFAULT_MAX_UPLOAD_BYTES = 1_000_000
+const DEFAULT_UPLOAD_EXPIRES_IN_SECONDS = 300
 
 const getNameFromKey = (key?: string) => {
   if (!key) return ''
@@ -43,14 +46,32 @@ export class S3DrawingStorage implements DrawingStorage {
       .filter((item) => item.id)
   }
 
-  async createUpload(name: string): Promise<{ url: string }> {
-    const command = new PutObjectCommand({
+  async createUpload(name: string) {
+    const maxBytes = this.options.maxUploadBytes ?? DEFAULT_MAX_UPLOAD_BYTES
+    const expiresIn =
+      this.options.uploadExpiresInSeconds ?? DEFAULT_UPLOAD_EXPIRES_IN_SECONDS
+    const key = `submissions/${randomUUID()}.svg`
+    const fields = {
+      'Content-Type': 'image/svg+xml',
+      'x-amz-meta-drawing-name': name,
+    }
+    const grant = await createPresignedPost(this.client, {
       Bucket: this.options.bucket,
-      Key: `submissions/${Date.now()}-${name}`,
-      ContentType: 'image/svg+xml',
+      Key: key,
+      Expires: expiresIn,
+      Fields: fields,
+      Conditions: [
+        ['content-length-range', 1, maxBytes],
+        { 'Content-Type': 'image/svg+xml' },
+        { 'x-amz-meta-drawing-name': name },
+      ],
     })
-    const url = await getSignedUrl(this.client, command, { expiresIn: 3600 })
 
-    return { url }
+    return {
+      ...grant,
+      method: 'POST' as const,
+      expiresAt: new Date(Date.now() + expiresIn * 1_000).toISOString(),
+      maxBytes,
+    }
   }
 }
