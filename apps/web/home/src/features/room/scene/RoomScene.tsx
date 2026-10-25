@@ -1,10 +1,11 @@
 import { useGLTF, useTexture } from '@react-three/drei'
 import { useControls } from 'leva'
+import { useRef } from 'react'
 import * as THREE from 'three'
 
 import {
-  CameraController,
   InteractionManager,
+  SceneRoot,
   type RoomHotspot,
 } from '../../scene-navigation'
 import { Board } from '../components/Board/Board'
@@ -15,11 +16,16 @@ import roomUrl from '../assets/models/room.glb'
 import roomBaked from '../assets/models/room.png'
 
 type RoomMeshProps = {
+  active: boolean
   onHotspotActivated: (hotspot: RoomHotspot) => void
   onVideoRequested: () => void
 }
 
-function RoomMesh({ onHotspotActivated, onVideoRequested }: RoomMeshProps) {
+function RoomMesh({
+  active,
+  onHotspotActivated,
+  onVideoRequested,
+}: RoomMeshProps) {
   const { nodes } = useGLTF(roomUrl)
   const roomNodes = nodes as Record<
     | 'Cube'
@@ -87,7 +93,11 @@ function RoomMesh({ onHotspotActivated, onVideoRequested }: RoomMeshProps) {
           <boxGeometry args={[1, 1]} />
           <meshBasicMaterial color="red" wireframe />
         </mesh>
-        <SakuraStar loc="cat" onActivate={() => onHotspotActivated('cat')} />
+        <SakuraStar
+          loc="cat"
+          active={active}
+          onActivate={() => onHotspotActivated('cat')}
+        />
       </group>
 
       <mesh geometry={roomNodes.screen.geometry}>
@@ -107,12 +117,16 @@ function RoomMesh({ onHotspotActivated, onVideoRequested }: RoomMeshProps) {
           <boxGeometry args={[1, 1]} />
           <meshBasicMaterial color="red" wireframe />
         </mesh>
-        <SakuraStar loc="pc" onActivate={() => onHotspotActivated('pc')} />
+        <SakuraStar
+          loc="pc"
+          active={active}
+          onActivate={() => onHotspotActivated('pc')}
+        />
       </group>
 
       <mesh geometry={roomNodes.board.geometry}>
         <meshBasicMaterial map={bakedTexture} />
-        <Board onVideoRequested={onVideoRequested} />
+        <Board active={active} onVideoRequested={onVideoRequested} />
       </mesh>
       <group position={board}>
         <mesh
@@ -129,6 +143,7 @@ function RoomMesh({ onHotspotActivated, onVideoRequested }: RoomMeshProps) {
         </mesh>
         <SakuraStar
           loc="board"
+          active={active}
           onActivate={() => onHotspotActivated('board')}
         />
       </group>
@@ -146,27 +161,42 @@ function RoomMesh({ onHotspotActivated, onVideoRequested }: RoomMeshProps) {
           <boxGeometry args={[1, 1]} />
           <meshBasicMaterial color="red" wireframe />
         </mesh>
-        <SakuraStar loc="draw" onActivate={() => onHotspotActivated('draw')} />
+        <SakuraStar
+          loc="draw"
+          active={active}
+          onActivate={() => onHotspotActivated('draw')}
+        />
       </group>
     </group>
   )
 }
 
 export function RoomScene({
+  active,
   onHotspotActivated,
   onVideoRequested,
 }: RoomMeshProps) {
+  const rootRef = useRef<THREE.Group>(null)
+
   return (
     <>
-      <CameraController />
-      <InteractionManager onFocus={(obj) => {}} />
+      {/* Attached to the shared scene, so it must leave with the room. */}
+      {active && <color attach="background" args={['#996754']} />}
 
-      <color attach="background" args={['#996754']} />
-      <directionalLight position={[10, 10, 5]} intensity={15} />
-      <RoomMesh
-        onHotspotActivated={onHotspotActivated}
-        onVideoRequested={onVideoRequested}
-      />
+      <SceneRoot ref={rootRef} active={active}>
+        <InteractionManager
+          root={rootRef}
+          active={active}
+          onFocus={(obj) => {}}
+        />
+
+        <directionalLight position={[10, 10, 5]} intensity={15} />
+        <RoomMesh
+          active={active}
+          onHotspotActivated={onHotspotActivated}
+          onVideoRequested={onVideoRequested}
+        />
+      </SceneRoot>
     </>
   )
 }

@@ -12,12 +12,14 @@ function SakuraStar({
   color = '#FFB7C5',
   size = 0.15,
   loc,
+  active,
   onActivate,
 }: {
   position?: [number, number, number]
   color?: string
   size?: number
   loc: CameraCoords
+  active: boolean
   onActivate: () => void
 }) {
   const progress = useRef(0)
@@ -59,6 +61,8 @@ function SakuraStar({
 
   // Animação de flutuar + girar
   useFrame((state, delta) => {
+    if (!active) return
+
     if (ref.current && torusRef.current) {
       ref.current.rotation.z += 0.01
       torusRef.current.rotation.z += Math.max(progress.current, 0.1) * 0.2

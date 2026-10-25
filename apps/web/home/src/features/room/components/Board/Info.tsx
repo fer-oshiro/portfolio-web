@@ -39,7 +39,9 @@ function useSpaceGradient() {
   }, [])
 }
 
-export function Info({ onVideoRequested }: InfoProps) {
+const noRaycast = () => {}
+
+export function Info({ active, onVideoRequested }: InfoProps) {
   const gradientTexture = useSpaceGradient()
   const foto = useTexture(eu)
   const ytTexture = useTexture(yt)
@@ -86,7 +88,13 @@ export function Info({ onVideoRequested }: InfoProps) {
   })
 
   return (
-    <mesh position={position} rotation={rotation}>
+    <mesh
+      position={position}
+      rotation={rotation}
+      // The portal content lives in its own scene, outside the room's scene
+      // root. The portal only raycasts after hitting this host mesh.
+      raycast={active ? THREE.Mesh.prototype.raycast : noRaycast}
+    >
       <planeGeometry args={[0.4, 1]} />
       <MeshPortalMaterial resolution={512} blur={0}>
         <ambientLight intensity={4} />
@@ -180,5 +188,6 @@ export function Info({ onVideoRequested }: InfoProps) {
 }
 
 interface InfoProps {
+  active: boolean
   onVideoRequested: () => void
 }
