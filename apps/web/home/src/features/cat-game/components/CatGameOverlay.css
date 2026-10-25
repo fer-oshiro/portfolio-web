@@ -1,0 +1,13 @@
+.cat-game-overlay {
+  position: absolute;
+  /*
+   * Drei's Html lived inside the Canvas wrapper (z-index 1), so the buttons
+   * sat above the scene but below the boot overlay and transitions. Rendered
+   * after the Canvas, the same z-index keeps that order.
+   */
+  z-index: 1;
+  top: 50%;
+  left: 50%;
+  /* Drei's Html content shrinks to min-content, so the buttons stack. */
+  width: min-content;
+}

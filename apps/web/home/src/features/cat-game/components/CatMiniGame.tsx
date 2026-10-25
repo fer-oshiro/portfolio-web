@@ -1,6 +1,7 @@
 import { Canvas } from '@react-three/fiber'
 
-import { Game } from './Game'
+import { CatScene } from '../scene/CatScene'
+import { CatGameOverlay } from './CatGameOverlay'
 
 export const CatMiniGame = ({ show }: { show: boolean }) => {
   return (
@@ -9,6 +10,7 @@ export const CatMiniGame = ({ show }: { show: boolean }) => {
         width: '100vw',
         height: '100vh',
         display: show ? 'block' : 'none',
+        position: 'relative',
       }}
     >
       <Canvas
@@ -16,8 +18,9 @@ export const CatMiniGame = ({ show }: { show: boolean }) => {
           zIndex: 1,
         }}
       >
-        <Game />
+        <CatScene />
       </Canvas>
+      <CatGameOverlay />
     </div>
   )
 }
