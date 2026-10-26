@@ -62,7 +62,7 @@ export const Home = () => {
               </div>
               {CatOverlay && (
                 <div hidden={currentScene !== 'cat'}>
-                  <CatOverlay />
+                  <CatOverlay active={currentScene === 'cat'} />
                 </div>
               )}
             </>

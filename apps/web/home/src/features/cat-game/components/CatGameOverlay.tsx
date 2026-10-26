@@ -1,56 +1,59 @@
-import { useRef } from 'react'
-import * as Tone from 'tone'
+import { useEffect, useRef } from 'react'
 
 import { useSceneController } from '../../scene-navigation'
 import glass from '../assets/glass.mp3'
 import pawn from '../assets/pawn_the-grey-room_golden-palms.mp3'
 import wood from '../assets/wood.mp3'
+import {
+  createCatAudioController,
+  type CatAudioController,
+} from '../audio/cat-audio-controller'
+import { catGameStore } from '../cat-game-store'
 
 import './CatGameOverlay.css'
 
-export const CatGameOverlay = () => {
+type CatGameOverlayProps = {
+  active: boolean
+}
+
+export const CatGameOverlay = ({ active }: CatGameOverlayProps) => {
   const { navigateTo } = useSceneController()
-  const musicRef = useRef<Tone.Player>(null)
-  const woodRef = useRef(new Audio(wood))
-  const glassRef = useRef(new Audio(glass))
+  const audioRef = useRef<CatAudioController | null>(null)
 
-  const start = async () => {
-    await Tone.start()
+  // Created in the effect so a remount or Strict Mode replay disposes the
+  // previous controller instead of leaking it.
+  useEffect(() => {
+    const audio = createCatAudioController({
+      musicUrl: pawn,
+      effectUrls: { glass, wood },
+      effectsVolume: () => catGameStore.getState().effectsVolume,
+      onMusicStatusChange: catGameStore.getState().setMusicStatus,
+    })
+    audioRef.current = audio
 
-    musicRef.current = new Tone.Player({
-      url: pawn,
-      onload: () => {
-        console.log('Música carregada com sucesso!')
-      },
-      autostart: true,
-    }).toDestination()
-
-    Tone.Transport.bpm.value = 120
-    Tone.Transport.start()
-  }
-
-  const stop = () => {
-    musicRef.current?.stop()
-    Tone.Transport.stop()
-  }
-
-  const soundEffect = (type: 'wood' | 'glass') => {
-    const audio = type === 'wood' ? woodRef.current : glassRef.current
-    if (audio.paused) {
-      audio.volume = 0.7
-      audio.play()
-    } else {
-      audio.pause()
+    return () => {
+      audio.dispose()
+      audioRef.current = null
     }
-  }
+  }, [])
+
+  useEffect(() => {
+    if (!active) audioRef.current?.stopAll()
+  }, [active])
 
   return (
     <div className="cat-game-overlay">
       <div>
-        <button onClick={() => soundEffect('glass')}>Play Glass</button>
-        <button onClick={() => soundEffect('wood')}>Play Wood</button>
-        <button onClick={start}>Play Song</button>
-        <button onClick={stop}>Stop Song</button>
+        <button onClick={() => audioRef.current?.toggleEffect('glass')}>
+          Play Glass
+        </button>
+        <button onClick={() => audioRef.current?.toggleEffect('wood')}>
+          Play Wood
+        </button>
+        <button onClick={() => void audioRef.current?.playMusic()}>
+          Play Song
+        </button>
+        <button onClick={() => audioRef.current?.stopMusic()}>Stop Song</button>
         <button onClick={() => navigateTo('room')}>Voltar</button>
       </div>
     </div>

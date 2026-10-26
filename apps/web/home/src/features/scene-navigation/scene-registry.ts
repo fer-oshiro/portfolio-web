@@ -2,7 +2,7 @@ import type { ComponentType } from 'react'
 
 export type SceneModule = {
   Scene: ComponentType<{ active: boolean }>
-  Overlay?: ComponentType
+  Overlay?: ComponentType<{ active: boolean }>
 }
 
 export type SceneLoadStatus = 'not-requested' | 'loading' | 'loaded' | 'failed'
