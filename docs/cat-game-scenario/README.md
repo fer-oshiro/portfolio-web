@@ -969,6 +969,38 @@ dispositivo de referência.
 **Commit sugerido:** usar um commit por categoria, por exemplo
 `perf(home): compress room texture`.
 
+#### Resultado registrado em 2026-10-26
+
+Mesmo ambiente da Fase 0: dev server do Home, Chrome headless, `1440 × 900`,
+cache vazio. Como o Turnstile não passa em headless, a chegada dos desenhos
+foi simulada pelo `galleryStore` para o boot concluir.
+
+| Categoria            | Antes                        | Depois                           | Decisão                                  |
+| -------------------- | ---------------------------- | -------------------------------- | ---------------------------------------- |
+| Textura da sala      | `room.png`, 4096², 11,02 MiB | `room.webp`, 4096², q90, 108 KiB | substituída após aprovação visual        |
+| Modelo/texturas gato | não existem                  | —                                | avaliar na Fase 8                        |
+| Efeitos sonoros      | 2 × 49 KiB, MP3 320 kbps     | sem mudança                      | já pequenos e carregados só no clique    |
+| Música opcional      | 7,08 MiB, MP3 320 kbps       | sem mudança                      | fora do caminho crítico, só no Play Song |
+| Chunk JS do gato     | junto do Home (Fase 4)       | 8 KiB; Tone 228 KiB sob demanda  | resolvido nas Fases 5 e 6                |
+
+Textura da sala: o canal alfa era totalmente opaco e foi descartado. A versão
+escolhida tem PSNR de 48,5 dB no espaço da textura e, renderizada nas poses
+`default`, `pc`, `board`, `cat` e `draw` em desktop e mobile emulado, ficou
+dentro do ruído das animações. O decode caiu de ~100 ms para ~53 ms. Versões
+2048 decodificaram em ~15 ms, mas perderam nitidez no mobile.
+
+Budgets confirmados:
+
+| Recurso                                    |       Limite |                     Medido |
+| ------------------------------------------ | -----------: | -------------------------: |
+| Maior textura individual                   |         2 MB |                    108 KiB |
+| Corpo transferido no boot, recursos locais |            — | 2,11 MiB (antes 13,41 MiB) |
+| Chunk do gato no preload                   |            — |                      8 KiB |
+| Música opcional                            | fora do boot |  carregada só no Play Song |
+
+Os arquivos `baked.png`, `board.png` e `board.glb` em `room/assets/models` não
+têm consumidores e não entram no build; a remoção fica como tarefa separada.
+
 ### Fase 8 — Construir o novo cenário
 
 **Effort recomendado:** `medium`; usar `high` se gameplay, física ou shaders
