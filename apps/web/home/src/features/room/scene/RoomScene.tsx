@@ -13,7 +13,7 @@ import { Computer } from '../components/Computer/Computer'
 import SakuraStar from '../components/SakuraStar'
 
 import roomUrl from '../assets/models/room.glb'
-import roomBaked from '../assets/models/room.png'
+import roomBaked from '../assets/models/room.webp'
 
 type RoomMeshProps = {
   active: boolean

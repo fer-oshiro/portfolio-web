@@ -60,7 +60,7 @@ module.exports = (_, argv) => {
             fullySpecified: false,
           },
         },
-        { test: /\.(glb|gltf|bin|png|mp3)$/i, type: 'asset/resource' },
+        { test: /\.(glb|gltf|bin|png|webp|mp3)$/i, type: 'asset/resource' },
         {
           test: /\.(css|s[ac]ss)$/i,
           use: [
