@@ -85,7 +85,43 @@ const BrushTransition = () => {
   )
 }
 
-export const Transition = () => {
+// Visual-only threshold: a covered wait longer than this shows a hint.
+const COVERED_NOTICE_DELAY_S = 0.8
+
+const CoveredNotice = () => {
+  const covered = useStore(
+    navigationStore,
+    (state) => state.phase === 'covered',
+  )
+
+  return (
+    <motion.p
+      role="status"
+      style={{
+        position: 'fixed',
+        bottom: '40px',
+        left: '50%',
+        x: '-50%',
+        padding: '8px 16px',
+        borderRadius: '20px',
+        backgroundColor: '#e6b092',
+        zIndex: 100000,
+        pointerEvents: 'none',
+      }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: covered ? 1 : 0 }}
+      transition={{ delay: covered ? COVERED_NOTICE_DELAY_S : 0 }}
+    >
+      Carregando…
+    </motion.p>
+  )
+}
+
+type TransitionProps = {
+  onBootFinished?: () => void
+}
+
+export const Transition = ({ onBootFinished }: TransitionProps) => {
   const drawingsReady = useStore(galleryStore, (state) => state.drawingsReady)
   const setCamera = useStore(cameraStore, (state) => state.setCamera)
   const { progress } = useProgress()
@@ -122,6 +158,10 @@ export const Transition = () => {
     return () => intro.stop()
   }, [bootPhase, opacity, setCamera])
 
+  useEffect(() => {
+    if (bootPhase === 'done') onBootFinished?.()
+  }, [bootPhase, onBootFinished])
+
   return (
     <>
       <motion.div
@@ -139,6 +179,7 @@ export const Transition = () => {
       />
       <CatTransition />
       <BrushTransition />
+      <CoveredNotice />
     </>
   )
 }

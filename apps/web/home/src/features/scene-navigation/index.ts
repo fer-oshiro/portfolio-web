@@ -16,9 +16,20 @@ export { getCatAnimation } from './cat-transition'
 export type { CatAnimation } from './cat-transition'
 export { CameraToDefault } from './components/CameraToDefault'
 export { InteractionManager } from './components/InteractionManager'
+export { LazyScene, useSceneModule } from './components/LazyScene'
+export { SceneFailureNotice } from './components/SceneFailureNotice'
+export { SceneReady } from './components/SceneReady'
 export { SceneRoot } from './components/SceneRoot'
 export { SceneViewport } from './components/SceneViewport'
 export { Transition } from './components/Transition'
+export { createSceneRegistry, shouldRequestScene } from './scene-registry'
+export type {
+  SceneEntry,
+  SceneLoadStatus,
+  SceneModule,
+  SceneRegistry,
+} from './scene-registry'
+export { useScenePreload } from './use-scene-preload'
 export { SceneController, useSceneController } from './scene-controller'
 export { resolveSceneControllerIntent } from './scene-controller-model'
 export type {

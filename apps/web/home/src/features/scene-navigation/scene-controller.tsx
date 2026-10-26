@@ -13,7 +13,7 @@ import {
   type RoomHotspot,
   type SceneControllerIntent,
 } from './scene-controller-model'
-import type { ActiveTransitionEffect, Scene } from './navigation-types'
+import type { Scene } from './navigation-types'
 
 type SceneControllerValue = {
   activateHotspot: (hotspot: RoomHotspot) => void
@@ -22,25 +22,6 @@ type SceneControllerValue = {
 }
 
 const SceneControllerContext = createContext<SceneControllerValue | null>(null)
-
-function navigateToEagerScene(
-  targetScene: Scene,
-  effect: ActiveTransitionEffect,
-) {
-  navigationStore.getState().navigate(targetScene, effect)
-
-  const navigation = navigationStore.getState()
-
-  // Temporary Phase 1 bridge: every current scene is already mounted eagerly.
-  // Phase 5 must replace this with readiness emitted by the scene runtime.
-  if (
-    navigation.phase === 'covering' &&
-    navigation.targetScene === targetScene &&
-    navigation.targetStatus === 'loading'
-  ) {
-    navigation.sceneReady(targetScene)
-  }
-}
 
 export function SceneController({ children }: PropsWithChildren) {
   const dispatch = useCallback((intent: SceneControllerIntent) => {
@@ -59,7 +40,7 @@ export function SceneController({ children }: PropsWithChildren) {
       if (command.type === 'focusCamera') {
         cameraStore.getState().setCamera(command.focus)
       } else {
-        navigateToEagerScene(command.targetScene, command.effect)
+        navigationStore.getState().navigate(command.targetScene, command.effect)
       }
     }
   }, [])

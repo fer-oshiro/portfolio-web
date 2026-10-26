@@ -30,7 +30,7 @@ describe('SceneController', () => {
     ['draw', 'brush'],
     ['cat', 'cat'],
   ] as const)(
-    'mantém room → %s → room executável com a ponte eager',
+    'deixa a prontidão de room → %s → room para o runtime das cenas',
     (targetScene: Scene, effect: ActiveTransitionEffect) => {
       controller?.navigateTo(targetScene)
 
@@ -39,10 +39,13 @@ describe('SceneController', () => {
         targetScene,
         phase: 'covering',
         effect,
-        targetStatus: 'ready',
+        targetStatus: 'loading',
       })
 
       navigationStore.getState().coverFinished()
+      expect(navigationStore.getState()).toMatchObject({ phase: 'covered' })
+
+      navigationStore.getState().sceneReady(targetScene)
       navigationStore.getState().revealFinished()
       controller?.navigateTo('room')
 
@@ -51,9 +54,10 @@ describe('SceneController', () => {
         targetScene: 'room',
         phase: 'covering',
         effect,
-        targetStatus: 'ready',
+        targetStatus: 'loading',
       })
 
+      navigationStore.getState().sceneReady('room')
       navigationStore.getState().coverFinished()
       navigationStore.getState().revealFinished()
 
