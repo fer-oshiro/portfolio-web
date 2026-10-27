@@ -1,6 +1,6 @@
 import { Button } from '@fer-oshiro/ui'
 import { motion } from 'motion/react'
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { ReadyState } from 'react-use-websocket'
 import { useStore } from 'zustand'
 
@@ -43,6 +43,21 @@ export const WebSocket = () => {
     handleGyro,
     handleConnectionStateChange,
   )
+
+  useEffect(() => {
+    if (!isOpen) return
+
+    // Capture phase runs before the scene "Voltar" Escape listeners, so the
+    // modal closes without also navigating back
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return
+      event.stopPropagation()
+      setIsOpen(false)
+    }
+
+    window.addEventListener('keydown', handleKeyDown, true)
+    return () => window.removeEventListener('keydown', handleKeyDown, true)
+  }, [isOpen])
 
   return (
     <div className="connection-panel-layer">

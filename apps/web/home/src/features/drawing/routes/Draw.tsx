@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { useSceneController } from '../../scene-navigation'
 import { Canvas } from '../components/Canvas'
 
@@ -5,6 +6,28 @@ import './Draw.css'
 
 function Draw({ show }: { show: boolean }) {
   const { navigateTo } = useSceneController()
+
+  useEffect(() => {
+    if (!show) return
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return
+
+      // Escape while typing the name just leaves the field
+      if (
+        event.target instanceof HTMLInputElement &&
+        event.target.type === 'text'
+      ) {
+        event.target.blur()
+        return
+      }
+
+      navigateTo('room')
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [show, navigateTo])
 
   return (
     <div className="draw-page" hidden={!show}>

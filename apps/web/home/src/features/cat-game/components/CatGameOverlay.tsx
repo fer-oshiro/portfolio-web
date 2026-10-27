@@ -41,6 +41,17 @@ export const CatGameOverlay = ({ active }: CatGameOverlayProps) => {
     if (!active) audioRef.current?.stopAll()
   }, [active])
 
+  useEffect(() => {
+    if (!active) return
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') navigateTo('room')
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [active, navigateTo])
+
   return (
     <div className="cat-game-overlay">
       <div>

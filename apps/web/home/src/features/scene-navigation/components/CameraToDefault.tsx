@@ -1,4 +1,5 @@
 import { AnimatePresence, motion } from 'motion/react'
+import { useEffect } from 'react'
 import { useStore } from 'zustand'
 import { cameraStore } from '../camera/camera-store'
 import { useSceneController } from '../scene-controller'
@@ -6,10 +7,22 @@ import { useSceneController } from '../scene-controller'
 export const CameraToDefault = () => {
   const focus = useStore(cameraStore, (state) => state.focus)
   const { resetCamera } = useSceneController()
+  const isFocused = ['pc', 'board'].includes(focus)
+
+  useEffect(() => {
+    if (!isFocused) return
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') resetCamera()
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [isFocused, resetCamera])
 
   return (
     <AnimatePresence mode="wait">
-      {['pc', 'board'].includes(focus) && (
+      {isFocused && (
         <motion.div
           style={{
             position: 'fixed',
