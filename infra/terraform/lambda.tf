@@ -52,6 +52,12 @@ resource "aws_iam_role_policy" "signaling_lambda_policy" {
         Resource = aws_dynamodb_table.security.arn
       },
       {
+        Sid      = "SharedTurnCredentials"
+        Action   = ["dynamodb:GetItem", "dynamodb:PutItem"]
+        Effect   = "Allow"
+        Resource = aws_dynamodb_table.turn_credentials.arn
+      },
+      {
         Sid      = "ConsumeSecurityQuotaTransaction"
         Action   = "dynamodb:UpdateItem"
         Effect   = "Allow"
@@ -217,7 +223,9 @@ resource "aws_lambda_function" "ws_handler" {
       TABLE_NAME                  = aws_dynamodb_table.connections.name
       QUOTAS_TABLE_NAME           = aws_dynamodb_table.security.name
       SECURITY_QUOTAS_JSON        = local.security_quotas_json
-      TURN_CREDENTIAL_TTL_SECONDS = "600"
+      TURN_CREDENTIALS_TABLE_NAME = aws_dynamodb_table.turn_credentials.name
+      # Shared by every room and renewed after half of it: at most 8 per day
+      TURN_CREDENTIAL_TTL_SECONDS = "21600"
       TWILIO_ACCOUNT_SID          = var.twilio_account_sid
       TWILIO_AUTH_TOKEN           = var.twilio_auth_token
     }

@@ -15,7 +15,9 @@ altera contas externas.
 - as Lambdas possuem concorrência reservada e API Gateway mantém throttles por
   rota;
 - Groq limita cada resposta a 300 tokens;
-- credenciais TURN duram 10 minutos e só são emitidas uma vez por sessão;
+- uma única credencial TURN de seis horas é compartilhada por todas as salas
+  (tabela `turn-credentials`) e renovada na Twilio só depois de metade da
+  validade;
 - upload usa Presigned POST de cinco minutos, limitado a SVG e 1 MB pela policy
   do próprio S3;
 - AWS envia alarmes por SNS e acompanha um budget mensal de US$ 10;
@@ -42,6 +44,13 @@ O heartbeat (`ping`, enviado após 3 minutos sem tráfego) não consome quota: a
 Lambda de signaling responde `pong` e a rota fica limitada só pelo throttle do
 API Gateway. Ele evita o idle timeout de 10 minutos do API Gateway, que fazia
 cada aba ociosa reconectar e abrir uma sessão nova.
+
+A quota de TURN conta só emissões novas na Twilio. O desktop que entra numa
+sala vazia lê primeiro a credencial compartilhada no DynamoDB e a reaproveita
+enquanto restar metade da validade; o celular herda a do desktop. Com TTL de
+6 h, são no máximo 8 emissões por dia, dentro do limite global de 10. A
+contrapartida é que uma credencial vazada vale por até 6 h; o teto de gasto
+continua sendo o Usage Trigger da Twilio.
 
 ## Giroscópio e capacidade
 

@@ -7,6 +7,7 @@ import { ApiGatewayMessagePublisher } from '../../adapters/aws/api-gateway-publi
 import { DynamoDbConnectionRepository } from '../../adapters/aws/dynamodb-connections'
 import { DynamoDbQuotaRepository } from '../../adapters/aws/dynamodb-quotas'
 import { DynamoDbSessionRepository } from '../../adapters/aws/dynamodb-sessions'
+import { DynamoDbTurnCredentialStore } from '../../adapters/aws/dynamodb-turn-credentials'
 import { TwilioTurnProvider } from '../../adapters/aws/twilio-turn'
 import { loadSignalingEnvironment } from '../../config/env'
 import { SignalingService } from '../../features/signaling'
@@ -40,6 +41,10 @@ const sessions = new DynamoDbSessionRepository(
   environment.quotasTableName,
   new DynamoDBClient(dynamoConfig),
 )
+const turnCredentials = new DynamoDbTurnCredentialStore(
+  environment.turnCredentialsTableName,
+  new DynamoDBClient(dynamoConfig),
+)
 const turn = new TwilioTurnProvider(
   twilio(environment.twilioAccountSid, environment.twilioAuthToken),
   environment.turnCredentialTtlSeconds,
@@ -55,7 +60,12 @@ const security = new SecurityService(
 export const handler: APIGatewayProxyWebsocketHandlerV2 = async (event) => {
   const { connectionId, routeKey, domainName, stage } = event.requestContext
   const publisher = new ApiGatewayMessagePublisher(domainName, stage)
-  const signaling = new SignalingService({ connections, publisher, turn })
+  const signaling = new SignalingService({
+    connections,
+    publisher,
+    turn,
+    turnCredentials,
+  })
 
   try {
     if (routeKey === '$connect') {

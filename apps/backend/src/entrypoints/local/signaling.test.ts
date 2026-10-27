@@ -9,6 +9,7 @@ import {
 import { WebSocket } from 'ws'
 
 import { LocalTurnProvider } from '../../adapters/local/local-turn'
+import { MemoryTurnCredentialStore } from '../../adapters/local/memory-turn-credentials'
 import { LocalWebSocketMessagePublisher } from '../../adapters/local/local-websocket-publisher'
 import { MemoryConnectionRepository } from '../../adapters/local/memory-connections'
 import { SignalingService } from '../../features/signaling'
@@ -88,6 +89,7 @@ describe('local signaling', () => {
       connections,
       publisher,
       turn: new LocalTurnProvider(),
+      turnCredentials: new MemoryTurnCredentialStore(),
     })
     const dispatcher = new LocalMessageDispatcher({
       chat: { respond: async () => undefined },

@@ -8,6 +8,7 @@ export interface SignalingEnvironment {
   quotaLimits: QuotaLimits
   quotasTableName: string
   tableName: string
+  turnCredentialsTableName: string
   turnCredentialTtlSeconds: number
   twilioAccountSid: string
   twilioAuthToken: string
@@ -150,10 +151,15 @@ export const loadSignalingEnvironment = (
   quotaLimits: quotaLimits(environment),
   quotasTableName: required(environment, 'QUOTAS_TABLE_NAME'),
   tableName: required(environment, 'TABLE_NAME'),
+  turnCredentialsTableName: required(
+    environment,
+    'TURN_CREDENTIALS_TABLE_NAME',
+  ),
+  // Shared by every room and reused while half of it is left (see signaling)
   turnCredentialTtlSeconds: positiveInteger(
     environment,
     'TURN_CREDENTIAL_TTL_SECONDS',
-    600,
+    21_600,
   ),
   twilioAccountSid: required(environment, 'TWILIO_ACCOUNT_SID'),
   twilioAuthToken: required(environment, 'TWILIO_AUTH_TOKEN'),

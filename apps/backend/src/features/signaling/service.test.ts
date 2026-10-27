@@ -3,7 +3,12 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 
 import type { MessagePublisher } from '../../ports/message-publisher'
-import type { ConnectionRepository, TurnProvider } from './ports'
+import type {
+  ConnectionRepository,
+  TurnCredential,
+  TurnCredentialStore,
+  TurnProvider,
+} from './ports'
 import { SignalingService } from './service'
 import type { Connection } from './types'
 
@@ -48,14 +53,33 @@ class RecordingPublisher implements MessagePublisher {
   }
 }
 
+const NOW = 10_000_000
+const TTL_MS = 6 * 3_600_000
+
 class FakeTurnProvider implements TurnProvider {
   calls = 0
 
   constructor(readonly iceServers: IceServer[]) {}
 
-  async getIceServers(): Promise<IceServer[]> {
+  async issueCredential(): Promise<TurnCredential> {
     this.calls += 1
-    return this.iceServers
+    return {
+      expiresAt: NOW + TTL_MS,
+      iceServers: this.iceServers,
+      issuedAt: NOW,
+    }
+  }
+}
+
+class FakeTurnCredentials implements TurnCredentialStore {
+  constructor(public credential: TurnCredential | null = null) {}
+
+  async find() {
+    return this.credential
+  }
+
+  async save(credential: TurnCredential) {
+    this.credential = credential
   }
 }
 
@@ -77,7 +101,13 @@ test('joins a room by reusing ICE and notifying both sides', async () => {
   ])
   const publisher = new RecordingPublisher()
   const turn = new FakeTurnProvider(generatedIceServers)
-  const service = new SignalingService({ connections, publisher, turn })
+  const service = new SignalingService({
+    connections,
+    now: () => NOW,
+    publisher,
+    turn,
+    turnCredentials: new FakeTurnCredentials(),
+  })
 
   await service.join({
     connectionId: 'mobile-1',
@@ -115,7 +145,13 @@ test('gets ICE from the provider when joining an empty room', async () => {
   const connections = new MemoryConnections()
   const publisher = new RecordingPublisher()
   const turn = new FakeTurnProvider(generatedIceServers)
-  const service = new SignalingService({ connections, publisher, turn })
+  const service = new SignalingService({
+    connections,
+    now: () => NOW,
+    publisher,
+    turn,
+    turnCredentials: new FakeTurnCredentials(),
+  })
   let beforeTurnCalls = 0
 
   await service.join({
@@ -152,7 +188,13 @@ test('rejects mobile-first without issuing TURN', async () => {
   ])
   const publisher = new RecordingPublisher()
   const turn = new FakeTurnProvider(generatedIceServers)
-  const service = new SignalingService({ connections, publisher, turn })
+  const service = new SignalingService({
+    connections,
+    now: () => NOW,
+    publisher,
+    turn,
+    turnCredentials: new FakeTurnCredentials(),
+  })
 
   await service.join({
     connectionId: 'mobile-1',
@@ -188,7 +230,13 @@ test('a reconnecting device replaces its old connection in the room', async () =
   ])
   const publisher = new RecordingPublisher()
   const turn = new FakeTurnProvider(generatedIceServers)
-  const service = new SignalingService({ connections, publisher, turn })
+  const service = new SignalingService({
+    connections,
+    now: () => NOW,
+    publisher,
+    turn,
+    turnCredentials: new FakeTurnCredentials(),
+  })
 
   await service.join({
     connectionId: 'mobile-new',
@@ -232,7 +280,13 @@ test('a reconnecting desktop alone gets fresh ICE and drops its ghost', async ()
   ])
   const publisher = new RecordingPublisher()
   const turn = new FakeTurnProvider(generatedIceServers)
-  const service = new SignalingService({ connections, publisher, turn })
+  const service = new SignalingService({
+    connections,
+    now: () => NOW,
+    publisher,
+    turn,
+    turnCredentials: new FakeTurnCredentials(),
+  })
 
   await service.join({
     connectionId: 'desktop-new',
@@ -280,6 +334,7 @@ test('relays a signal only when source and target share a room', async () => {
     connections,
     publisher,
     turn: new FakeTurnProvider(generatedIceServers),
+    turnCredentials: new FakeTurnCredentials(),
   })
   const signal = { type: 'offer' as const, sdp: 'v=0' }
 
@@ -321,9 +376,78 @@ test('disconnect removes the connection', async () => {
     connections,
     publisher: new RecordingPublisher(),
     turn: new FakeTurnProvider(generatedIceServers),
+    turnCredentials: new FakeTurnCredentials(),
   })
 
   await service.disconnect('connection-1')
 
   assert.deepEqual(connections.removed, ['connection-1'])
+})
+
+const joinDesktopAlone = async (stored: TurnCredential | null) => {
+  const turn = new FakeTurnProvider(generatedIceServers)
+  const turnCredentials = new FakeTurnCredentials(stored)
+  const publisher = new RecordingPublisher()
+  let beforeTurnCalls = 0
+  const service = new SignalingService({
+    connections: new MemoryConnections(),
+    now: () => NOW,
+    publisher,
+    turn,
+    turnCredentials,
+  })
+
+  await service.join({
+    beforeTurn: async () => {
+      beforeTurnCalls += 1
+    },
+    connectionId: 'desktop-1',
+    role: 'desktop',
+    roomId: 'room-1',
+  })
+
+  const joined = publisher.messages.at(0)?.message
+  return {
+    beforeTurnCalls,
+    iceServers: joined?.type === 'joined' ? joined.iceServers : undefined,
+    stored: turnCredentials.credential,
+    turnCalls: turn.calls,
+  }
+}
+
+test('reuses the shared TURN credential without spending quota', async () => {
+  const result = await joinDesktopAlone({
+    expiresAt: NOW + TTL_MS / 2 + 1,
+    iceServers: storedIceServers,
+    issuedAt: NOW - TTL_MS / 2 + 1,
+  })
+
+  assert.equal(result.turnCalls, 0)
+  assert.equal(result.beforeTurnCalls, 0)
+  assert.deepEqual(result.iceServers, storedIceServers)
+})
+
+test('issues and stores a TURN credential when none is stored', async () => {
+  const result = await joinDesktopAlone(null)
+
+  assert.equal(result.turnCalls, 1)
+  assert.equal(result.beforeTurnCalls, 1)
+  assert.deepEqual(result.iceServers, generatedIceServers)
+  assert.deepEqual(result.stored, {
+    expiresAt: NOW + TTL_MS,
+    iceServers: generatedIceServers,
+    issuedAt: NOW,
+  })
+})
+
+test('renews the TURN credential once half of its lifetime is gone', async () => {
+  const result = await joinDesktopAlone({
+    expiresAt: NOW + TTL_MS / 2,
+    iceServers: storedIceServers,
+    issuedAt: NOW - TTL_MS / 2,
+  })
+
+  assert.equal(result.turnCalls, 1)
+  assert.equal(result.beforeTurnCalls, 1)
+  assert.deepEqual(result.iceServers, generatedIceServers)
 })

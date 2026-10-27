@@ -3,7 +3,7 @@ import { it } from 'node:test'
 
 import { TwilioTurnProvider } from './twilio-turn'
 
-it('requests TURN credentials with a ten-minute TTL', async () => {
+it('requests TURN credentials and reports their lifetime', async () => {
   const calls: unknown[] = []
   const provider = new TwilioTurnProvider(
     {
@@ -14,10 +14,16 @@ it('requests TURN credentials with a ten-minute TTL', async () => {
         },
       },
     },
-    600,
+    21_600,
+    () => 1_000,
   )
 
-  await provider.getIceServers()
+  const credential = await provider.issueCredential()
 
-  assert.deepEqual(calls, [{ ttl: 600 }])
+  assert.deepEqual(calls, [{ ttl: 21_600 }])
+  assert.deepEqual(credential, {
+    expiresAt: 1_000 + 21_600_000,
+    iceServers: [{ urls: 'turn:example.test' }],
+    issuedAt: 1_000,
+  })
 })

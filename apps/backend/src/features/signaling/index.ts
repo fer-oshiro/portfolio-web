@@ -1,6 +1,8 @@
 export type {
   ConnectionRepository,
   SignalingDependencies,
+  TurnCredential,
+  TurnCredentialStore,
   TurnProvider,
 } from './ports'
 export { SignalingService } from './service'

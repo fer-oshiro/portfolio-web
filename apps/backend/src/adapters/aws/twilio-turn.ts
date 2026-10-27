@@ -1,6 +1,6 @@
 import { iceServerSchema } from '@fer-oshiro/realtime-contract'
 
-import type { TurnProvider } from '../../features/signaling'
+import type { TurnCredential, TurnProvider } from '../../features/signaling'
 
 interface TwilioTokenClient {
   tokens: {
@@ -12,10 +12,17 @@ export class TwilioTurnProvider implements TurnProvider {
   constructor(
     private readonly client: TwilioTokenClient,
     private readonly ttlSeconds = 600,
+    private readonly now: () => number = Date.now,
   ) {}
 
-  async getIceServers() {
+  async issueCredential(): Promise<TurnCredential> {
+    const issuedAt = this.now()
     const token = await this.client.tokens.create({ ttl: this.ttlSeconds })
-    return iceServerSchema.array().parse(token.iceServers)
+
+    return {
+      expiresAt: issuedAt + this.ttlSeconds * 1_000,
+      iceServers: iceServerSchema.array().parse(token.iceServers),
+      issuedAt,
+    }
   }
 }

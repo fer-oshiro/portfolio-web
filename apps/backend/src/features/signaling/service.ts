@@ -16,7 +16,7 @@ export class SignalingService {
   }
 
   async join(input: JoinInput): Promise<void> {
-    const { connections, publisher, turn } = this.dependencies
+    const { connections, publisher } = this.dependencies
     const others = (await connections.findByRoom(input.roomId)).filter(
       ({ connectionId }) => connectionId !== input.connectionId,
     )
@@ -37,8 +37,8 @@ export class SignalingService {
       return
     }
 
-    if (peers.length === 0) await input.beforeTurn?.()
-    const iceServers = peers.at(0)?.iceServers ?? (await turn.getIceServers())
+    const iceServers =
+      peers.at(0)?.iceServers ?? (await this.sharedIceServers(input))
 
     await Promise.all(
       replaced.map(({ connectionId }) => connections.remove(connectionId)),
@@ -67,6 +67,22 @@ export class SignalingService {
         }),
       ),
     )
+  }
+
+  // The first device of a room reuses the stored credential while at least
+  // half of its lifetime is left: a peer that joins later inherits it, and
+  // the WebRTC session must not outlive it. Only a new one spends TURN quota.
+  private async sharedIceServers(input: JoinInput) {
+    const { now = Date.now, turn, turnCredentials } = this.dependencies
+    const stored = await turnCredentials.find()
+    if (stored && now() < (stored.issuedAt + stored.expiresAt) / 2) {
+      return stored.iceServers
+    }
+
+    await input.beforeTurn?.()
+    const credential = await turn.issueCredential()
+    await turnCredentials.save(credential)
+    return credential.iceServers
   }
 
   async signal(input: SignalInput): Promise<void> {

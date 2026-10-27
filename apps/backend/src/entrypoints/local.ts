@@ -17,6 +17,7 @@ import {
 import { LocalTurnProvider } from '../adapters/local/local-turn'
 import { LocalWebSocketMessagePublisher } from '../adapters/local/local-websocket-publisher'
 import { MemoryConnectionRepository } from '../adapters/local/memory-connections'
+import { MemoryTurnCredentialStore } from '../adapters/local/memory-turn-credentials'
 import { loadLocalEnvironment } from '../config/env'
 import { ChatService, type ChatProvider } from '../features/chat'
 import { DrawingService } from '../features/drawing'
@@ -170,6 +171,7 @@ export const createLocalApplication = ({
       connections: new MemoryConnectionRepository(),
       publisher,
       turn: new LocalTurnProvider(),
+      turnCredentials: new MemoryTurnCredentialStore(),
     }),
   })
 

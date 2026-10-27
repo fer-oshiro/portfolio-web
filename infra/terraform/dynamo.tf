@@ -45,3 +45,25 @@ resource "aws_dynamodb_table" "security" {
     enabled        = true
   }
 }
+
+# TURN credential shared by every room (one item). Kept apart from the
+# security table: it holds a secret handed to browsers, not quota counters.
+resource "aws_dynamodb_table" "turn_credentials" {
+  name         = "${var.project_name}-turn-credentials"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "id"
+
+  attribute {
+    name = "id"
+    type = "S"
+  }
+
+  ttl {
+    attribute_name = "expiresAt"
+    enabled        = true
+  }
+
+  tags = {
+    Project = var.project_name
+  }
+}
