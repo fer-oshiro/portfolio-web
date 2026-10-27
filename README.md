@@ -140,3 +140,21 @@ terminarem com sucesso. Para conferir opções sem build ou acesso à AWS:
 ```bash
 npm run deploy:web -- --help
 ```
+
+## Deploy do backend
+
+Para publicar apenas código das Lambdas, sem `terraform apply`:
+
+```bash
+npm run deploy:back -- --profile nome-do-profile        # todas as funções
+npm run deploy:back -- --profile nome-do-profile chat   # só o chat
+```
+
+As funções aceitas são `authorizer`, `signaling`, `chat`, `drawing` e
+`cost-guard`. O script gera os zips em `apps/backend/dist/aws`, chama
+`aws lambda update-function-code` e aguarda cada atualização terminar. Os nomes
+seguem `project_name` do Terraform (`--project-name`, padrão `portfolio`) e a
+região padrão é `us-east-1` (`--region`). Como o Terraform compara o hash do zip
+local, o próximo `plan` continua limpo se o mesmo artefato for usado. Mudanças em
+variáveis de ambiente, memória, timeout ou permissões continuam exigindo
+Terraform.
