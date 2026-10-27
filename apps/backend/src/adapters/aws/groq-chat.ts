@@ -10,7 +10,8 @@ export class GroqChatProvider implements ChatProvider {
 
   async *stream(message: string): AsyncIterable<string> {
     const stream = await this.client.chat.completions.create({
-      model: 'llama-3.1-8b-instant',
+      model: 'openai/gpt-oss-20b',
+      reasoning_effort: 'low',
       stream: true,
       temperature: 0.2,
       max_completion_tokens: this.maxCompletionTokens,

@@ -86,7 +86,7 @@ local. Não aponte um frontend local sem desafio para o WebSocket de produção.
    aplicações.
 2. Crie o projeto `portfolio-prod`, selecione-o e gere uma chave exclusiva.
 3. Em **Manage Projects → View → Rate limits**, aplique limites conservadores
-   ao modelo `llama-3.1-8b-instant`. Se todos os campos estiverem disponíveis,
+   ao modelo `openai/gpt-oss-20b`. Se todos os campos estiverem disponíveis,
    comece com 10 RPM e 100 RPD; nunca aumente os limites da organização para
    acomodar este projeto.
 4. Passe a chave nova em `TF_VAR_groq_api_key` e revogue a chave antiga depois
