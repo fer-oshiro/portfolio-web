@@ -16,6 +16,7 @@ module.exports = (_, argv) => {
     mode: isProd ? 'production' : 'development',
     output: {
       publicPath: isProd ? `${CDN_BASE}/shell/` : `http://${LAN_IP}:3000/`,
+      filename: isProd ? '[name].[contenthash].js' : '[name].js',
       clean: true,
     },
 

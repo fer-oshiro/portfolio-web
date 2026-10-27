@@ -22,6 +22,7 @@ module.exports = (_, argv) => {
   return {
     output: {
       publicPath: isProd ? 'https://fer-oshiro.com/home/' : 'auto',
+      filename: isProd ? '[name].[contenthash].js' : '[name].js',
       clean: true,
     },
 

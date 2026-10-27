@@ -88,7 +88,26 @@ for app in shell home blog resume; do
   aws "${aws_options[@]}" s3 sync \
     "${artifact_dir}/" \
     "s3://${bucket}/${app}/" \
-    --delete
+    --exclude 'index.html' \
+    --exclude 'remoteEntry.js' \
+    --cache-control 'public, max-age=31536000, immutable'
+
+  for entry_file in index.html remoteEntry.js; do
+    [[ -f "${artifact_dir}/${entry_file}" ]] || continue
+
+    aws "${aws_options[@]}" s3 cp \
+      "${artifact_dir}/${entry_file}" \
+      "s3://${bucket}/${app}/${entry_file}" \
+      --cache-control 'no-cache'
+  done
+
+  aws "${aws_options[@]}" s3 sync \
+    "${artifact_dir}/" \
+    "s3://${bucket}/${app}/" \
+    --delete \
+    --exclude 'index.html' \
+    --exclude 'remoteEntry.js' \
+    --cache-control 'public, max-age=31536000, immutable'
 done
 
 aws "${aws_options[@]}" cloudfront create-invalidation \

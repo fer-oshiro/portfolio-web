@@ -24,6 +24,7 @@ module.exports = (_, argv) => {
       publicPath: isProd
         ? 'https://fer-oshiro.com/resume/'
         : `http://${LAN_IP}:3002/`,
+      filename: isProd ? '[name].[contenthash].js' : '[name].js',
       clean: true,
     },
 
