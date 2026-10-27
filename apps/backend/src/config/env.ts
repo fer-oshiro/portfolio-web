@@ -94,7 +94,7 @@ export const defaultQuotaLimits: QuotaLimits = {
     chat: 10,
     get_drawings: 30,
     join: 6,
-    save_drawing: 2,
+    save_drawing: 3,
     signal: 200,
     turn: 1,
   },

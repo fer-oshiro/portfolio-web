@@ -57,6 +57,9 @@ export const clientMessageSchema = z.discriminatedUnion('action', [
     action: z.literal('save_drawing'),
     name: z.string().trim().min(1).max(60),
   }),
+  z.object({
+    action: z.literal('ping'),
+  }),
 ])
 
 export const serverMessageSchema = z.discriminatedUnion('type', [
@@ -80,6 +83,9 @@ export const serverMessageSchema = z.discriminatedUnion('type', [
   }),
   z.object({
     type: z.literal('chat_done'),
+  }),
+  z.object({
+    type: z.literal('pong'),
   }),
   z.object({
     type: z.literal('drawings'),

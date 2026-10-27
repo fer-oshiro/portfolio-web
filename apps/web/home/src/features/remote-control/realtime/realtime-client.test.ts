@@ -56,6 +56,21 @@ describe('RealtimeClient', () => {
     expect(secondSend).toHaveBeenCalledWith(chatMessage)
   })
 
+  it('reconnect fecha o estado e pede um socket novo ao transporte', () => {
+    const client = new RealtimeClient()
+    const reconnect = vi.fn()
+    const stateListener = vi.fn()
+
+    client.connect(vi.fn(), reconnect)
+    client.setReadyState(ReadyState.OPEN)
+    client.subscribeState(stateListener)
+    client.reconnect()
+
+    expect(reconnect).toHaveBeenCalledOnce()
+    expect(client.getReadyState()).toBe(ReadyState.CLOSED)
+    expect(stateListener).toHaveBeenCalledOnce()
+  })
+
   it('volta a enfileirar depois de desconectar e envia no reconnect', () => {
     const client = new RealtimeClient()
     const firstSend = vi.fn()

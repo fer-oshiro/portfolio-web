@@ -91,6 +91,13 @@ export const handler: APIGatewayProxyWebsocketHandlerV2 = async (event) => {
       return { statusCode: 400, body: 'Invalid message' }
     }
 
+    // Heartbeat: keeps API Gateway from closing idle connections (10 min) and
+    // lets the client detect half-open sockets. No quota: throttled per route.
+    if (parsed.data.action === 'ping') {
+      await publisher.send(connectionId, { type: 'pong' })
+      return { statusCode: 200, body: 'Pong' }
+    }
+
     if (parsed.data.action === 'join') {
       const session = await resolveSessionContext(event, sessions)
       await security.consume({

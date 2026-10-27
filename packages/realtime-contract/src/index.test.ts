@@ -31,6 +31,11 @@ describe('realtime contract', () => {
     ).toBe(true)
   })
 
+  it('accepts heartbeat messages', () => {
+    expect(clientMessageSchema.safeParse({ action: 'ping' }).success).toBe(true)
+    expect(serverMessageSchema.safeParse({ type: 'pong' }).success).toBe(true)
+  })
+
   it('rejects unknown and malformed messages', () => {
     expect(
       clientMessageSchema.safeParse({ action: 'offer', sdp: 'v=0' }).success,

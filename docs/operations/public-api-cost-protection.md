@@ -29,7 +29,7 @@ altera contas externas.
 | Chat/Groq      |         10 |                100 |
 | Listar galeria |         30 |              5.000 |
 | Join           |          6 |              5.000 |
-| Upload         |          2 |                 20 |
+| Upload         |          3 |                 20 |
 | Signaling      |        200 |              5.000 |
 | TURN           |          1 |                 10 |
 | Novas sessões  |          — |                500 |
@@ -37,6 +37,11 @@ altera contas externas.
 Esses valores ficam em `security_quotas` no Terraform. A quota de `signal`
 conta somente SDP e candidatos ICE enviados pelo WebSocket. O limite de novas
 sessões fica em `security_max_daily_sessions`.
+
+O heartbeat (`ping`, enviado após 3 minutos sem tráfego) não consome quota: a
+Lambda de signaling responde `pong` e a rota fica limitada só pelo throttle do
+API Gateway. Ele evita o idle timeout de 10 minutos do API Gateway, que fazia
+cada aba ociosa reconectar e abrir uma sessão nova.
 
 ## Giroscópio e capacidade
 

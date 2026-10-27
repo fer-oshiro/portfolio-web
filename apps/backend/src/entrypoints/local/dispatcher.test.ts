@@ -105,6 +105,19 @@ describe('LocalMessageDispatcher', () => {
     ])
   })
 
+  it('answers heartbeat pings without calling features', async () => {
+    const { calls, dependencies, messages } = createDependencies()
+    const dispatcher = new LocalMessageDispatcher(dependencies)
+
+    await dispatcher.dispatch(
+      'connection-1',
+      JSON.stringify({ action: 'ping' }),
+    )
+
+    assert.deepEqual(calls, [])
+    assert.deepEqual(messages, [{ type: 'pong' }])
+  })
+
   it('translates feature failures to protocol errors', async () => {
     const { dependencies, messages } = createDependencies()
     dependencies.chat.respond = async () => {

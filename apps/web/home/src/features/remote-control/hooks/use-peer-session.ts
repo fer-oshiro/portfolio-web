@@ -22,6 +22,10 @@ type UsePeerSessionOptions = {
   roomId: string
 }
 
+// The mobile may reconnect before the desktop has rejoined the room. Each join
+// spends session quota (6 per session), so 1 join + 4 retries fits it.
+const ROOM_NOT_READY_RETRY_DELAYS_MS = [3_000, 5_000, 10_000, 15_000]
+
 const decodePeerData = (data: unknown) => {
   if (typeof data === 'string') return data
   if (data instanceof ArrayBuffer) return new TextDecoder().decode(data)
@@ -48,6 +52,8 @@ export const usePeerSession = ({
   const iceServersRef = useRef<IceServer[] | undefined>(undefined)
   const peerRef = useRef<Peer.Instance | null>(null)
   const targetConnectionIdRef = useRef<string | null>(null)
+  const joinRetriesRef = useRef(0)
+  const joinRetryTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined)
   const onDataRef = useRef(onData)
   const onConnectionStateChangeRef = useRef(onConnectionStateChange)
   const onLogRef = useRef(onLog)
@@ -148,6 +154,7 @@ export const usePeerSession = ({
   )
 
   useRealtimeMessage('joined', (message) => {
+    joinRetriesRef.current = 0
     iceServersRef.current = message.iceServers
     setIceServers(message.iceServers)
     connectToPeers(message.peers)
@@ -163,17 +170,34 @@ export const usePeerSession = ({
     peer?.signal(signal as Peer.SignalData)
   })
 
-  useRealtimeMessage('error', ({ message, source }) => {
+  useRealtimeMessage('error', ({ code, message, source }) => {
     if (source !== 'signaling') return
+
+    const retryDelay = ROOM_NOT_READY_RETRY_DELAYS_MS[joinRetriesRef.current]
+    if (code === 'ROOM_NOT_READY' && retryDelay !== undefined) {
+      joinRetriesRef.current += 1
+      onLogRef.current(`${message} Tentando de novo...`)
+      clearTimeout(joinRetryTimerRef.current)
+      joinRetryTimerRef.current = setTimeout(
+        () => send({ action: 'join', roomId, role }),
+        retryDelay,
+      )
+      return
+    }
+
     onLogRef.current(message)
     onSocketError?.()
   })
 
   useEffect(() => {
-    if (readyState === ReadyState.OPEN) {
-      disposePeer()
-      send({ action: 'join', roomId, role })
-    }
+    if (readyState !== ReadyState.OPEN) return
+
+    disposePeer()
+    joinRetriesRef.current = 0
+    send({ action: 'join', roomId, role })
+
+    // A pending retry belongs to this socket; a new one joins on its own
+    return () => clearTimeout(joinRetryTimerRef.current)
   }, [disposePeer, readyState, role, roomId, send])
 
   useEffect(() => disposePeer, [disposePeer])

@@ -56,6 +56,12 @@ resource "aws_apigatewayv2_route" "signal" {
   target    = "integrations/${aws_apigatewayv2_integration.lambda.id}"
 }
 
+resource "aws_apigatewayv2_route" "ping" {
+  api_id    = aws_apigatewayv2_api.ws.id
+  route_key = "ping"
+  target    = "integrations/${aws_apigatewayv2_integration.lambda.id}"
+}
+
 resource "aws_apigatewayv2_route" "chat" {
   api_id    = aws_apigatewayv2_api.ws.id
   route_key = "chat"
@@ -177,6 +183,13 @@ resource "aws_apigatewayv2_stage" "prod" {
     throttling_rate_limit  = 1
   }
 
+  # Heartbeat: one ping every ~4 minutes per open tab
+  route_settings {
+    route_key              = "ping"
+    throttling_burst_limit = 10
+    throttling_rate_limit  = 5
+  }
+
   route_settings {
     route_key              = "save_drawing"
     throttling_burst_limit = 2
@@ -199,7 +212,8 @@ resource "aws_apigatewayv2_stage" "prod" {
     })
   }
 
-  depends_on = [aws_api_gateway_account.main]
+  # route_settings needs the route to exist first
+  depends_on = [aws_api_gateway_account.main, aws_apigatewayv2_route.ping]
 }
 
 resource "aws_cloudwatch_log_group" "websocket_access_logs" {

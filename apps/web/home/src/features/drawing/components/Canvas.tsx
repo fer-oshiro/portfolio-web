@@ -1,11 +1,16 @@
 import { PointerEvent, useEffect, useRef, useState } from 'react'
-import type { ServerMessageOf } from '@fer-oshiro/realtime-contract'
 import getStroke, { Vec2 } from 'perfect-freehand'
-import { ReadyState } from 'react-use-websocket'
 
-import { useRealtime, useRealtimeMessage } from '../../remote-control/realtime'
+import { useRealtimeClient } from '../../remote-control/realtime'
+import { PermanentSaveError, SAVE_ATTEMPTS, saveDrawing } from '../save-drawing'
 
 import './Canvas.css'
+
+type SaveStatus =
+  | { kind: 'idle' }
+  | { kind: 'saving'; attempt: number }
+  | { kind: 'okay' }
+  | { kind: 'error'; message: string }
 
 const COLORS = [
   { className: 'drawing-color--black', value: '#000000' },
@@ -42,14 +47,12 @@ export function Canvas() {
   const [color, setColor] = useState('#000000')
   const [brushSize, setBrushSize] = useState(6)
   const [name, setName] = useState('')
-  const [status, setStatus] = useState<'idle' | 'loading' | 'okay' | 'error'>(
-    'idle',
-  )
+  const [status, setStatus] = useState<SaveStatus>({ kind: 'idle' })
   const [size, setSize] = useState({
     width: window.innerWidth * 0.8,
     height: window.innerHeight * 0.5,
   })
-  const { send, readyState } = useRealtime()
+  const realtime = useRealtimeClient()
 
   const handlePointerDown = (e: PointerEvent<SVGSVGElement>) => {
     e.currentTarget.setPointerCapture(e.pointerId)
@@ -83,51 +86,32 @@ export function Canvas() {
 
   const allLines = currentPoints ? [...lines, currentPoints] : lines
 
-  const handleSubmit = () => {
-    if (readyState !== ReadyState.OPEN) return
-    setStatus('loading')
-    send({ action: 'save_drawing', name: name.slice(0, 60) })
-  }
+  const trimmedName = name.trim().slice(0, 60)
 
-  const exportSVG = () => {
+  const handleSubmit = async () => {
     const svg = svgRef.current
-    if (!svg) return
-    const serializer = new XMLSerializer()
-    const svgStr = serializer.serializeToString(svg)
-    return svgStr
-  }
+    if (!svg || !trimmedName || status.kind === 'saving') return
 
-  const uploadDrawing = async (grant: ServerMessageOf<'upload_grant'>) => {
     try {
-      const svgStr = exportSVG()
-      if (!svgStr || !grant.url) return
-
-      const blob = new Blob([svgStr], { type: 'image/svg+xml' })
-      if (blob.size > grant.maxBytes) {
-        throw new Error('O desenho excede o limite permitido.')
-      }
-
-      let response: Response
-      if (grant.method === 'POST') {
-        const form = new FormData()
-        for (const [field, value] of Object.entries(grant.fields)) {
-          form.append(field, value)
-        }
-        form.append('file', blob, 'drawing.svg')
-        response = await fetch(grant.url, { method: 'POST', body: form })
-      } else {
-        response = await fetch(grant.url, {
-          method: 'PUT',
-          body: blob,
-          headers: { 'Content-Type': 'image/svg+xml' },
-        })
-      }
-
-      if (!response.ok) throw new Error(`Upload falhou: ${response.status}`)
-      setStatus('okay')
-    } catch (e) {
-      console.error(e)
-      setStatus('error')
+      await saveDrawing(
+        realtime,
+        {
+          name: trimmedName,
+          // Snapshot now: strokes drawn while retrying are not part of it
+          svg: new XMLSerializer().serializeToString(svg),
+        },
+        { onAttempt: (attempt) => setStatus({ kind: 'saving', attempt }) },
+      )
+      setStatus({ kind: 'okay' })
+    } catch (error) {
+      console.error(error)
+      setStatus({
+        kind: 'error',
+        message:
+          error instanceof PermanentSaveError
+            ? error.message
+            : 'Vish... Erro no servidor (｡ᵕ ◞ _◟)',
+      })
     }
   }
 
@@ -148,21 +132,6 @@ export function Canvas() {
     window.addEventListener('resize', updateSize)
     return () => window.removeEventListener('resize', updateSize)
   }, [])
-
-  useRealtimeMessage('upload_grant', (grant) => uploadDrawing(grant))
-  useRealtimeMessage('upload_url', ({ url }) =>
-    uploadDrawing({
-      type: 'upload_grant',
-      url,
-      method: 'PUT',
-      fields: {},
-      expiresAt: new Date().toISOString(),
-      maxBytes: Number.MAX_SAFE_INTEGER,
-    }),
-  )
-  useRealtimeMessage('error', ({ source }) => {
-    if (source === 'draw') setStatus('error')
-  })
 
   return (
     <div>
@@ -214,19 +183,28 @@ export function Canvas() {
       </div>
 
       <div className="drawing-status">
-        {status === 'okay' && <div>Obrigada ⸜(｡˃ ᵕ ˂ )⸝♡</div>}
-        {status === 'idle' && (
+        {status.kind === 'okay' && <div>Obrigada ⸜(｡˃ ᵕ ˂ )⸝♡</div>}
+        {(status.kind === 'idle' || status.kind === 'error') && (
           <>
+            {status.kind === 'error' && <div>{status.message}</div>}
             <input
               name="name"
-              maxLength={100}
+              maxLength={60}
+              value={name}
               onChange={(e) => setName(e.target.value)}
             />
-            <button onClick={handleSubmit}>Salvar</button>
+            <button onClick={handleSubmit} disabled={!trimmedName}>
+              Salvar
+            </button>
           </>
         )}
-        {status === 'error' && <div>Vish... Erro no servidor (｡ᵕ ◞ _◟)</div>}
-        {status === 'loading' && <div>Enviando ε(´｡•᎑•`)っ━ 📨</div>}
+        {status.kind === 'saving' && (
+          <div>
+            Enviando ε(´｡•᎑•`)っ━ 📨
+            {status.attempt > 1 &&
+              ` (tentativa ${status.attempt} de ${SAVE_ATTEMPTS})`}
+          </div>
+        )}
       </div>
     </div>
   )

@@ -15,6 +15,7 @@ type TransportSend = (message: ClientMessage) => void
 
 type Transport = {
   id: symbol
+  reconnect: () => void
   send: TransportSend
 }
 
@@ -30,9 +31,10 @@ export class RealtimeClient {
   private readyState = ReadyState.UNINSTANTIATED
   private transport: Transport | null = null
 
-  connect(send: TransportSend) {
+  connect(send: TransportSend, reconnect: () => void = () => {}) {
     const transport: Transport = {
       id: Symbol('RealtimeTransport'),
+      reconnect,
       send,
     }
 
@@ -94,6 +96,17 @@ export class RealtimeClient {
   }
 
   getReadyState = () => this.readyState
+
+  /**
+   * Drops the current socket and opens a fresh one. For sockets that look open
+   * but stopped answering, or when automatic reconnection gave up.
+   */
+  reconnect = () => {
+    if (!this.transport) return
+    this.readyState = ReadyState.CLOSED
+    this.emitStateChange()
+    this.transport.reconnect()
+  }
 
   setReadyState(readyState: ReadyState) {
     this.readyState = readyState

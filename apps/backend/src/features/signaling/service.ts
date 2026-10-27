@@ -17,18 +17,15 @@ export class SignalingService {
 
   async join(input: JoinInput): Promise<void> {
     const { connections, publisher, turn } = this.dependencies
-    const peers = (await connections.findByRoom(input.roomId)).filter(
+    const others = (await connections.findByRoom(input.roomId)).filter(
       ({ connectionId }) => connectionId !== input.connectionId,
     )
-    if (peers.some(({ role }) => role === input.role) || peers.length >= 2) {
-      await publisher.send(input.connectionId, {
-        type: 'error',
-        source: 'signaling',
-        code: 'ROOM_FULL',
-        message: 'Esta sala já possui um dispositivo com o mesmo papel.',
-      })
-      return
-    }
+    // A device that reconnects gets a new connectionId while the old one may
+    // linger: $disconnect is best effort, and a half-open socket stays alive
+    // for API Gateway until the idle timeout. The newest connection of a role
+    // wins, so a reconnect never finds the room locked by its own ghost.
+    const replaced = others.filter(({ role }) => role === input.role)
+    const peers = others.filter(({ role }) => role !== input.role)
 
     if (peers.length === 0 && input.role === 'mobile') {
       await publisher.send(input.connectionId, {
@@ -43,6 +40,9 @@ export class SignalingService {
     if (peers.length === 0) await input.beforeTurn?.()
     const iceServers = peers.at(0)?.iceServers ?? (await turn.getIceServers())
 
+    await Promise.all(
+      replaced.map(({ connectionId }) => connections.remove(connectionId)),
+    )
     await connections.save({
       connectionId: input.connectionId,
       iceServers,

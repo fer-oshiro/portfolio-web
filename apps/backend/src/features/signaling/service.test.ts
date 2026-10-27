@@ -141,8 +141,15 @@ test('gets ICE from the provider when joining an empty room', async () => {
   ])
 })
 
-test('rejects mobile-first and duplicate roles without issuing TURN', async () => {
-  const connections = new MemoryConnections()
+test('rejects mobile-first without issuing TURN', async () => {
+  const connections = new MemoryConnections([
+    {
+      connectionId: 'mobile-old',
+      iceServers: storedIceServers,
+      role: 'mobile',
+      roomId: 'room-1',
+    },
+  ])
   const publisher = new RecordingPublisher()
   const turn = new FakeTurnProvider(generatedIceServers)
   const service = new SignalingService({ connections, publisher, turn })
@@ -152,25 +159,99 @@ test('rejects mobile-first and duplicate roles without issuing TURN', async () =
     role: 'mobile',
     roomId: 'room-1',
   })
-  connections.connections.set('desktop-1', {
-    connectionId: 'desktop-1',
-    iceServers: storedIceServers,
-    role: 'desktop',
-    roomId: 'room-2',
-  })
-  await service.join({
-    connectionId: 'desktop-2',
-    role: 'desktop',
-    roomId: 'room-2',
-  })
 
   assert.equal(turn.calls, 0)
+  assert.deepEqual(connections.removed, [])
+  assert.equal(connections.connections.has('mobile-1'), false)
   assert.deepEqual(
     publisher.messages.map(({ message }) =>
       message.type === 'error' ? message.code : message.type,
     ),
-    ['ROOM_NOT_READY', 'ROOM_FULL'],
+    ['ROOM_NOT_READY'],
   )
+})
+
+test('a reconnecting device replaces its old connection in the room', async () => {
+  const connections = new MemoryConnections([
+    {
+      connectionId: 'desktop-1',
+      iceServers: storedIceServers,
+      role: 'desktop',
+      roomId: 'room-1',
+    },
+    {
+      connectionId: 'mobile-old',
+      iceServers: storedIceServers,
+      role: 'mobile',
+      roomId: 'room-1',
+    },
+  ])
+  const publisher = new RecordingPublisher()
+  const turn = new FakeTurnProvider(generatedIceServers)
+  const service = new SignalingService({ connections, publisher, turn })
+
+  await service.join({
+    connectionId: 'mobile-new',
+    role: 'mobile',
+    roomId: 'room-1',
+  })
+
+  assert.equal(turn.calls, 0)
+  assert.deepEqual(connections.removed, ['mobile-old'])
+  assert.deepEqual([...connections.connections.keys()].sort(), [
+    'desktop-1',
+    'mobile-new',
+  ])
+  assert.deepEqual(publisher.messages, [
+    {
+      connectionId: 'mobile-new',
+      message: {
+        type: 'joined',
+        iceServers: storedIceServers,
+        peers: [{ connectionId: 'desktop-1', role: 'desktop' }],
+      },
+    },
+    {
+      connectionId: 'desktop-1',
+      message: {
+        type: 'peer_joined',
+        peer: { connectionId: 'mobile-new', role: 'mobile' },
+      },
+    },
+  ])
+})
+
+test('a reconnecting desktop alone gets fresh ICE and drops its ghost', async () => {
+  const connections = new MemoryConnections([
+    {
+      connectionId: 'desktop-old',
+      iceServers: storedIceServers,
+      role: 'desktop',
+      roomId: 'room-1',
+    },
+  ])
+  const publisher = new RecordingPublisher()
+  const turn = new FakeTurnProvider(generatedIceServers)
+  const service = new SignalingService({ connections, publisher, turn })
+
+  await service.join({
+    connectionId: 'desktop-new',
+    role: 'desktop',
+    roomId: 'room-1',
+  })
+
+  assert.equal(turn.calls, 1)
+  assert.deepEqual(connections.removed, ['desktop-old'])
+  assert.deepEqual(publisher.messages, [
+    {
+      connectionId: 'desktop-new',
+      message: {
+        type: 'joined',
+        iceServers: generatedIceServers,
+        peers: [],
+      },
+    },
+  ])
 })
 
 test('relays a signal only when source and target share a room', async () => {

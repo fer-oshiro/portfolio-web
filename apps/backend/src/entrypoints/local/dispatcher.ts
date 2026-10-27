@@ -112,6 +112,11 @@ export class LocalMessageDispatcher {
             message.name,
           )
           break
+        case 'ping':
+          await this.dependencies.publisher.send(connectionId, {
+            type: 'pong',
+          })
+          break
       }
     } catch (error) {
       console.error(`[local:${message.action}] error:`, error)
