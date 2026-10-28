@@ -36,6 +36,7 @@ export {
   stepHoverProgress,
 } from './hover-select'
 export type { HoverPoint, HoverRect } from './hover-select'
+export { useHoverSelect } from './use-hover-select'
 export { SceneController, useSceneController } from './scene-controller'
 export { resolveSceneControllerIntent } from './scene-controller-model'
 export type {

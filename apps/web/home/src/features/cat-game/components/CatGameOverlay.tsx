@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 
-import { useSceneController } from '../../scene-navigation'
+import { useHoverSelect, useSceneController } from '../../scene-navigation'
 import glass from '../assets/glass.mp3'
 import pawn from '../assets/pawn_the-grey-room_golden-palms.mp3'
 import wood from '../assets/wood.mp3'
@@ -19,6 +19,9 @@ type CatGameOverlayProps = {
 export const CatGameOverlay = ({ active }: CatGameOverlayProps) => {
   const { navigateTo } = useSceneController()
   const audioRef = useRef<CatAudioController | null>(null)
+  const backRef = useRef<HTMLButtonElement>(null)
+
+  useHoverSelect(backRef, () => navigateTo('room'), active)
 
   // Created in the effect so a remount or Strict Mode replay disposes the
   // previous controller instead of leaking it.
@@ -65,7 +68,9 @@ export const CatGameOverlay = ({ active }: CatGameOverlayProps) => {
           Play Song
         </button>
         <button onClick={() => audioRef.current?.stopMusic()}>Stop Song</button>
-        <button onClick={() => navigateTo('room')}>Voltar</button>
+        <button ref={backRef} onClick={() => navigateTo('room')}>
+          Voltar
+        </button>
       </div>
     </div>
   )

@@ -1,13 +1,17 @@
 import { AnimatePresence, motion } from 'motion/react'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { useStore } from 'zustand'
 import { cameraStore } from '../camera/camera-store'
 import { useSceneController } from '../scene-controller'
+import { useHoverSelect } from '../use-hover-select'
 
 export const CameraToDefault = () => {
   const focus = useStore(cameraStore, (state) => state.focus)
   const { resetCamera } = useSceneController()
   const isFocused = ['pc', 'board'].includes(focus)
+  const buttonRef = useRef<HTMLButtonElement>(null)
+
+  useHoverSelect(buttonRef, resetCamera, isFocused)
 
   useEffect(() => {
     if (!isFocused) return
@@ -46,11 +50,13 @@ export const CameraToDefault = () => {
           exit={{ left: '-100px' }}
         >
           <button
+            ref={buttonRef}
             style={{
               width: '100%',
               height: '100%',
               border: 'none',
               background: 'none',
+              borderRadius: 'inherit',
               cursor: 'pointer',
             }}
             onClick={resetCamera}
