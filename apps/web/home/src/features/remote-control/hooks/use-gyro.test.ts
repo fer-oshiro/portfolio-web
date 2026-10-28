@@ -24,15 +24,15 @@ describe('mapGyroToScreen', () => {
     expect(at(-40)).toBeCloseTo(1080)
   })
 
-  it('alcança as laterais com 50 graus em qualquer largura', () => {
+  it('alcança as laterais com 45 graus em qualquer largura', () => {
     for (const width of [1920, 3440]) {
       const size = { width, height: 1080 }
 
       expect(
-        mapGyroToScreen({ alpha: 310, beta: 10 }, size).position.x,
+        mapGyroToScreen({ alpha: 315, beta: 10 }, size).position.x,
       ).toBeCloseTo(width)
       expect(
-        mapGyroToScreen({ alpha: 50, beta: 10 }, size).position.x,
+        mapGyroToScreen({ alpha: 45, beta: 10 }, size).position.x,
       ).toBeCloseTo(0)
       expect(
         mapGyroToScreen({ alpha: 0, beta: 10 }, size).position.x,
@@ -51,22 +51,22 @@ describe('mapGyroToScreen', () => {
   it('mantém o deslocamento relativo ao cruzar 360 graus', () => {
     expect(
       mapGyroToScreen({ alpha: 350, beta: 10 }, viewport, 350).position.x,
-    ).toBeCloseTo(1344)
+    ).toBeCloseTo(1386.67)
   })
 
   it('arrasta o centro ao passar da borda para não prender o cursor', () => {
     const pastEdge = mapGyroToScreen({ alpha: 270, beta: 10 }, viewport, 0)
 
     expect(pastEdge.position.x).toBeCloseTo(1920)
-    expect(pastEdge.yawCenter).toBeCloseTo(40)
+    expect(pastEdge.yawCenter).toBeCloseTo(45)
 
     const back = mapGyroToScreen(
-      { alpha: 320, beta: 10 },
+      { alpha: 315, beta: 10 },
       viewport,
       pastEdge.yawCenter,
     )
 
     expect(back.position.x).toBeCloseTo(960)
-    expect(back.yawCenter).toBeCloseTo(40)
+    expect(back.yawCenter).toBeCloseTo(45)
   })
 })
