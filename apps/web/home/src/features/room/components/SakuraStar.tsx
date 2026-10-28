@@ -4,6 +4,7 @@ import { useFrame } from '@react-three/fiber'
 import { useControls } from 'leva'
 import { cameraStore } from '../../scene-navigation/camera/camera-store'
 import type { CameraCoords } from '../../scene-navigation/camera/camera-types'
+import { stepHoverProgress } from '../../scene-navigation'
 import { Billboard } from '@react-three/drei'
 import { useStore } from 'zustand'
 
@@ -69,11 +70,11 @@ function SakuraStar({
       torusRef.current.rotation.y += Math.max(progress.current, 0.1) * 0.2
       torusRef.current.rotation.x += Math.max(progress.current, 0.1) * 0.2
 
-      if (hover === loc && focus !== loc) {
-        progress.current = Math.min(progress.current + delta / 1.2, 1)
-      } else {
-        progress.current = Math.max(progress.current - delta / 1.2, 0)
-      }
+      progress.current = stepHoverProgress(
+        progress.current,
+        hover === loc && focus !== loc,
+        delta,
+      )
 
       torusRef.current.material.color.lerpColors(
         colorA,

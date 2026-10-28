@@ -30,6 +30,12 @@ export type {
   SceneRegistry,
 } from './scene-registry'
 export { useScenePreload } from './use-scene-preload'
+export {
+  HOVER_SELECT_SECONDS,
+  isInsideRect,
+  stepHoverProgress,
+} from './hover-select'
+export type { HoverPoint, HoverRect } from './hover-select'
 export { SceneController, useSceneController } from './scene-controller'
 export { resolveSceneControllerIntent } from './scene-controller-model'
 export type {
