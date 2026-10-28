@@ -202,6 +202,11 @@ export const usePeerSession = ({
 
   useEffect(() => disposePeer, [disposePeer])
 
+  useEffect(() => {
+    window.addEventListener('pagehide', destroyPeer)
+    return () => window.removeEventListener('pagehide', destroyPeer)
+  }, [destroyPeer])
+
   const sendData = useCallback((data: GyroscopeData) => {
     if (!peerRef.current?.connected) return
     peerRef.current.send(JSON.stringify(data))
