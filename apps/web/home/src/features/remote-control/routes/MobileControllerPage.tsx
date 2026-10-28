@@ -45,7 +45,7 @@ const GyroControls = ({
           id="alpha"
           name="alpha"
           min="0"
-          max="60"
+          max="360"
           value={gyro.alpha}
           onChange={(e) => handleFakeInput({ alpha: Number(e.target.value) })}
         />
@@ -58,7 +58,7 @@ const GyroControls = ({
           id="beta"
           name="beta"
           min="-30"
-          max="30"
+          max="60"
           value={gyro.beta}
           onChange={(e) => handleFakeInput({ beta: Number(e.target.value) })}
         />

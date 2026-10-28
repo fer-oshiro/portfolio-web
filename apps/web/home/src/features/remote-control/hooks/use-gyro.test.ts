@@ -1,51 +1,72 @@
 import { describe, expect, it } from 'vitest'
 
-import { mapGyroToScreen } from './use-gyro'
+import { getPointerAngles, mapGyroToScreen } from './use-gyro'
 
 const viewport = { width: 1920, height: 1080 }
 
+const expectPosition = (
+  actual: { x: number; y: number },
+  expected: { x: number; y: number },
+) => {
+  expect(actual.x).toBeCloseTo(expected.x)
+  expect(actual.y).toBeCloseTo(expected.y)
+}
+
 describe('mapGyroToScreen', () => {
-  it('mapeia a posição neutra para o centro da tela', () => {
-    expect(mapGyroToScreen({ alpha: 0, beta: 15 }, viewport)).toEqual({
-      x: 960,
-      y: 540,
-    })
+  it('mapeia a inclinação para cima e para baixo em faixa fixa', () => {
+    const at = (beta: number) =>
+      mapGyroToScreen({ alpha: 0, beta }, viewport).position.y
+
+    expect(at(30)).toBeCloseTo(0)
+    expect(at(10)).toBeCloseTo(540)
+    expect(at(-10)).toBeCloseTo(1080)
+    expect(at(60)).toBeCloseTo(0)
+    expect(at(-40)).toBeCloseTo(1080)
   })
 
-  it('aceita zero como leitura válida do giroscópio', () => {
-    expect(mapGyroToScreen({ alpha: 0, beta: 0 }, viewport)).toEqual({
-      x: 960,
-      y: 945,
-    })
+  it('alcança as laterais com 50 graus em qualquer largura', () => {
+    for (const width of [1920, 3440]) {
+      const size = { width, height: 1080 }
+
+      expect(
+        mapGyroToScreen({ alpha: 310, beta: 10 }, size).position.x,
+      ).toBeCloseTo(width)
+      expect(
+        mapGyroToScreen({ alpha: 50, beta: 10 }, size).position.x,
+      ).toBeCloseTo(0)
+      expect(
+        mapGyroToScreen({ alpha: 0, beta: 10 }, size).position.x,
+      ).toBeCloseTo(width / 2)
+    }
   })
 
-  it('normaliza a volta do alpha e limita a posição à viewport', () => {
-    expect(mapGyroToScreen({ alpha: 340, beta: 15 }, viewport).x).toBe(1440)
-    expect(mapGyroToScreen({ alpha: 100, beta: 15 }, viewport).x).toBe(0)
-    expect(mapGyroToScreen({ alpha: 260, beta: 15 }, viewport).x).toBe(1920)
-  })
-
-  it('aplica a calibração nos dois eixos', () => {
-    expect(
-      mapGyroToScreen({ alpha: 210, beta: 25 }, viewport, {
-        alpha: 210,
-        beta: 25,
-      }),
-    ).toEqual({ x: 960, y: 540 })
+  it('ignora a virada de Euler quando o celular rola mais de 90 graus', () => {
+    expectPosition(
+      mapGyroToScreen({ alpha: 180, beta: 170 }, viewport).position,
+      mapGyroToScreen({ alpha: 0, beta: 10 }, viewport).position,
+    )
+    expect(getPointerAngles({ alpha: 200, beta: 160 }).pitch).toBeCloseTo(20)
   })
 
   it('mantém o deslocamento relativo ao cruzar 360 graus', () => {
     expect(
-      mapGyroToScreen({ alpha: 10, beta: 15 }, viewport, {
-        alpha: 350,
-        beta: 15,
-      }).x,
-    ).toBe(480)
+      mapGyroToScreen({ alpha: 350, beta: 10 }, viewport, 350).position.x,
+    ).toBeCloseTo(1344)
   })
 
-  it('mantém a sensibilidade proporcional ao tamanho da viewport', () => {
-    expect(
-      mapGyroToScreen({ alpha: 20, beta: 5 }, { width: 960, height: 540 }),
-    ).toEqual({ x: 0, y: 540 })
+  it('arrasta o centro ao passar da borda para não prender o cursor', () => {
+    const pastEdge = mapGyroToScreen({ alpha: 270, beta: 10 }, viewport, 0)
+
+    expect(pastEdge.position.x).toBeCloseTo(1920)
+    expect(pastEdge.yawCenter).toBeCloseTo(40)
+
+    const back = mapGyroToScreen(
+      { alpha: 320, beta: 10 },
+      viewport,
+      pastEdge.yawCenter,
+    )
+
+    expect(back.position.x).toBeCloseTo(960)
+    expect(back.yawCenter).toBeCloseTo(40)
   })
 })
