@@ -1,5 +1,6 @@
 export { RoomScene } from './scene/RoomScene'
 export { Board } from './components/Board/Board'
 export { Computer } from './components/Computer/Computer'
+export { ComputerScreen } from './components/Computer/ComputerScreen'
 export { RoomOverlay } from './components/RoomOverlay'
 export { default as SakuraStar } from './components/SakuraStar'

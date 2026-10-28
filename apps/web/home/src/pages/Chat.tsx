@@ -1,10 +1,5 @@
-import '../components/Computer/Computer.css'
-import { AssistantWindow } from '../features/assistant'
+import { ComputerScreen } from '../features/room'
 
 export const Chat = () => {
-  return (
-    <div className="htmlscreen">
-      <AssistantWindow />
-    </div>
-  )
+  return <ComputerScreen />
 }

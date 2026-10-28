@@ -1,14 +1,14 @@
 import { Html } from '@react-three/drei'
 
-import './Computer.css'
 import { useControls } from 'leva'
-import { AssistantWindow } from '../../../assistant'
 import {
   RealtimeContextProvider,
   useRealtimeClient,
 } from '../../../remote-control/realtime'
 import { cameraStore } from '../../../scene-navigation/camera/camera-store'
 import { useStore } from 'zustand'
+
+import { ComputerScreen } from './ComputerScreen'
 
 export const Computer = () => {
   const focus = useStore(cameraStore, (state) => state.focus)
@@ -31,9 +31,7 @@ export const Computer = () => {
     >
       {focus === 'pc' && (
         <RealtimeContextProvider client={realtimeClient}>
-          <div className="htmlscreen">
-            <AssistantWindow />
-          </div>
+          <ComputerScreen />
         </RealtimeContextProvider>
       )}
     </Html>
